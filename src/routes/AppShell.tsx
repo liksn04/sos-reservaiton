@@ -272,6 +272,7 @@ export default function AppShell() {
                 reservations={reservations}
                 selectedDate={selectedDate}
                 currentUserId={profile?.id ?? ''}
+                isAdmin={profile?.is_admin}
                 onEdit={openEdit}
                 onDelete={handleDelete}
               />
@@ -395,7 +396,7 @@ export default function AppShell() {
                           
                           {/* Right: Actions */}
                           <div className="flex flex-col gap-1.5 flex-shrink-0 ml-auto pl-2">
-                            {res.role === 'host' ? (
+                            {(res.role === 'host' || profile?.is_admin) ? (
                               <>
                                 <button onClick={() => openEdit(res)} className="w-8 h-8 rounded-full flex items-center justify-center bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant border border-outline-variant/10">
                                   <span className="material-symbols-outlined text-[18px]">settings</span>

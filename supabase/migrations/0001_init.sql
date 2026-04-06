@@ -142,12 +142,12 @@ create policy "reservations_insert_approved"
 
 create policy "reservations_update_host"
   on public.reservations for update
-  using (host_id = auth.uid())
-  with check (host_id = auth.uid());
+  using (host_id = auth.uid() or public.is_admin_user())
+  with check (host_id = auth.uid() or public.is_admin_user());
 
 create policy "reservations_delete_host"
   on public.reservations for delete
-  using (host_id = auth.uid());
+  using (host_id = auth.uid() or public.is_admin_user());
 
 -- ── reservation_invitees RLS 정책 ────────────────────────────
 create policy "invitees_select_approved"

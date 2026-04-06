@@ -207,6 +207,16 @@ h1, h2, h3, h4 { font-style: normal; letter-spacing: -0.02em; }
 }
 .secondary-btn:active { transform: scale(0.98); opacity: 0.9; }
 
+.error-btn {
+  height: 54px; border-radius: 1rem; 
+  background: rgba(255, 69, 58, 0.1);
+  color: #ff453a; font-weight: 700; border: 1px solid rgba(255, 69, 58, 0.2); cursor: pointer; padding: 0 1.5rem;
+  transition: all 0.2s;
+}
+.error-btn:hover { background: rgba(255, 69, 58, 0.15); border-color: rgba(255, 69, 58, 0.3); }
+.error-btn:active { transform: scale(0.98); opacity: 0.8; }
+.error-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .modal-header {
   display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;
 }

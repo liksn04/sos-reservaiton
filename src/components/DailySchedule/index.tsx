@@ -5,6 +5,7 @@ interface Props {
   reservations: ReservationWithDetails[];
   selectedDate: Date;
   currentUserId: string;
+  isAdmin?: boolean;
   onEdit: (res: ReservationWithDetails) => void;
   onDelete: (id: string, teamName: string) => void;
 }
@@ -13,6 +14,7 @@ export default function DailySchedule({
   reservations,
   selectedDate,
   currentUserId,
+  isAdmin = false,
   onEdit,
   onDelete,
 }: Props) {
@@ -31,6 +33,7 @@ export default function DailySchedule({
       ) : (
         dayRes.map((res) => {
           const isHost = res.host_id === currentUserId;
+          const isEditable = isHost || isAdmin;
           const isInvitee = res.reservation_invitees?.some(
             (inv) => inv.user_id === currentUserId,
           );
@@ -67,6 +70,11 @@ export default function DailySchedule({
                       INVITED
                     </span>
                   )}
+                  {!isHost && isAdmin && (
+                    <span className="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest bg-orange-500/20 text-orange-500">
+                      ADMIN
+                    </span>
+                  )}
                 </div>
                 
                 <h4 className="text-lg font-black italic tracking-tight text-on-surface truncate mb-1">
@@ -87,7 +95,7 @@ export default function DailySchedule({
               </div>
 
               {/* Right: Actions */}
-              {isHost && (
+              {isEditable && (
                 <div className="flex flex-col gap-1.5 ml-auto pl-2">
                   <button 
                     className="w-8 h-8 rounded-full flex items-center justify-center bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant" 
