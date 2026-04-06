@@ -9,8 +9,8 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  async function fetchPending() {
-    setLoading(true);
+  async function fetchPending(showLoader = true) {
+    if (showLoader) setLoading(true);
     const { data } = await supabase
       .from('profiles')
       .select('*')
@@ -20,7 +20,8 @@ export default function Admin() {
     setLoading(false);
   }
 
-  useEffect(() => { fetchPending(); }, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchPending(false); }, []);
 
   async function handleAction(userId: string, action: 'approved' | 'rejected') {
     setActionLoading(userId);

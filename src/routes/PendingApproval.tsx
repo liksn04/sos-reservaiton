@@ -1,7 +1,18 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function PendingApproval() {
-  const { profile, signOut } = useAuth();
+  const { session, profile, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // 로컬 개발 환경 + 익명 로그인인 경우 승인 페이지 무시하고 메인으로 이동
+    const isLocalAnonymous = import.meta.env.DEV && (session?.user?.is_anonymous || session?.user?.app_metadata.provider === 'anonymous');
+    if (isLocalAnonymous) {
+      navigate('/', { replace: true });
+    }
+  }, [session, navigate]);
 
   const isRejected = profile?.status === 'rejected';
 

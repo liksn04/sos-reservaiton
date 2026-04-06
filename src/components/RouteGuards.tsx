@@ -19,6 +19,11 @@ export function RequireApproved() {
   const { session, profile, loading } = useAuth();
   if (loading) return <div className="loading-screen"><div className="spinner" /></div>;
   if (!session) return <Navigate to="/login" replace />;
+
+  // 로컬 개발 환경 + 익명 로그인인 경우 승인 체크 우회
+  const isLocalAnonymous = import.meta.env.DEV && (session?.user?.is_anonymous || session?.user?.app_metadata.provider === 'anonymous');
+  if (isLocalAnonymous) return <Outlet />;
+
   if (!profile || profile.display_name === '')
     return <Navigate to="/profile/setup" replace />;
   if (profile.status !== 'approved')

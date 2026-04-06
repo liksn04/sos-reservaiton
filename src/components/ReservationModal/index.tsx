@@ -170,19 +170,25 @@ export default function ReservationModal({
   const isEditing = !!editing;
 
   return (
-    <div className="modal-overlay active" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal-container glass-card">
+    <div className={`modal-overlay ${isOpen ? 'active' : ''}`} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal-container">
         <div className="modal-header">
-          <h2>{isEditing ? '예약 수정' : '새로운 예약'}</h2>
-          <button className="icon-btn" onClick={onClose}>
-            <i className="fa-solid fa-xmark" />
+          <h2 className="text-2xl font-black italic tracking-tighter">
+            {isEditing ? '예약' : '새로운'} <span className="text-primary">{isEditing ? '수정' : '예약'}</span>
+          </h2>
+          <button 
+            className="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors" 
+            onClick={onClose}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '24px' }}
+          >
+            close
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
           {/* 날짜 */}
           <div className="form-group">
-            <label>이용 날짜</label>
+            <label>예약 날짜</label>
             <input
               type="date"
               value={date}
@@ -205,17 +211,17 @@ export default function ReservationModal({
           {/* 팀명 / 인원 */}
           <div className="form-row">
             <div className="form-group">
-              <label>팀명</label>
+              <label>밴드팀 이름</label>
               <input
                 type="text"
-                placeholder="예: 밴드팀"
+                placeholder="밴드팀 이름"
                 value={teamName}
                 onChange={(e) => setTeamName(e.target.value)}
                 required
               />
             </div>
             <div className="form-group">
-              <label>사용 인원수</label>
+              <label>참여 인원</label>
               <input
                 type="number"
                 min={1}
@@ -229,11 +235,11 @@ export default function ReservationModal({
 
           {/* 목적 */}
           <div className="form-group">
-            <label>사용 목적</label>
+            <label>이용 목적</label>
             <select value={purpose} onChange={(e) => setPurpose(e.target.value as Purpose)}>
               {PURPOSES.map((p) => (
                 <option key={p} value={p}>
-                  {p === '합주' ? '🎸 합주' : p === '강습' ? '📚 강습' : p}
+                  {p === '합주' ? '🎸 ' : p === '강습' ? '📚 ' : '💬 '}{p}
                 </option>
               ))}
             </select>
@@ -249,7 +255,7 @@ export default function ReservationModal({
             />
           )}
 
-          {error && <p className="form-error">{error}</p>}
+          {error && <p className="form-error" style={{ color: 'var(--error)', fontSize: '0.85rem', marginTop: '1rem', fontWeight: '700' }}>{error}</p>}
 
           <div className="form-actions">
             <button type="button" className="secondary-btn" onClick={onClose}>
@@ -257,8 +263,8 @@ export default function ReservationModal({
             </button>
             <button type="submit" className="primary-btn" disabled={submitting}>
               {submitting
-                ? isEditing ? '수정 중...' : '예약 중...'
-                : isEditing ? '수정 완료' : '예약 완료'}
+                ? isEditing ? '저장 중...' : '예약 진행 중...'
+                : isEditing ? '변경사항 저장' : '예약 확정하기'}
             </button>
           </div>
         </form>

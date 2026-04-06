@@ -38,53 +38,58 @@ export default function InviteePicker({ members, selected, currentUserId, onChan
   }
 
   return (
-    <div className="invitee-picker">
+    <div className="form-group">
       <label>합주 참여 부원 초대</label>
       <input
         type="text"
-        className="invitee-search"
         placeholder="닉네임 또는 파트로 검색"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
-      <div className="invitee-list">
+      <div className="mt-2 max-h-48 overflow-y-auto bg-surface-container-highest border border-outline-variant/20 rounded-xl p-2 flex flex-col gap-1">
         {filtered.length === 0 ? (
-          <p className="text-muted" style={{ padding: '0.5rem', fontSize: '0.85rem' }}>
+          <p className="text-on-surface-variant text-sm p-2 text-center">
             검색 결과가 없습니다.
           </p>
         ) : (
           filtered.map((member) => {
             const checked = selected.includes(member.id);
             return (
-              <label key={member.id} className={`invitee-item${checked ? ' checked' : ''}`}>
+              <label 
+                key={member.id} 
+                className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${checked ? 'bg-primary/20 border border-primary/30' : 'hover:bg-white/5 border border-transparent'}`}
+              >
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => toggle(member.id)}
+                  className="hidden"
                 />
-                <div className="invitee-avatar">
+                <div className="w-8 h-8 rounded-full overflow-hidden border border-outline-variant flex-shrink-0 bg-surface-container-low flex items-center justify-center">
                   {member.avatar_url ? (
-                    <img src={member.avatar_url} alt={member.display_name} />
+                    <img src={member.avatar_url} alt={member.display_name} className="w-full h-full object-cover" />
                   ) : (
-                    <i className="fa-solid fa-user" />
+                    <span className="material-symbols-outlined text-[1rem] text-on-surface-variant">person</span>
                   )}
                 </div>
-                <div className="invitee-info">
-                  <span className="invitee-name">{member.display_name}</span>
+                <div className="flex-1 flex flex-col">
+                  <span className="text-sm font-bold text-on-surface leading-tight text-white">{member.display_name}</span>
                   {member.part && (
-                    <span className="invitee-part text-muted">
+                    <span className="text-[10px] text-on-surface-variant uppercase tracking-wider">
                       {PART_LABELS[member.part]}
                     </span>
                   )}
                 </div>
-                <i className={`fa-solid fa-circle-check invitee-check${checked ? ' visible' : ''}`} />
+                {checked && (
+                  <span className="material-symbols-outlined text-primary text-xl">check_circle</span>
+                )}
               </label>
             );
           })
         )}
       </div>
       {selected.length > 0 && (
-        <p className="invitee-count">
+        <p className="text-xs text-primary font-bold mt-1 text-right">
           {selected.length}명 선택됨
         </p>
       )}

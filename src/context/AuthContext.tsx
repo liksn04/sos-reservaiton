@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
@@ -25,7 +26,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .select('*')
       .eq('id', userId)
       .single();
-    setProfile(data ?? null);
+
+    if (data) {
+      setProfile(data);
+    } else if (import.meta.env.DEV && (session?.user?.is_anonymous || session?.user?.app_metadata.provider === 'anonymous')) {
+      // 로컬 개발 환경에서 익명 로그인인 경우, 프로필이 없으면 Mock 데이터 생성
+      setProfile({
+        id: userId,
+        kakao_id: null,
+        display_name: 'Guest (Local)',
+        avatar_url: null,
+        part: 'guitar',
+        bio: 'Anonymous developer account',
+        status: 'approved',
+        is_admin: false,
+        created_at: new Date().toISOString(),
+      });
+    } else {
+      setProfile(null);
+    }
   }
 
   async function refreshProfile() {

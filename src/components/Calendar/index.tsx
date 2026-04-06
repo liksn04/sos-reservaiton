@@ -9,45 +9,39 @@ interface Props {
   onMonthChange: (delta: 1 | -1) => void;
 }
 
-const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
+const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 export default function Calendar({
   reservations,
   selectedDate,
   currentMonth,
   onSelectDate,
-  onMonthChange,
 }: Props) {
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const monthTitle = `${year}년 ${month + 1}월`;
-
   return (
-    <div className="glass-card calendar-section">
-      {/* 월 네비게이션 */}
-      <div className="calendar-nav">
-        <button className="icon-btn" onClick={() => onMonthChange(-1)}>
-          <i className="fa-solid fa-chevron-left" />
-        </button>
-        <h2 className="month-title">{monthTitle}</h2>
-        <button className="icon-btn" onClick={() => onMonthChange(1)}>
-          <i className="fa-solid fa-chevron-right" />
-        </button>
-      </div>
-
+    <div className="calendar-container animate-fade-in">
       {/* 요일 헤더 */}
-      <div className="weekdays">
-        {WEEKDAYS.map((d) => <div key={d}>{d}</div>)}
+      <div className="calendar-weekdays-grid">
+        {WEEKDAYS.map((d, idx) => (
+          <div 
+            key={d} 
+            className="weekday-label"
+            style={{ color: idx === 0 ? 'var(--error)' : idx === 6 ? 'var(--primary)' : 'var(--text-muted)' }}
+          >
+            {d}
+          </div>
+        ))}
       </div>
 
       {/* 날짜 그리드 */}
-      <div className="calendar-grid">
+      <div className="calendar-days-grid">
         {/* 첫째 날 이전 빈 칸 */}
         {Array.from({ length: firstDay }).map((_, i) => (
-          <div key={`empty-${i}`} className="day-cell empty" />
+          <div key={`empty-${i}`} className="day-cell-wrapper empty" />
         ))}
 
         {/* 날짜 셀 */}
@@ -57,28 +51,29 @@ export default function Calendar({
           const isSelected = formatDate(selectedDate) === dateStr;
           const dayReservations = reservations.filter((r) => r.date === dateStr);
           const dow = cellDate.getDay();
+          const isToday = formatDate(new Date()) === dateStr;
 
           return (
             <div
               key={day}
-              className={`day-cell${isSelected ? ' active' : ''}`}
+              className={`day-cell-wrapper ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}`}
               onClick={() => onSelectDate(cellDate)}
             >
-              <div
-                className="day-number"
-                style={
-                  dow === 0
-                    ? { color: '#ef4444' }
-                    : dow === 6
-                    ? { color: '#3b82f6' }
-                    : undefined
-                }
-              >
-                {day}
+              <div className="day-cell-content">
+                <span 
+                  className="day-number"
+                  style={{ 
+                    color: isSelected 
+                      ? 'var(--on-primary-fixed)' 
+                      : (dow === 0 ? 'var(--error)' : dow === 6 ? 'var(--primary)' : 'white')
+                  }}
+                >
+                  {day}
+                </span>
+                {dayReservations.length > 0 && (
+                  <div className="res-dot-indicator"></div>
+                )}
               </div>
-              {dayReservations.length > 0 && (
-                <div className="res-indicator">{dayReservations.length}건</div>
-              )}
             </div>
           );
         })}

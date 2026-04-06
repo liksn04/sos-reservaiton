@@ -17,19 +17,37 @@ create table public.profiles (
   created_at    timestamptz default now()
 );
 
--- 카카오 로그인 직후 자동으로 profiles 행 생성
+-- 카카오 로그인 및 익명/이메일 로그인 직후 자동으로 profiles 행 생성
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
 security definer set search_path = public
 as $$
+declare
+  v_display_name text;
 begin
-  insert into public.profiles (id, kakao_id)
+  -- 카카오 닉네임 -> name -> 이메일 앞부분 -> 'Guest_ID' 순으로 이름 결정
+  v_display_name := coalesce(
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'name',
+    split_part(new.email, '@', 1),
+    'Guest_' || substr(new.id::text, 1, 8)
+  );
+
+  insert into public.profiles (id, kakao_id, display_name, status)
   values (
     new.id,
-    new.raw_user_meta_data->>'provider_id'
+    new.raw_user_meta_data->>'provider_id',
+    v_display_name,
+    'approved' -- 테스트/개발 편의를 위해 일단 가입 즉시 승인 처리
   )
-  on conflict (id) do nothing;
+  on conflict (id) do update
+  set display_name = case 
+        when profiles.display_name = '' or profiles.display_name is null then excluded.display_name 
+        else profiles.display_name 
+      end,
+      status = 'approved';
+      
   return new;
 end;
 $$;

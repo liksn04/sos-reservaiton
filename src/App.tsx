@@ -6,9 +6,7 @@ import { RequireAuth, RequireApproved, RequireAdmin } from './components/RouteGu
 import Login from './routes/Login';
 import PendingApproval from './routes/PendingApproval';
 import ProfileSetup from './routes/ProfileSetup';
-import Home from './routes/Home';
-import MyReservations from './routes/MyReservations';
-import Profile from './routes/Profile';
+import AppShell from './routes/AppShell';
 import Admin from './routes/Admin';
 
 const queryClient = new QueryClient({
@@ -36,9 +34,7 @@ export default function App() {
 
               {/* 승인 필요 */}
               <Route element={<RequireApproved />}>
-                <Route path="/" element={<Home />} />
-                <Route path="/my-reservations" element={<MyReservations />} />
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/" element={<AppShell />} />
 
                 {/* 관리자 전용 */}
                 <Route element={<RequireAdmin />}>
