@@ -89,7 +89,7 @@ language sql security definer stable
 as $$
   select exists (
     select 1 from public.profiles
-    where id = auth.uid() and status = 'approved'
+    where id = (select auth.uid()) and status = 'approved'
   );
 $$;
 
@@ -99,69 +99,57 @@ language sql security definer stable
 as $$
   select exists (
     select 1 from public.profiles
-    where id = auth.uid() and is_admin = true and status = 'approved'
+    where id = (select auth.uid()) and is_admin = true and status = 'approved'
   );
 $$;
 
 -- ── profiles RLS 정책 ─────────────────────────────────────────
--- 자기 자신은 항상 조회 가능
-create policy "profiles_select_self"
+-- 모든 프로필 조회 정책 통합 (본인, 승인된 타인, 관리자)
+create policy "profiles_select_all"
   on public.profiles for select
-  using (id = auth.uid());
+  using (
+    (id = (select auth.uid())) or
+    ((select public.is_approved()) and status = 'approved') or
+    (select public.is_admin_user())
+  );
 
--- approved 유저는 다른 approved 유저 프로필 조회 가능 (초대 목록용)
-create policy "profiles_select_approved_others"
-  on public.profiles for select
-  using (public.is_approved() and status = 'approved');
-
--- 회원가입 시 자동 insert (트리거가 security definer로 처리하므로 정책 불필요)
--- 자기 프로필만 수정 가능 (display_name, avatar_url, part, bio)
-create policy "profiles_update_self"
+-- 프로필 수정 정책 통합 (본인 또는 관리자)
+create policy "profiles_update_owner_or_admin"
   on public.profiles for update
-  using (id = auth.uid())
-  with check (id = auth.uid());
-
--- 관리자는 status/is_admin 포함 모든 프로필 수정 가능
-create policy "profiles_update_admin"
-  on public.profiles for update
-  using (public.is_admin_user());
-
--- 관리자는 pending 포함 모든 프로필 조회 가능
-create policy "profiles_select_admin"
-  on public.profiles for select
-  using (public.is_admin_user());
+  using ((id = (select auth.uid())) or (select public.is_admin_user()))
+  with check ((id = (select auth.uid())) or (select public.is_admin_user()));
 
 -- ── reservations RLS 정책 ────────────────────────────────────
 create policy "reservations_select_approved"
   on public.reservations for select
-  using (public.is_approved());
+  using ((select public.is_approved()));
 
 create policy "reservations_insert_approved"
   on public.reservations for insert
-  with check (public.is_approved() and host_id = auth.uid());
+  with check ((select public.is_approved()) and host_id = (select auth.uid()));
 
 create policy "reservations_update_host"
   on public.reservations for update
-  using (host_id = auth.uid() or public.is_admin_user())
-  with check (host_id = auth.uid() or public.is_admin_user());
+  using (host_id = (select auth.uid()) or (select public.is_admin_user()))
+  with check (host_id = (select auth.uid()) or (select public.is_admin_user()));
 
 create policy "reservations_delete_host"
   on public.reservations for delete
-  using (host_id = auth.uid() or public.is_admin_user());
+  using (host_id = (select auth.uid()) or (select public.is_admin_user()));
 
 -- ── reservation_invitees RLS 정책 ────────────────────────────
 create policy "invitees_select_approved"
   on public.reservation_invitees for select
-  using (public.is_approved());
+  using ((select public.is_approved()));
 
 -- 예약의 호스트만 초대 추가 가능
 create policy "invitees_insert_host"
   on public.reservation_invitees for insert
   with check (
-    public.is_approved() and
+    (select public.is_approved()) and
     exists (
       select 1 from public.reservations r
-      where r.id = reservation_id and r.host_id = auth.uid()
+      where r.id = reservation_id and r.host_id = (select auth.uid())
     )
   );
 
@@ -169,10 +157,10 @@ create policy "invitees_insert_host"
 create policy "invitees_delete_host_or_self"
   on public.reservation_invitees for delete
   using (
-    user_id = auth.uid() or
+    user_id = (select auth.uid()) or
     exists (
       select 1 from public.reservations r
-      where r.id = reservation_id and r.host_id = auth.uid()
+      where r.id = reservation_id and r.host_id = (select auth.uid())
     )
   );
 

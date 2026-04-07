@@ -1,62 +1,59 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../context/AuthContext';
-import type { Profile } from '../types';
+import PendingTab from '../components/admin/PendingTab';
+import MembersTab from '../components/admin/MembersTab';
+import BannedTab  from '../components/admin/BannedTab';
+import LogsTab    from '../components/admin/LogsTab';
+
+type AdminTab = 'pending' | 'members' | 'banned' | 'logs';
+
+interface TabCount {
+  pending: number;
+  banned: number;
+}
 
 export default function Admin() {
   const navigate = useNavigate();
-  const { profile: me } = useAuth();
-  const [pendingUsers, setPendingUsers] = useState<Profile[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<AdminTab>('pending');
 
-  async function fetchPending(showLoader = true) {
-    if (showLoader) setLoading(true);
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('status', 'pending')
-      .order('created_at', { ascending: true });
-    setPendingUsers((data as Profile[]) ?? []);
-    setLoading(false);
-  }
+  // 배지 카운트용 쿼리
+  const { data: counts } = useQuery<TabCount>({
+    queryKey: ['admin', 'counts'],
+    queryFn: async () => {
+      const [p, b] = await Promise.all([
+        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'banned'),
+      ]);
+      return { pending: p.count ?? 0, banned: b.count ?? 0 };
+    },
+    refetchInterval: 30_000,
+  });
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { 
-    fetchPending(false); 
-  }, []);
-
-  async function handleAction(userId: string, action: 'approved' | 'rejected') {
-    setActionLoading(userId);
-    try {
-      await supabase
-        .from('profiles')
-        .update({ status: action })
-        .eq('id', userId);
-      await fetchPending(false);
-    } catch (err) {
-      console.error('Error updating user status:', err);
-      alert('상태 업데이트 중 오류가 발생했습니다.');
-    } finally {
-      setActionLoading(null);
-    }
-  }
+  const TABS: { key: AdminTab; icon: string; label: string; badge?: number }[] = [
+    { key: 'pending', icon: 'how_to_reg',  label: '대기중',  badge: counts?.pending },
+    { key: 'members', icon: 'groups',      label: '전체 회원' },
+    { key: 'banned',  icon: 'block',       label: '차단됨',  badge: counts?.banned },
+    { key: 'logs',    icon: 'history',     label: '관리 로그' },
+  ];
 
   return (
     <div className="app-shell">
-      {/* Top App Bar with Back Button */}
-      <header className="top-app-bar" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      {/* Top App Bar */}
+      <header className="top-app-bar" style={{ borderBottom: '1px solid var(--card-border)' }}>
         <div className="logo-area">
-          <button 
-            onClick={() => navigate(-1)} 
-            className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-bright transition-colors text-on-surface"
+          <button
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-high transition-colors text-on-surface"
           >
             <span className="material-symbols-outlined text-[24px]">arrow_back</span>
           </button>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-black tracking-widest uppercase">Admin Panel</span>
+          <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-black tracking-widest uppercase">
+            Admin Panel
+          </span>
         </div>
       </header>
 
@@ -66,78 +63,46 @@ export default function Admin() {
           <h1 className="dashboard-title">
             <span className="text-gradient-white-purple">빛소리 관리자</span>
           </h1>
-          <p className="dashboard-subtitle">
-            새로운 회원들의 가입 요청을 검토하고 승인할 수 있습니다.
-          </p>
-        </div>
 
-        <div className="flex flex-col gap-4 mt-4">
-          <h3 className="text-sm font-bold text-on-surface-variant flex items-center gap-2 mb-2">
-            <span className="material-symbols-outlined text-[18px]">how_to_reg</span>
-            승인 대기 목록 ({pendingUsers.length})
-          </h3>
+          {/* ── 탭 네비게이션 ── */}
+          <div className="flex gap-1 mb-6 bg-surface-container rounded-2xl p-1.5 overflow-x-auto">
+            {TABS.map(({ key, icon, label, badge }) => {
+              const isActive = activeTab === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setActiveTab(key)}
+                  className={`relative flex-1 min-w-fit flex flex-col items-center gap-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all ${
+                    isActive
+                      ? 'bg-surface-container-highest text-on-surface shadow-sm'
+                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
+                  }`}
+                >
+                  <span
+                    className="material-symbols-outlined text-[20px]"
+                    style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
+                  >
+                    {icon}
+                  </span>
+                  <span>{label}</span>
+                  {/* 배지 */}
+                  {badge != null && badge > 0 && (
+                    <span className="absolute top-1 right-1 w-4 h-4 bg-primary text-on-primary text-[9px] font-black rounded-full flex items-center justify-center">
+                      {badge > 9 ? '9+' : badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-          {loading ? (
-            <div className="empty-card flex-col gap-4">
-              <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-              <p>목록을 불러오는 중입니다...</p>
-            </div>
-          ) : pendingUsers.length === 0 ? (
-            <div className="empty-card flex-col gap-4">
-              <span className="material-symbols-outlined text-4xl opacity-30">check_circle</span>
-              <p>현재 승인 대기 중인 사용자가 없습니다.</p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {pendingUsers.map((user) => (
-                <div key={user.id} className="glass-card rounded-[2rem] p-5 flex items-center gap-4 animate-fade-in-up">
-                  {/* User Avatar */}
-                  <div className="w-14 h-14 bg-surface-bright rounded-[1.25rem] overflow-hidden flex-shrink-0 border border-outline-variant/30 relative">
-                    {user.avatar_url ? (
-                      <img src={user.avatar_url} alt={user.display_name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-on-surface-variant opacity-40">
-                        <span className="material-symbols-outlined text-[28px]">person</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-lg font-bold text-on-surface truncate">
-                      {user.display_name || '(닉네임 미설정)'}
-                    </h4>
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
-                      <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">
-                        {user.part ?? '파트 미설정'}
-                      </span>
-                      <span className="text-xs text-on-surface-variant line-clamp-1">
-                        {user.bio || '한줄소개가 없습니다.'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2">
-                    <button
-                      className="error-btn px-4 h-11 text-sm flex items-center justify-center gap-2"
-                      disabled={!!actionLoading || user.id === me?.id}
-                      onClick={() => handleAction(user.id, 'rejected')}
-                    >
-                      {actionLoading === user.id ? <div className="w-4 h-4 border-2 border-error/20 border-t-error rounded-full animate-spin" /> : '거절'}
-                    </button>
-                    <button
-                      className="primary-btn px-6 h-11 text-sm flex items-center justify-center gap-2"
-                      disabled={!!actionLoading || user.id === me?.id}
-                      onClick={() => handleAction(user.id, 'approved')}
-                    >
-                      {actionLoading === user.id ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : '승인'}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          {/* ── 탭 콘텐츠 ── */}
+          <div key={activeTab} className="animate-fade-in-up">
+            {activeTab === 'pending'  && <PendingTab />}
+            {activeTab === 'members'  && <MembersTab />}
+            {activeTab === 'banned'   && <BannedTab />}
+            {activeTab === 'logs'     && <LogsTab />}
+          </div>
         </div>
       </main>
     </div>

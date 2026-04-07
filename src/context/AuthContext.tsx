@@ -20,32 +20,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function fetchProfile(userId: string) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-    if (data) {
-      setProfile(data);
-    } else if (import.meta.env.DEV && (session?.user?.is_anonymous || session?.user?.app_metadata.provider === 'anonymous')) {
-      // 로컬 개발 환경에서 익명 로그인인 경우, 프로필이 없으면 Mock 데이터 생성
-      setProfile({
-        id: userId,
-        kakao_id: null,
-        display_name: 'Guest (Local)',
-        avatar_url: null,
-        part: 'guitar',
-        bio: 'Anonymous developer account',
-        status: 'approved',
-        is_admin: false,
-        created_at: new Date().toISOString(),
-      });
-    } else {
-      setProfile(null);
+      if (profileError) {
+        if (profileError.code === 'PGRST116' && import.meta.env.DEV) {
+          setProfile({
+            id: userId,
+            kakao_id: null,
+            display_name: `Guest_${userId.slice(0, 8)}`,
+            avatar_url: null,
+            part: 'other',
+            bio: 'Anonymous developer account',
+            status: 'approved',
+            is_admin: false,
+            banned_at: null,
+            banned_reason: null,
+            banned_by: null,
+            created_at: new Date().toISOString(),
+          });
+        }
+        return;
+      }
+
+      if (data) {
+        setProfile(data as Profile);
+      }
+    } catch (err) {
+      console.error('Critical Profile Fetch Error:', err);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   async function refreshProfile() {
     if (session?.user) await fetchProfile(session.user.id);

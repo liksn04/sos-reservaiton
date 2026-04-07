@@ -23,7 +23,10 @@ export function useReservations() {
           purpose,
           created_at,
           host:profiles!host_id(id, display_name, avatar_url),
-          reservation_invitees(user_id)
+          reservation_invitees(
+            user_id,
+            profile:profiles(id, display_name, avatar_url)
+          )
         `)
         .order('date', { ascending: true })
         .order('start_time', { ascending: true });
@@ -35,21 +38,32 @@ export function useReservations() {
 
   // Supabase Realtime — reservations 또는 invitees 변경 시 쿼리 무효화
   useEffect(() => {
-    const channel = supabase
-      .channel('reservations-realtime')
+    // 채널 이름을 유니크하게 생성하여 중복 방지 (HMR 또는 Strict Mode 대응)
+    const channelId = `reservations-changes-${Math.random().toString(36).substring(7)}`;
+    const channel = supabase.channel(channelId);
+
+    channel
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'reservations' },
-        () => queryClient.invalidateQueries({ queryKey: ['reservations'] }),
+        () => {
+          console.log('🔄 Realtime: Reservations changed, invalidating...');
+          queryClient.invalidateQueries({ queryKey: ['reservations'] });
+        }
       )
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'reservation_invitees' },
-        () => queryClient.invalidateQueries({ queryKey: ['reservations'] }),
+        () => {
+          console.log('🔄 Realtime: Invitees changed, invalidating...');
+          queryClient.invalidateQueries({ queryKey: ['reservations'] });
+        }
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [queryClient]);
 
   return query;

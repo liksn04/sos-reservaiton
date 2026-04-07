@@ -26,6 +26,8 @@ export function RequireApproved() {
 
   if (!profile || profile.display_name === '')
     return <Navigate to="/profile/setup" replace />;
+  if (profile.status === 'banned')
+    return <Navigate to="/banned" replace />;
   if (profile.status !== 'approved')
     return <Navigate to="/pending-approval" replace />;
   return <Outlet />;

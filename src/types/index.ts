@@ -1,4 +1,4 @@
-export type ProfileStatus = 'pending' | 'approved' | 'rejected';
+export type ProfileStatus = 'pending' | 'approved' | 'rejected' | 'banned';
 export type Part = 'vocal' | 'guitar' | 'drum' | 'bass' | 'keyboard' | 'other';
 export type Purpose = '합주' | '강습' | '정기회의';
 
@@ -11,6 +11,20 @@ export interface Profile {
   bio: string | null;
   status: ProfileStatus;
   is_admin: boolean;
+  banned_at: string | null;
+  banned_reason: string | null;
+  banned_by: string | null;
+  created_at: string;
+}
+
+export interface AdminActionLog {
+  id: string;
+  admin_id: string | null;
+  admin_name: string | null;
+  target_id: string | null;
+  target_name: string | null;
+  action: 'approve' | 'reject' | 'ban' | 'unban' | 'promote' | 'demote' | 'delete';
+  reason: string | null;
   created_at: string;
 }
 
@@ -29,7 +43,10 @@ export interface Reservation {
 
 export interface ReservationWithDetails extends Reservation {
   host: Pick<Profile, 'id' | 'display_name' | 'avatar_url'> | null;
-  reservation_invitees: { user_id: string }[];
+  reservation_invitees: {
+    user_id: string;
+    profile: Pick<Profile, 'id' | 'display_name' | 'avatar_url'> | null;
+  }[];
 }
 
 export interface MyReservation extends ReservationWithDetails {
