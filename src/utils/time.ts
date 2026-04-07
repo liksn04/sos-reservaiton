@@ -144,3 +144,32 @@ export function hasOverlap(
   const eB = getReservationTimestamp(dateB, endB, isNextDayB);
   return sA < eB && eA > sB;
 }
+
+/**
+ * 예약의 종료 시간을 기준으로 이미 한 시점인지 확인합니다.
+ * @param date YYYY-MM-DD
+ * @param endTime HH:mm
+ * @param isNextDay 익일 종료 여부
+ */
+export function isPastReservation(
+  date: string,
+  endTime: string,
+  isNextDay: boolean,
+): boolean {
+  const endTs = getReservationTimestamp(date, endTime, isNextDay);
+  return Date.now() > endTs;
+}
+
+/**
+ * 예약 날짜가 현재로부터 지정된 기간(기본 14일) 이상 경과했는지 확인합니다.
+ * @param date YYYY-MM-DD
+ * @param days 경과 일수 (기본 14일)
+ */
+export function isOldReservation(date: string, days = 14): boolean {
+  if (!date) return false;
+  // 해당 날짜의 시작 시점(00:00)을 기준으로 계산합니다.
+  const targetTs = getReservationTimestamp(date, '00:00', false);
+  const nowTs = Date.now();
+  const diff = nowTs - targetTs;
+  return diff > days * 24 * 60 * 60 * 1000;
+}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
+import { queryKeys } from '../lib/queryKeys';
 import PendingTab from '../components/admin/PendingTab';
 import MembersTab from '../components/admin/MembersTab';
 import BannedTab  from '../components/admin/BannedTab';
@@ -20,7 +21,7 @@ export default function Admin() {
 
   // 배지 카운트용 쿼리
   const { data: counts } = useQuery<TabCount>({
-    queryKey: ['admin', 'counts'],
+    queryKey: queryKeys.admin.counts,
     queryFn: async () => {
       const [p, b] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
@@ -41,7 +42,7 @@ export default function Admin() {
   return (
     <div className="app-shell">
       {/* Top App Bar */}
-      <header className="top-app-bar" style={{ borderBottom: '1px solid var(--card-border)' }}>
+      <header className="top-app-bar border-b border-card-border">
         <div className="logo-area">
           <button
             onClick={() => navigate(-1)}
@@ -59,35 +60,68 @@ export default function Admin() {
 
       <main className="shell-main">
         <div className="animate-slide-up">
-          <div className="club-tag">SOUND OF SHINE</div>
-          <h1 className="dashboard-title">
+          <div className="club-tag mb-2">SOUND OF SHINE</div>
+          <h1 className="dashboard-title mb-8">
             <span className="text-gradient-white-purple">빛소리 관리자</span>
           </h1>
 
+          {/* ── 관리 도구 바로가기 ── */}
+          <div className="grid grid-cols-2 gap-4 mb-10">
+            {/* 예산 관리 카드 */}
+            <div 
+              onClick={() => navigate('/budget')}
+              className="bg-surface-container-low border border-card-border p-6 rounded-[2.5rem] relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition-all"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined text-primary text-2xl font-black">payments</span>
+              </div>
+              <div className="space-y-1 text-left">
+                <p className="text-sm font-black text-on-surface leading-tight">예산 관리</p>
+                <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-40">FINANCE HUB</p>
+              </div>
+            </div>
+
+            {/* 행사 관리 카드 */}
+            <div 
+              onClick={() => navigate('/events')}
+              className="bg-surface-container-low border border-card-border p-6 rounded-[2.5rem] relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition-all"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-secondary/10 border border-secondary/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined text-secondary text-2xl font-black">event_available</span>
+              </div>
+              <div className="space-y-1 text-left">
+                <p className="text-sm font-black text-on-surface leading-tight">행사 관리</p>
+                <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-40">EVENT HUB</p>
+              </div>
+            </div>
+          </div>
+
           {/* ── 탭 네비게이션 ── */}
-          <div className="flex gap-1 mb-6 bg-surface-container rounded-2xl p-1.5 overflow-x-auto">
+          <div className="flex gap-2 mb-8 bg-surface-container-low p-2 rounded-2xl border border-card-border overflow-x-auto no-scrollbar">
             {TABS.map(({ key, icon, label, badge }) => {
               const isActive = activeTab === key;
               return (
                 <button
                   key={key}
                   onClick={() => setActiveTab(key)}
-                  className={`relative flex-1 min-w-fit flex flex-col items-center gap-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all ${
+                  className={`relative flex items-center gap-2 py-2.5 px-6 rounded-2xl text-[11px] font-bold transition-all ${
                     isActive
-                      ? 'bg-surface-container-highest text-on-surface shadow-sm'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
+                      ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                      : 'text-on-surface-variant opacity-60 hover:opacity-100 hover:bg-white/5'
                   }`}
                 >
                   <span
-                    className="material-symbols-outlined text-[20px]"
+                    className="material-symbols-outlined text-[18px]"
                     style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
                   >
                     {icon}
                   </span>
-                  <span>{label}</span>
+                  <span className="whitespace-nowrap">{label}</span>
                   {/* 배지 */}
                   {badge != null && badge > 0 && (
-                    <span className="absolute top-1 right-1 w-4 h-4 bg-primary text-on-primary text-[9px] font-black rounded-full flex items-center justify-center">
+                    <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${
+                      isActive ? 'bg-white text-primary' : 'bg-primary text-white'
+                    }`}>
                       {badge > 9 ? '9+' : badge}
                     </span>
                   )}

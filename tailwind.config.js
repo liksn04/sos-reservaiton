@@ -67,6 +67,21 @@ export default {
       fontFamily: {
         sans: ['Pretendard', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
+      // ── 아래는 rgb() 패턴을 쓸 수 없는 CSS 변수들 (rgba 전체값 / gradient / shadow) ──
+      // colors 확장으로는 불가능하므로 각 유틸리티에 직접 매핑합니다.
+      borderColor: {
+        'card-border':    'var(--card-border)',    // border-card-border, divide-card-border
+        'outline-border': 'var(--outline-border)', // border-outline-border
+      },
+      textColor: {
+        'muted': 'var(--text-muted)', // text-muted
+      },
+      backgroundImage: {
+        'primary-btn': 'var(--primary-btn-gradient)', // bg-primary-btn
+      },
+      boxShadow: {
+        'primary-glow': 'var(--primary-glow-shadow)', // shadow-primary-glow
+      },
     },
   },
   corePlugins: {

@@ -35,10 +35,9 @@ export default function BanDialog({ isOpen, userName, onConfirm, onClose, isPend
             회원 <span className="text-error">차단</span>
           </h2>
           <button
-            className="material-symbols-outlined text-on-surface-variant"
+            className="material-symbols-outlined text-2xl text-on-surface-variant"
             onClick={onClose}
             disabled={isPending}
-            style={{ fontSize: '24px' }}
           >
             close
           </button>

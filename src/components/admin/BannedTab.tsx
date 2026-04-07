@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
+import { queryKeys } from '../../lib/queryKeys';
 import { useUnbanUser } from '../../hooks/mutations/useUnbanUser';
 import AdminUserCard from './AdminUserCard';
 import type { Profile } from '../../types';
@@ -8,7 +9,7 @@ export default function BannedTab() {
   const unbanUser = useUnbanUser();
 
   const { data: users = [], isLoading } = useQuery<Profile[]>({
-    queryKey: ['admin', 'banned'],
+    queryKey: queryKeys.admin.banned,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles').select('*').eq('status', 'banned')
@@ -27,18 +28,18 @@ export default function BannedTab() {
 
   if (isLoading) {
     return (
-      <div className="empty-card flex-col gap-4">
+      <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-4">
         <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-        <p>목록을 불러오는 중...</p>
+        <p className="text-sm font-bold opacity-60">목록을 불러오는 중...</p>
       </div>
     );
   }
 
   if (users.length === 0) {
     return (
-      <div className="empty-card flex-col gap-4">
-        <span className="material-symbols-outlined text-4xl opacity-30">check_circle</span>
-        <p>차단된 회원이 없습니다.</p>
+      <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-4 opacity-60">
+        <span className="material-symbols-outlined text-5xl opacity-20">check_circle</span>
+        <p className="text-sm font-bold">차단된 회원이 없습니다.</p>
       </div>
     );
   }
@@ -50,7 +51,7 @@ export default function BannedTab() {
           key={user.id}
           user={user}
           badge={
-            <span className="text-[9px] bg-error/20 text-error px-1.5 py-0.5 rounded font-black tracking-widest uppercase">
+            <span className="text-[9px] bg-error/10 text-error px-1.5 py-0.5 rounded font-black tracking-widest uppercase">
               BANNED
             </span>
           }
@@ -65,11 +66,11 @@ export default function BannedTab() {
             <button
               onClick={() => handleUnban(user)}
               disabled={unbanUser.isPending}
-              className="px-4 h-10 rounded-xl text-sm font-bold flex items-center gap-1.5 bg-surface-container text-on-surface-variant border border-outline-variant/20 hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-colors"
+              className="bg-surface-container-highest border border-card-border text-on-surface text-[13px] font-black px-5 h-11 rounded-2xl hover:bg-primary/10 hover:text-primary transition-all flex items-center justify-center gap-2"
             >
               {unbanUser.isPending
                 ? <div className="w-4 h-4 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-                : <><span className="material-symbols-outlined text-[16px]">lock_open</span>차단 해제</>}
+                : <><span className="material-symbols-outlined text-[18px]">lock_open</span>차단 해제</>}
             </button>
           }
         />

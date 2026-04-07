@@ -1,0 +1,387 @@
+import { useMemo, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useEvents } from '../hooks/useEvents';
+import { useEventCategories } from '../hooks/useEventCategories';
+import { useDeleteEvent } from '../hooks/mutations/useEventMutations';
+import { useJoinEvent, useLeaveEvent } from '../hooks/mutations/useEventParticipantMutations';
+import { useEventParticipants } from '../hooks/useEventParticipants';
+import EventModal from '../components/EventModal';
+import EventParticipantsModal from '../components/EventParticipantsModal';
+import EventTimeline from '../components/EventTimeline';
+import type { ClubEventWithDetails } from '../types';
+
+
+type Tab = 'upcoming' | 'past' | 'timeline';
+
+function formatKDate(dateStr: string) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+}
+
+function diffDays(target: string, today: string) {
+  const a = new Date(target + 'T00:00:00').getTime();
+  const b = new Date(today + 'T00:00:00').getTime();
+  return Math.round((a - b) / (1000 * 3600 * 24));
+}
+
+export default function EventsRoute() {
+  const { profile } = useAuth();
+  const { data: events = [], isLoading } = useEvents();
+  const { data: categories = [] } = useEventCategories();
+  const deleteEvent = useDeleteEvent();
+
+  const [tab, setTab] = useState<Tab>('upcoming');
+  const [filterCategory, setFilterCategory] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [participantsModalOpen, setParticipantsModalOpen] = useState(false);
+  const [editing, setEditing] = useState<ClubEventWithDetails | null>(null);
+  const [viewingParticipants, setViewingParticipants] = useState<ClubEventWithDetails | null>(null);
+
+
+  const today = new Date().toISOString().slice(0, 10);
+  const isAdmin = !!profile?.is_admin;
+
+  const filtered = useMemo(() => {
+    return events
+      .filter((e) => (filterCategory ? e.category_id === filterCategory : true))
+      .filter((e) => {
+        const lastDay = e.end_date ?? e.start_date;
+        if (tab === 'timeline') return true; // 타임라인은 전체 표시
+        return tab === 'upcoming' ? lastDay >= today : lastDay < today;
+      });
+  }, [events, filterCategory, tab, today]);
+
+
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    arr.sort((a, b) => {
+      const dc = a.start_date.localeCompare(b.start_date);
+      if (dc !== 0) return tab === 'upcoming' ? dc : -dc;
+      return (a.start_time ?? '').localeCompare(b.start_time ?? '');
+    });
+    return arr;
+  }, [filtered, tab]);
+
+  function openNew() {
+    setEditing(null);
+    setModalOpen(true);
+  }
+  function openEdit(ev: ClubEventWithDetails) {
+    setEditing(ev);
+    setModalOpen(true);
+  }
+  async function handleDelete(ev: ClubEventWithDetails) {
+    if (!confirm(`[${ev.title}] 일정을 삭제하시겠습니까?`)) return;
+    try {
+      await deleteEvent.mutateAsync(ev.id);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : '삭제에 실패했습니다.');
+    }
+  }
+
+  return (
+    <div className="tab-content animate-slide-up">
+      {/* 헤더 */}
+      <section className="mb-8">
+        <div className="club-tag">
+          <span className="material-symbols-outlined text-sm">calendar_month</span>
+          동아리 일정
+        </div>
+        <h2 className="dashboard-title italic">
+          <span className="text-gradient-white-purple">우리의 큰</span><br />
+          <span>일정 모아보기</span>
+        </h2>
+        <p className="dashboard-subtitle">
+          정기공연, 버스킹, 워크샵 등<br />동아리의 주요 일정을 확인하세요.
+        </p>
+      </section>
+
+      {/* 탭 */}
+      <div className="flex gap-4 mb-6 border-b" style={{ borderColor: 'var(--outline-border)' }}>
+        {(['upcoming', 'past', 'timeline'] as Tab[]).map((t) => (
+          <button key={t} onClick={() => setTab(t)} className="relative pb-3 px-1">
+            <span
+              className="text-lg font-black italic transition-colors"
+              style={{ color: tab === t ? 'var(--primary)' : 'var(--text-muted)' }}
+            >
+              {t === 'upcoming' ? '다가오는 일정' : t === 'past' ? '지난 일정' : '타임라인'}
+            </span>
+            {tab === t && (
+              <div className="absolute bottom-0 left-0 w-full h-1 rounded-t-lg bg-primary-btn shadow-primary-glow" />
+            )}
+          </button>
+        ))}
+      </div>
+
+
+      {/* 카테고리 필터 */}
+      {categories.length > 0 && (
+        <div className="flex flex-wrap gap-2 pb-2 mb-6">
+          <button
+            onClick={() => setFilterCategory(null)}
+            className="flex-shrink-0 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border"
+            style={{
+              backgroundColor: filterCategory === null ? 'var(--club-tag-bg)' : 'rgba(var(--color-surface-container-highest), 0.3)',
+              color: filterCategory === null ? 'var(--primary)' : 'var(--text-on-surface-variant)',
+              borderColor: filterCategory === null ? 'var(--primary-border)' : 'rgba(255, 255, 255, 0.08)',
+            }}
+          >
+            ALL
+          </button>
+          {categories.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => setFilterCategory(c.id)}
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border ${
+                filterCategory === c.id
+                  ? 'shadow-lg scale-105'
+                  : 'bg-surface-container-highest/30 text-on-surface-variant border-white/5 hover:bg-surface-container-highest/50 hover:text-white'
+              }`}
+              style={{
+                backgroundColor: filterCategory === c.id ? `${c.color}25` : '',
+                color: filterCategory === c.id ? c.color : '',
+                borderColor: filterCategory === c.id ? c.color : '',
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '14px', fontVariationSettings: "'FILL' 1" }}>{c.icon}</span>
+              {c.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* 일정 리스트 */}
+      <div className="space-y-4 animate-fade-in">
+        {isLoading ? (
+          <div className="glass-card rounded-[2rem] p-10 flex justify-center">
+            <div className="spinner" />
+          </div>
+        ) : tab === 'timeline' ? (
+          <EventTimeline events={sorted} />
+        ) : sorted.length === 0 ? (
+          <div className="glass-card rounded-[2rem] p-10 flex flex-col items-center justify-center text-center border border-outline-variant/10">
+            <span className="material-symbols-outlined text-[48px] text-surface-variant mb-4">event_busy</span>
+            <p className="text-on-surface-variant font-bold">
+              {tab === 'upcoming' ? '예정된 일정이 없습니다.' : '지난 일정이 없습니다.'}
+            </p>
+          </div>
+        ) : (
+          sorted.map((ev) => (
+            <EventCard
+              key={ev.id}
+              ev={ev}
+              today={today}
+              tab={tab}
+              isAdmin={isAdmin}
+              currentUserId={profile?.id}
+              onEdit={() => openEdit(ev)}
+              onDelete={() => handleDelete(ev)}
+              onViewParticipants={() => {
+                setViewingParticipants(ev);
+                setParticipantsModalOpen(true);
+              }}
+            />
+          ))
+        )}
+      </div>
+      
+      {/* 일정 등록 버튼 (Admin 전용, Reserve 페이지 스타일) */}
+      {isAdmin && (
+        <button 
+          className="reserve-now-btn min-w-[200px] mx-auto mt-10 block shadow-2xl hover:scale-105 transition-all" 
+          onClick={openNew}
+        >
+          <span className="material-symbols-outlined" style={{ fontWeight: 'bold' }}>add_circle</span>
+          일정 등록하기
+        </button>
+      )}
+
+
+
+      <EventModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        editing={editing}
+      />
+
+      <EventParticipantsModal
+        isOpen={participantsModalOpen}
+        onClose={() => setParticipantsModalOpen(false)}
+        event={viewingParticipants}
+      />
+    </div>
+  );
+}
+
+/**
+ * 개별 일정 카드 컴포넌트 (가독성을 위한 분리)
+ */
+function EventCard({ 
+  ev, today, tab, isAdmin, currentUserId, 
+  onEdit, onDelete, onViewParticipants 
+}: { 
+  ev: ClubEventWithDetails, 
+  today: string, 
+  tab: Tab, 
+  isAdmin: boolean,
+  currentUserId?: string,
+  onEdit: () => void,
+  onDelete: () => void,
+  onViewParticipants: () => void
+}) {
+  const { data: participants = [] } = useEventParticipants(ev.id);
+  const joinEvent = useJoinEvent();
+  const leaveEvent = useLeaveEvent();
+
+  const isJoined = participants.some(p => p.user_id === currentUserId);
+  const dDays = diffDays(ev.start_date, today);
+  const isDday = tab === 'upcoming' && dDays === 0;
+  const cat = ev.category;
+
+  const handleJoinToggle = async () => {
+    try {
+      if (isJoined) {
+        if (confirm('참가를 취소하시겠습니까?')) {
+          await leaveEvent.mutateAsync(ev.id);
+        }
+      } else {
+        await joinEvent.mutateAsync(ev.id);
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : '요청 처리에 실패했습니다.');
+    }
+  };
+
+  return (
+    <div
+      className="glass-card rounded-[2rem] p-6 border transition-all hover:translate-y-[-2px] hover:border-primary/40 group"
+      style={{
+        borderColor: isDday ? (cat?.color ?? 'var(--primary)') : 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: isDday ? `${cat?.color ?? '#cc97ff'}15` : undefined,
+        boxShadow: isDday ? `0 8px 30px ${cat?.color ?? '#cc97ff'}25` : undefined,
+      }}
+    >
+      <div className="flex items-start gap-4">
+        {/* D-Day 원형 배지 */}
+        <div
+          className="flex flex-col items-center justify-center min-w-[72px] h-[72px] rounded-2xl border flex-shrink-0"
+          style={{
+            backgroundColor: cat ? `${cat.color}1A` : 'var(--surface-container)',
+            borderColor: cat?.color ?? 'var(--outline-border)',
+          }}
+        >
+          {isDday ? (
+            <>
+              <span className="font-black text-xl italic tracking-tighter leading-none" style={{ color: cat?.color ?? 'var(--primary)' }}>D-</span>
+              <span className="font-black text-sm italic tracking-tighter leading-none uppercase" style={{ color: cat?.color ?? 'var(--primary)' }}>Day</span>
+            </>
+          ) : (
+            <span className="font-black text-2xl italic tracking-tighter" style={{ color: cat?.color ?? 'var(--text-on-surface-var)' }}>
+              {tab === 'upcoming' ? `D-${dDays}` : `D+${Math.abs(dDays)}`}
+            </span>
+          )}
+        </div>
+
+        {/* 본문 */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            {cat && (
+              <span
+                className="flex items-center gap-1 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest"
+                style={{ backgroundColor: `${cat.color}25`, color: cat.color }}
+              >
+                <span className="material-symbols-outlined text-xs">{cat.icon}</span>
+                {cat.name}
+              </span>
+            )}
+            {!ev.is_public && (
+              <span className="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest bg-yellow-500/20 text-yellow-500">
+                비공개
+              </span>
+            )}
+          </div>
+          <h3 className="text-lg font-black italic tracking-tight text-on-surface mb-1 truncate">{ev.title}</h3>
+          
+          <div className="space-y-1">
+            <p className="text-[11px] font-bold text-on-surface-variant flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-sm">schedule</span>
+              {formatKDate(ev.start_date)}
+              {ev.start_time && ` ${ev.start_time.slice(0, 5)}`}
+              {ev.end_date && ev.end_date !== ev.start_date && ` ~ ${formatKDate(ev.end_date)}`}
+            </p>
+            {ev.location && (
+              <p className="text-[11px] font-bold text-on-surface-variant flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm">place</span>
+                {ev.location}
+              </p>
+            )}
+          </div>
+
+          {/* 참가자 정보 및 버튼 */}
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 cursor-pointer group" onClick={onViewParticipants}>
+              <div className="flex -space-x-2">
+                {participants.slice(0, 3).map((p) => (
+                  <img
+                    key={p.id}
+                    src={p.profile?.avatar_url || '/placeholder-avatar.png'}
+                    className="w-6 h-6 rounded-full border-2 border-surface object-cover"
+                    title={p.profile?.display_name}
+                  />
+                ))}
+
+                {participants.length > 3 && (
+                  <div className="w-6 h-6 rounded-full border-2 border-surface bg-surface-container flex items-center justify-center text-[8px] font-black italic">
+                    +{participants.length - 3}
+                  </div>
+                )}
+              </div>
+              <span className="text-[10px] font-black italic text-muted group-hover:text-primary transition-colors">
+                {participants.length}명 참여 중
+              </span>
+            </div>
+
+            {tab === 'upcoming' && (
+              <button
+                onClick={handleJoinToggle}
+                disabled={joinEvent.isPending || leaveEvent.isPending}
+                className="flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter transition-all"
+                style={{
+                  backgroundColor: isJoined ? `${cat?.color ?? '#cc97ff'}20` : 'var(--primary)',
+                  color: isJoined ? (cat?.color ?? 'var(--primary)') : 'var(--on-primary)',
+                  border: isJoined ? `1px solid ${cat?.color ?? '#cc97ff'}40` : 'none',
+                }}
+              >
+                <span className="material-symbols-outlined text-sm">
+                  {isJoined ? 'check_circle' : 'add_circle'}
+                </span>
+                {isJoined ? '참여 완료' : '참여하기'}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 액션 (admin) */}
+        {isAdmin && (
+          <div className="flex flex-col gap-2 flex-shrink-0">
+            <button
+              onClick={onEdit}
+              title="수정"
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-all bg-surface-container-high text-on-surface-variant border border-card-border hover:border-primary/50 hover:text-primary hover:bg-surface-highest group-hover:shadow-md"
+            >
+              <span className="material-symbols-outlined text-lg">settings</span>
+            </button>
+            <button
+              onClick={onDelete}
+              title="삭제"
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-all bg-surface-container-high text-on-surface-variant border border-card-border hover:border-error/50 hover:text-error hover:bg-error/5 group-hover:shadow-md"
+            >
+              <span className="material-symbols-outlined text-lg">delete</span>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+

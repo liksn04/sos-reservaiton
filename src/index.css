@@ -82,17 +82,17 @@
   --kakao-yellow:           #FEE500;
   --kakao-black:            #191919;
 
-  /* Computed theme tokens */
-  --glass-bg:               rgba(255, 255, 255, 0.03);
-  --glass-border:           rgba(255, 255, 255, 0.08);
-  --glass-border-hover:     rgba(255, 255, 255, 0.15);
-  --card-border:            rgba(255, 255, 255, 0.05);
+  /* Computed theme tokens — 다크모드 시인성 강화를 위해 불투명도 및 경계 대비 상향 */
+  --glass-bg:               rgba(255, 255, 255, 0.05); /* 0.03 -> 0.05 */
+  --glass-border:           rgba(255, 255, 255, 0.15); /* 0.08 -> 0.15 */
+  --glass-border-hover:     rgba(255, 255, 255, 0.25); /* 0.15 -> 0.25 */
+  --card-border:            rgba(255, 255, 255, 0.12); /* 0.05 -> 0.12 */
   --input-bg:               #000000;
-  --input-border:           rgba(255, 255, 255, 0.1);
+  --input-border:           rgba(255, 255, 255, 0.15); /* 0.1 -> 0.15 */
   --nav-bg:                 rgba(10, 10, 11, 0.95);
-  --nav-border:             rgba(255, 255, 255, 0.03);
+  --nav-border:             rgba(255, 255, 255, 0.05); /* 0.03 -> 0.05 */
   --nav-link-inactive:      #6b7280;
-  --overlay-bg:             rgba(0, 0, 0, 0.8);
+  --overlay-bg:             rgba(0, 0, 0, 0.7);
   --title-gradient:         linear-gradient(to right, #ffffff 10%, #d8b4fe 100%);
   --primary-btn-gradient:   linear-gradient(135deg, #d8b4fe 0%, #a855f7 100%);
   --reserve-btn-gradient:   linear-gradient(90deg,  #d8b4fe 0%, #a855f7 100%);
@@ -265,7 +265,7 @@ h1, h2, h3, h4 { font-style: normal; letter-spacing: -0.02em; }
 
 /* Dashboard Titles */
 .dashboard-title {
-  font-size: 2.25rem; font-weight: 900; line-height: 1.1; margin-bottom: 1rem; letter-spacing: -0.04em;
+  font-size: 2.25rem; font-weight: 900; line-height: 1.1; margin-bottom: 2rem; letter-spacing: -0.01em;
   color: var(--text-main);
 }
 .text-gradient-white-purple {
@@ -343,14 +343,34 @@ h1, h2, h3, h4 { font-style: normal; letter-spacing: -0.02em; }
 /* Modals & Forms */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 1000; background: var(--overlay-bg);
-  display: flex; align-items: start; justify-content: center; padding: 2rem 1.5rem;
-  overflow-y: auto; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
 .modal-container {
-  margin: auto; width: 100%; max-width: 500px; padding: 1.5rem; border-radius: 1.5rem;
+  width: 100%; max-width: 500px; max-height: 90vh; border-radius: 1.5rem;
   background-color: var(--surface-container-high); border: 1px solid var(--card-border);
-  transition: background-color 0.2s, border-color 0.2s;
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  transform: translateY(20px); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-overlay.active .modal-container { transform: translateY(0); }
+
+.modal-header {
+  padding: 2.25rem 1.75rem 1rem; /* 상단 여백을 1.5rem에서 2.25rem(36px)으로 대폭 확장 */
+  border-bottom: 1px solid var(--outline-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-body {
+  padding: 1.75rem; overflow-y: auto; flex: 1;
+  -webkit-overflow-scrolling: touch;
+}
+.modal-footer {
+  padding: 1rem 1.75rem 1.5rem; border-top: 1px solid var(--outline-border);
+  display: flex; gap: 0.75rem;
 }
 .form-group { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
 .form-group label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
@@ -370,6 +390,7 @@ h1, h2, h3, h4 { font-style: normal; letter-spacing: -0.02em; }
   height: 54px; border-radius: 1rem;
   background: var(--primary-btn-gradient);
   color: white; font-weight: 700; border: none; cursor: pointer; padding: 0 1.5rem;
+  white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;
   transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
   box-shadow: 0 4px 15px rgba(168, 85, 247, 0.2);
 }
@@ -387,6 +408,14 @@ h1, h2, h3, h4 { font-style: normal; letter-spacing: -0.02em; }
 .glass-card:hover {
   border-color: var(--glass-border-hover);
   transform: translateY(-2px);
+}
+
+/* ── Tab Indicators (Neon) ── */
+.bg-primary-btn {
+  background: var(--primary-btn-gradient);
+}
+.shadow-primary-glow {
+  box-shadow: var(--primary-glow-shadow);
 }
 
 .animate-slide-up {
@@ -408,8 +437,9 @@ h1, h2, h3, h4 { font-style: normal; letter-spacing: -0.02em; }
 .secondary-btn {
   height: 54px; border-radius: 1rem;
   background: var(--secondary-btn-gradient);
-  color: var(--secondary-btn-color); font-weight: 700;
-  border: 1px solid var(--secondary-btn-border); cursor: pointer; padding: 0 1.5rem;
+  color: var(--text-main); font-weight: 600; border: 1px solid var(--card-border);
+  cursor: pointer; padding: 0 1.25rem; white-space: nowrap;
+  display: inline-flex; align-items: center; justify-content: center;
   transition: transform 0.2s, opacity 0.2s, background 0.2s;
 }
 .secondary-btn:active { transform: scale(0.98); opacity: 0.9; }
@@ -426,15 +456,71 @@ h1, h2, h3, h4 { font-style: normal; letter-spacing: -0.02em; }
 .error-btn:active { transform: scale(0.98); opacity: 0.8; }
 .error-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.modal-header {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;
-}
+/* .modal-header 중복 선언 제거됨 (360라인 근처로 통합) */
 
 .form-actions {
-  display: flex; gap: 0.75rem; margin-top: 2.5rem;
+  display: flex; gap: 0.75rem; margin-top: 1.5rem;
 }
 .form-actions .secondary-btn { flex: 1; }
 .form-actions .primary-btn   { flex: 2; }
+
+/* ── Custom Picker & Input Polishing ── */
+.premium-input-box {
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.premium-input-box:hover {
+  border-color: var(--primary);
+  background-color: rgba(var(--color-primary) / 0.05);
+}
+.premium-input-value {
+  flex: 1; font-size: 0.95rem; font-weight: 600; color: var(--text-main);
+}
+.premium-select-input {
+  width: 100%;
+  height: 54px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  padding: 0 1rem 0 3.75rem; /* 아이콘 겹침 방지를 위해 3.75rem(60px)으로 더 상향 조정 */
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  outline: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  appearance: none;
+}
+
+.premium-select-input:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.premium-select-input:focus {
+  border-color: rgba(var(--primary-rgb), 0.5);
+  background-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
+}
+
+/* 셀렉트 박스 우측 화살표 아이콘 커스텀 (CSS 만으로 구현 시 한계가 있어 화살표 배경 이미지 권장되나 현재는 기본 스타일 유지 혹은 간단한 팁) */
+.premium-select-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.3)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.2rem;
+}
+
+.chip-group-wrap {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+}
 
 /* Calendar */
 .calendar-weekdays-grid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem; }

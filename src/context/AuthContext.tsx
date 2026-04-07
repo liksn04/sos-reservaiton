@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             kakao_id: null,
             display_name: `Guest_${userId.slice(0, 8)}`,
             avatar_url: null,
-            part: 'other',
+            part: [],
             bio: 'Anonymous developer account',
             status: 'approved',
             is_admin: false,

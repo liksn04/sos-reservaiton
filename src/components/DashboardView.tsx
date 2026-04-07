@@ -129,7 +129,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
               <h4 style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: '600' }}>{primaryRes.team_name}</h4>
               {isOngoingNow && (
-                <div className="live-badge">ON AIR</div>
+                <div className="live-badge">공연 중</div>
               )}
             </div>
             

@@ -9,6 +9,7 @@ import ProfileForm from '../components/ProfileForm';
 import DeleteAccountDialog from '../components/DeleteAccountDialog';
 import ThemeToggle from '../components/ThemeToggle';
 import type { AppShellContext } from './AppShell';
+import { PART_INFO } from '../lib/constants';
 
 export default function ProfileRoute() {
   const { profile, signOut } = useAuth();
@@ -102,12 +103,31 @@ export default function ProfileRoute() {
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="User Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="material-symbols-outlined text-[40px]" style={{ color: 'var(--text-muted)' }}>person</span>
+                  <span className="material-symbols-outlined text-[40px] text-muted">person</span>
                 )}
               </div>
               <div className="flex flex-col items-center z-10 relative">
                 <span className="text-[10px] font-bold tracking-widest text-primary mb-1">멤버십 프로필</span>
-                <h2 className="text-xl font-bold text-on-surface mb-4">{profile?.display_name || '게스트'}</h2>
+                <h2 className="text-xl font-bold text-on-surface mb-2">{profile?.display_name || '게스트'}</h2>
+                
+                {/* 파트 뱃지 영역 */}
+                <div className="flex flex-wrap justify-center gap-1.5 mb-5">
+                  {(Array.isArray(profile?.part) ? profile!.part : []).map((p) => (
+                    <span
+                      key={p}
+                      className="px-2.5 py-0.5 rounded-full text-[9px] font-black tracking-tighter"
+                      style={{ backgroundColor: PART_INFO[p].bg, color: PART_INFO[p].text }}
+                    >
+                      {PART_INFO[p].label}
+                    </span>
+                  ))}
+                  {(!profile?.part || profile.part.length === 0) && (
+                    <span className="px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant text-[9px] font-black tracking-tighter">
+                      NO SESSION
+                    </span>
+                  )}
+                </div>
+
                 <div className="flex gap-2">
                   <button
                     onClick={() => setIsEditingProfile(true)}
@@ -118,8 +138,7 @@ export default function ProfileRoute() {
                   </button>
                   <button
                     onClick={signOut}
-                    className="px-4 py-2 rounded-lg text-xs font-bold transition-colors"
-                    style={{ backgroundColor: 'var(--surface-container-high)', color: 'var(--error)', border: '1px solid var(--outline-border)' }}
+                    className="px-4 py-2 rounded-lg text-xs font-bold transition-colors bg-surface-container-high text-error border border-outline-border"
                   >
                     로그아웃
                   </button>
@@ -179,7 +198,7 @@ export default function ProfileRoute() {
                 다가오는 일정
               </span>
               {scheduleTab === 'upcoming' && (
-                <div className="absolute bottom-0 left-0 w-full h-1 rounded-t-lg" style={{ background: 'var(--primary-btn-gradient)', boxShadow: 'var(--primary-glow-shadow)' }}></div>
+                <div className="absolute bottom-0 left-0 w-full h-1 rounded-t-lg bg-primary-btn shadow-primary-glow"></div>
               )}
             </button>
             <button onClick={() => setScheduleTab('history')} className="relative pb-3 px-1 group">
@@ -190,7 +209,7 @@ export default function ProfileRoute() {
                 지난 일정
               </span>
               {scheduleTab === 'history' && (
-                <div className="absolute bottom-0 left-0 w-full h-1 rounded-t-lg" style={{ background: 'var(--primary-btn-gradient)', boxShadow: 'var(--primary-glow-shadow)' }}></div>
+                <div className="absolute bottom-0 left-0 w-full h-1 rounded-t-lg bg-primary-btn shadow-primary-glow"></div>
               )}
             </button>
           </div>

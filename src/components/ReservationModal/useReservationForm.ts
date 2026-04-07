@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useCreateReservation, useUpdateReservation } from '../../hooks/mutations/useReservationMutations';
+import { useToast } from '../../contexts/ToastContext';
 import { validateReservationTime } from '../../utils/validation';
 import { formatDate, normalizeTime } from '../../utils/time';
 import type { ReservationWithDetails, Purpose } from '../../types';
@@ -35,6 +36,7 @@ export function useReservationForm({
   const [purpose, setPurpose]         = useState<Purpose>('합주');
   const [invitees, setInvitees]       = useState<string[]>([]);
   const [error, setError]             = useState('');
+  const { addToast }                  = useToast();
 
   const submitting = createReservation.isPending || updateReservation.isPending;
 
@@ -74,7 +76,7 @@ export function useReservationForm({
     setError('');
 
     const validationError = validateReservationTime(
-      date, startTime, endTime, reservations, editing?.id ?? null,
+      date, startTime, endTime, reservations, editing?.id ?? null, purpose,
     );
     if (validationError) {
       setError(validationError.message);
@@ -88,17 +90,21 @@ export function useReservationForm({
           date, startTime, endTime,
           teamName, peopleCount, purpose, invitees,
         });
+        addToast('예약이 성공적으로 수정되었습니다.', 'success');
       } else {
         await createReservation.mutateAsync({
           hostId: currentUserId,
           date, startTime, endTime,
           teamName, peopleCount, purpose, invitees,
         });
+        addToast('성공적으로 예약되었습니다!', 'success');
       }
       onClose();
     } catch (err) {
       console.error(err);
-      setError('저장에 실패했습니다. 네트워크 연결을 확인해주세요.');
+      const msg = '저장에 실패했습니다. 네트워크 연결을 확인해주세요.';
+      setError(msg);
+      addToast(msg, 'error');
     }
   }
 

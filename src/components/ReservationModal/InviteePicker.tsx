@@ -7,7 +7,6 @@ const PART_LABELS: Record<Part, string> = {
   drum: '드럼',
   bass: '베이스',
   keyboard: '키보드',
-  other: '기타',
 };
 
 interface Props {
@@ -26,7 +25,7 @@ export default function InviteePicker({ members, selected, currentUserId, onChan
   const filtered = eligibleMembers.filter(
     (m) =>
       m.display_name.toLowerCase().includes(query.toLowerCase()) ||
-      (m.part && PART_LABELS[m.part].includes(query)),
+      (m.part && m.part.some((p) => PART_LABELS[p].includes(query))),
   );
 
   function toggle(id: string) {
@@ -74,9 +73,9 @@ export default function InviteePicker({ members, selected, currentUserId, onChan
                 </div>
                 <div className="flex-1 flex flex-col">
                   <span className="text-sm font-bold text-on-surface leading-tight">{member.display_name}</span>
-                  {member.part && (
+                  {member.part && member.part.length > 0 && (
                     <span className="text-[10px] text-on-surface-variant uppercase tracking-wider">
-                      {PART_LABELS[member.part]}
+                      {member.part.map((p) => PART_LABELS[p]).join(', ')}
                     </span>
                   )}
                 </div>

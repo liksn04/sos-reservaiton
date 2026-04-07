@@ -1,4 +1,4 @@
-import { formatDate, normalizeTime } from '../../utils/time';
+import { formatDate, normalizeTime, isPastReservation } from '../../utils/time';
 import type { ReservationWithDetails } from '../../types';
 
 interface Props {
@@ -32,13 +32,17 @@ export default function DailySchedule({
         </div>
       ) : (
         dayRes.map((res) => {
+          const start = normalizeTime(res.start_time);
+          const end = normalizeTime(res.end_time);
+          
           const isHost = res.host_id === currentUserId;
-          const isEditable = isHost || isAdmin;
           const isInvitee = res.reservation_invitees?.some(
             (inv) => inv.user_id === currentUserId,
           );
-          const start = normalizeTime(res.start_time);
-          const end = normalizeTime(res.end_time);
+
+          const isPast = isPastReservation(res.date, end, res.is_next_day);
+          // 호스트는 미래 일정만 가능, 관리자는 과거 일정도 가능
+          const isEditable = (isHost && !isPast) || isAdmin;
 
           return (
             <div key={res.id} className={`glass-card rounded-3xl p-4 flex items-center gap-4 border transition-all ${isHost ? 'border-primary/30 bg-primary/5' : 'border-outline-variant/10'}`}>
@@ -102,17 +106,17 @@ export default function DailySchedule({
 
               {/* Right: Actions */}
               {isEditable && (
-                <div className="flex flex-col gap-1.5 ml-auto pl-2">
+                <div className="flex flex-col gap-2 ml-auto pl-2">
                   <button
-                    className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-                    style={{ backgroundColor: 'var(--surface-container)', color: 'var(--text-muted)', border: '1px solid var(--outline-border)' }}
+                    title="수정"
+                    className="w-9 h-9 rounded-full flex items-center justify-center transition-all bg-surface-container-high text-on-surface-variant border border-card-border hover:border-primary/50 hover:text-primary hover:bg-surface-highest shadow-sm"
                     onClick={() => onEdit(res)}
                   >
                     <span className="material-symbols-outlined text-[18px]">settings</span>
                   </button>
                   <button
-                    className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-                    style={{ backgroundColor: 'var(--surface-container)', color: 'var(--text-muted)', border: '1px solid var(--outline-border)' }}
+                    title="삭제"
+                    className="w-9 h-9 rounded-full flex items-center justify-center transition-all bg-surface-container-high text-on-surface-variant border border-card-border hover:border-error/50 hover:text-error hover:bg-error/5 shadow-sm"
                     onClick={() => onDelete(res.id, res.team_name)}
                   >
                     <span className="material-symbols-outlined text-[18px]">delete</span>

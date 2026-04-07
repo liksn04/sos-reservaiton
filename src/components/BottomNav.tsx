@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom';
 
 const TABS = [
-  { to: '/',        icon: 'home',    label: '홈',      end: true  },
-  { to: '/reserve', icon: 'add_box', label: '예약하기', end: false },
-  { to: '/profile', icon: 'person',  label: '프로필',   end: false },
+  { to: '/',        icon: 'home',           label: '홈',      end: true  },
+  { to: '/reserve', icon: 'add_box',        label: '예약',    end: false },
+  { to: '/events',  icon: 'calendar_month', label: '일정',    end: false },
+  { to: '/profile', icon: 'person',         label: '프로필',  end: false },
 ] as const;
 
 export default function BottomNav() {

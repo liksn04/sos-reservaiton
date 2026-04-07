@@ -12,7 +12,6 @@ export default function DeleteAccountDialog({ isOpen, onClose }: Props) {
   const deleteAccount = useDeleteAccount();
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [reason, setReason] = useState('');
   const [confirmName, setConfirmName] = useState('');
   const [error, setError] = useState('');
   const confirmInputRef = useRef<HTMLInputElement>(null);
@@ -21,7 +20,6 @@ export default function DeleteAccountDialog({ isOpen, onClose }: Props) {
   useEffect(() => {
     if (!isOpen) return;
     setStep(1);
-    setReason('');
     setConfirmName('');
     setError('');
   }, [isOpen]);
@@ -49,8 +47,8 @@ export default function DeleteAccountDialog({ isOpen, onClose }: Props) {
     if (!nameMatches) return;
     setError('');
     try {
-      await deleteAccount.mutateAsync(reason.trim() || undefined);
-      // 탈퇴 성공 → 세션 제거 (AuthContext가 SIGNED_OUT 이벤트 감지하여 리다이렉트)
+      // 탈퇴 사유(reason) 필드를 삭제했으므로 undefined 전달
+      await deleteAccount.mutateAsync(undefined);
       await signOut();
     } catch (err) {
       console.error(err);
@@ -60,142 +58,133 @@ export default function DeleteAccountDialog({ isOpen, onClose }: Props) {
 
   return (
     <div
-      className="modal-overlay active"
+      className={`modal-overlay ${isOpen ? 'active' : ''}`}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="modal-container" style={{ maxWidth: 420 }}>
+      <div className="modal-container animate-slide-up" style={{ maxWidth: 420 }}>
 
         {/* 헤더 */}
-        <div className="modal-header">
+        <div className="modal-header" style={{ paddingBottom: '1rem' }}>
           <h2 className="text-xl font-black italic tracking-tighter">
             회원 <span className="text-error">탈퇴</span>
           </h2>
           <button
-            className="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors"
+            className="material-symbols-outlined text-2xl text-on-surface-variant hover:text-on-surface transition-colors"
             onClick={onClose}
-            style={{ fontSize: '24px' }}
             disabled={deleteAccount.isPending}
           >
             close
           </button>
         </div>
 
-        {/* ── STEP 1: 경고 + 사유 입력 ── */}
-        {step === 1 && (
-          <div className="space-y-4">
-            {/* 경고 박스 */}
-            <div className="rounded-xl p-4 border border-error/30 bg-error/5">
-              <div className="flex items-start gap-3">
-                <span className="material-symbols-outlined text-error flex-shrink-0 mt-0.5">warning</span>
-                <div className="space-y-1.5">
-                  <p className="text-sm font-black text-error">탈퇴 시 다음 정보가 모두 삭제됩니다</p>
-                  <ul className="text-xs text-on-surface-variant space-y-0.5 list-none">
-                    <li className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-[14px] text-error/60">chevron_right</span>
-                      프로필 정보 및 아바타 이미지
-                    </li>
-                    <li className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-[14px] text-error/60">chevron_right</span>
-                      내가 등록한 모든 예약
-                    </li>
-                    <li className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-[14px] text-error/60">chevron_right</span>
-                      합주 초대 내역
-                    </li>
-                  </ul>
-                  <p className="text-xs text-error/70 font-bold mt-2">이 작업은 되돌릴 수 없습니다.</p>
+        <div className="modal-body space-y-6 !p-6">
+          {/* ── STEP 1: 경고 확인 ── */}
+          {step === 1 && (
+            <div className="space-y-6">
+              {/* 경고 박스 */}
+              <div 
+                className="rounded-2xl p-5 border border-error/20 bg-error/5" 
+              >
+                <div className="flex items-start gap-4">
+                  <span className="material-symbols-outlined text-2xl text-error flex-shrink-0">warning</span>
+                  <div className="space-y-2">
+                    <p className="text-base font-black text-error leading-tight">탈퇴 시 다음 정보가 모두 삭제됩니다</p>
+                    <ul className="text-[13px] text-on-surface-variant/80 space-y-1.5 list-none">
+                      <li className="flex items-center gap-1.5 font-bold">
+                        <span className="material-symbols-outlined text-[14px] text-error">chevron_right</span>
+                        프로필 정보 및 아바타 이미지
+                      </li>
+                      <li className="flex items-center gap-1.5 font-bold">
+                        <span className="material-symbols-outlined text-[14px] text-error">chevron_right</span>
+                        내가 등록한 모든 예약
+                      </li>
+                      <li className="flex items-center gap-1.5 font-bold">
+                        <span className="material-symbols-outlined text-[14px] text-error">chevron_right</span>
+                        합주 초대 내역
+                      </li>
+                    </ul>
+                    <p className="text-[11px] text-error/80 font-black mt-3 flex items-center gap-1 uppercase tracking-widest">
+                      <span className="material-symbols-outlined text-[14px]">info</span>
+                      이 작업은 되돌릴 수 없습니다.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* 사유 입력 (선택) */}
-            <div className="form-group">
-              <label>탈퇴 사유 <span className="text-on-surface-variant text-xs font-normal">(선택)</span></label>
-              <textarea
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                placeholder="탈퇴하시는 이유를 알려주시면 서비스 개선에 도움이 됩니다."
-                rows={3}
-                maxLength={300}
-                style={{ resize: 'none' }}
-              />
+              <div className="flex gap-3">
+                <button type="button" className="secondary-btn flex-1 py-4" onClick={onClose}>
+                  취소
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className="error-btn flex-[1.5] py-4"
+                >
+                  계속 진행
+                </button>
+              </div>
             </div>
+          )}
 
-            <div className="form-actions">
-              <button type="button" className="secondary-btn" onClick={onClose}>
-                취소
-              </button>
-              <button
-                type="button"
-                onClick={() => setStep(2)}
-                className="px-6 py-3 rounded-xl font-black text-sm bg-error/10 text-error border border-error/30 hover:bg-error/20 transition-colors"
+          {/* ── STEP 2: 이름 재확인 ── */}
+          {step === 2 && (
+            <div className="space-y-6">
+              <div 
+                className="rounded-2xl p-5 border border-outline-variant/10"
+                style={{ backgroundColor: 'var(--surface-container-high)' }}
               >
-                계속 진행
-              </button>
-            </div>
-          </div>
-        )}
+                <p className="text-sm font-bold text-on-surface-variant leading-relaxed">
+                  탈퇴를 확인하려면 아래에 본인의 닉네임{' '}
+                  <span className="text-on-surface font-black underline decoration-error/50 underline-offset-4">
+                    {profile?.display_name}
+                  </span>
+                  을(를) 정확히 입력하세요.
+                </p>
+              </div>
 
-        {/* ── STEP 2: 이름 재확인 ── */}
-        {step === 2 && (
-          <div className="space-y-4">
-            <div className="rounded-xl p-4 border border-outline-variant/20 bg-surface-container">
-              <p className="text-sm text-on-surface-variant leading-relaxed">
-                탈퇴를 확인하려면 아래에 본인의 닉네임{' '}
-                <span className="text-on-surface font-black">
-                  {profile?.display_name}
-                </span>
-                을(를) 정확히 입력하세요.
-              </p>
-            </div>
+              <div className="form-group">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted mb-1.5 block">닉네임 확인</label>
+                <input
+                  ref={confirmInputRef}
+                  type="text"
+                  className="w-full h-[54px] bg-surface-container-low border border-outline-variant/10 rounded-2xl px-4 font-bold text-lg outline-none focus:border-error/50 transition-colors text-on-surface"
+                  value={confirmName}
+                  onChange={(e) => setConfirmName(e.target.value)}
+                  placeholder={profile?.display_name ?? ''}
+                  autoComplete="off"
+                />
+                {confirmName && !nameMatches && (
+                  <p className="text-[11px] text-error mt-2 font-black italic tracking-tight">앗, 닉네임이 일치하지 않아요!</p>
+                )}
+              </div>
 
-            <div className="form-group">
-              <label>닉네임 입력</label>
-              <input
-                ref={confirmInputRef}
-                type="text"
-                value={confirmName}
-                onChange={(e) => setConfirmName(e.target.value)}
-                placeholder={profile?.display_name ?? ''}
-                autoComplete="off"
-              />
-              {confirmName && !nameMatches && (
-                <p className="text-xs text-error mt-1.5 font-bold">닉네임이 일치하지 않습니다.</p>
+              {error && (
+                <div className="text-[11px] p-3 rounded-xl bg-error/10 text-error font-bold border border-error/20">
+                  {error}
+                </div>
               )}
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  className="secondary-btn flex-1 py-4"
+                  onClick={() => setStep(1)}
+                  disabled={deleteAccount.isPending}
+                >
+                  뒤로
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirm}
+                  disabled={!nameMatches || deleteAccount.isPending}
+                  className="error-btn flex-[1.5] py-4 disabled:opacity-30"
+                >
+                  {deleteAccount.isPending ? '처리 중...' : '탈퇴 확정'}
+                </button>
+              </div>
             </div>
-
-            {error && (
-              <p className="text-xs text-error font-bold">{error}</p>
-            )}
-
-            <div className="form-actions">
-              <button
-                type="button"
-                className="secondary-btn"
-                onClick={() => setStep(1)}
-                disabled={deleteAccount.isPending}
-              >
-                뒤로
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirm}
-                disabled={!nameMatches || deleteAccount.isPending}
-                className="px-6 py-3 rounded-xl font-black text-sm transition-colors border"
-                style={{
-                  background: nameMatches && !deleteAccount.isPending ? 'rgb(var(--error-rgb, 179 38 30) / 0.15)' : undefined,
-                  color: nameMatches && !deleteAccount.isPending ? 'var(--error, #b3261e)' : undefined,
-                  borderColor: nameMatches && !deleteAccount.isPending ? 'rgb(var(--error-rgb, 179 38 30) / 0.4)' : undefined,
-                  opacity: (!nameMatches || deleteAccount.isPending) ? 0.4 : 1,
-                  cursor: (!nameMatches || deleteAccount.isPending) ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {deleteAccount.isPending ? '탈퇴 처리 중...' : '탈퇴 확정'}
-              </button>
-            </div>
-          </div>
-        )}
-
+          )}
+        </div>
       </div>
     </div>
   );

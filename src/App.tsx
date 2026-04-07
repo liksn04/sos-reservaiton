@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
 import { RequireAuth, RequireApproved, RequireAdmin } from './components/RouteGuards';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { ToastProvider } from './contexts/ToastContext';
+import { ToastContainer } from './components/Toast';
 
 import Login from './routes/Login';
 import PendingApproval from './routes/PendingApproval';
@@ -11,11 +13,14 @@ import ProfileSetup from './routes/ProfileSetup';
 import AppShell from './routes/AppShell';
 import HomeRoute from './routes/HomeRoute';
 import Reserve from './routes/Reserve';
+import EventsRoute from './routes/EventsRoute';
+import BudgetRoute from './routes/BudgetRoute';
 import ProfileRoute from './routes/ProfileRoute';
 import Admin from './routes/Admin';
 import BannedPage from './routes/BannedPage';
 import OfflineBanner from './components/OfflineBanner';
 import UpdatePrompt from './components/UpdatePrompt';
+import { RealtimeProvider } from './lib/RealtimeProvider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,40 +64,41 @@ export default function App() {
       <OfflineBanner />
       <UpdatePrompt />
       <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <BrowserRouter>
-            <Routes>
-              {/* 공개 */}
-              <Route path="/login" element={<Login />} />
+        <ToastProvider>
+          <QueryClientProvider client={queryClient}>
+            <RealtimeProvider>
+            <AuthProvider>
+              <BrowserRouter>
+                <Routes>
+                  {/* ... routes ... */}
+                  <Route path="/login" element={<Login />} />
+                  <Route element={<RequireAuth />}>
+                    <Route path="/profile/setup" element={<ProfileSetup />} />
+                    <Route path="/pending-approval" element={<PendingApproval />} />
+                    <Route path="/banned" element={<BannedPage />} />
 
-              {/* 로그인 필요 */}
-              <Route element={<RequireAuth />}>
-                <Route path="/profile/setup" element={<ProfileSetup />} />
-                <Route path="/pending-approval" element={<PendingApproval />} />
-                <Route path="/banned" element={<BannedPage />} />
+                    <Route element={<RequireApproved />}>
+                      <Route element={<AppShell />}>
+                        <Route index element={<HomeRoute />} />
+                        <Route path="reserve" element={<Reserve />} />
+                        <Route path="events" element={<EventsRoute />} />
+                        <Route path="profile" element={<ProfileRoute />} />
+                      </Route>
 
-                {/* 승인된 사용자 전용 — AppShell이 공통 레이아웃 */}
-                <Route element={<RequireApproved />}>
-                  <Route element={<AppShell />}>
-                    <Route index element={<HomeRoute />} />
-                    <Route path="reserve" element={<Reserve />} />
-                    <Route path="profile" element={<ProfileRoute />} />
+                      <Route element={<RequireAdmin />}>
+                        <Route path="admin" element={<Admin />} />
+                        <Route path="budget" element={<BudgetRoute />} />
+                      </Route>
+                    </Route>
                   </Route>
-
-                  {/* 관리자 전용 */}
-                  <Route element={<RequireAdmin />}>
-                    <Route path="admin" element={<Admin />} />
-                  </Route>
-                </Route>
-              </Route>
-
-              {/* 기타 경로 → 홈 */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </BrowserRouter>
-        </AuthProvider>
-      </QueryClientProvider>
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </BrowserRouter>
+            </AuthProvider>
+            </RealtimeProvider>
+          </QueryClientProvider>
+          <ToastContainer />
+        </ToastProvider>
       </ThemeProvider>
     </AppErrorBoundary>
   );

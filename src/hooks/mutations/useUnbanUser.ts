@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
+import { queryKeys } from '../../lib/queryKeys';
 
 interface UnbanPayload {
   userId: string;
@@ -35,9 +36,9 @@ export function useUnbanUser() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'approved'] });
-      queryClient.invalidateQueries({ queryKey: ['admin', 'banned'] });
-      queryClient.invalidateQueries({ queryKey: ['admin', 'logs'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.approved });
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.banned });
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.logs });
     },
   });
 }

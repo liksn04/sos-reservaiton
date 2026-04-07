@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
+import { queryKeys } from '../../lib/queryKeys';
 import { useAuth } from '../../context/AuthContext';
 import { useBanUser } from '../../hooks/mutations/useBanUser';
 import { useSetAdminRole } from '../../hooks/mutations/useSetAdminRole';
@@ -19,7 +20,7 @@ export default function MembersTab() {
   const [search, setSearch]         = useState('');
 
   const { data: users = [], isLoading } = useQuery<Profile[]>({
-    queryKey: ['admin', 'approved'],
+    queryKey: queryKeys.admin.approved,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles').select('*').eq('status', 'approved')
@@ -31,7 +32,7 @@ export default function MembersTab() {
 
   const filtered = users.filter((u) =>
     u.display_name.toLowerCase().includes(search.toLowerCase()) ||
-    (u.part ?? '').toLowerCase().includes(search.toLowerCase()),
+    (u.part || []).some((p) => p.toLowerCase().includes(search.toLowerCase())),
   );
 
   async function handleToggleAdmin(user: Profile) {
@@ -57,9 +58,9 @@ export default function MembersTab() {
   return (
     <>
       {/* 검색 */}
-      <div className="form-group mb-4">
-        <div className="relative">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">
+      <div className="mb-6">
+        <div className="relative group">
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[22px] transition-colors group-focus-within:text-primary">
             search
           </span>
           <input
@@ -67,15 +68,15 @@ export default function MembersTab() {
             placeholder="이름 또는 파트로 검색"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10"
+            className="w-full bg-surface-container-low border border-card-border rounded-2xl py-4 pl-12 pr-4 text-sm font-bold focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant/40"
           />
         </div>
       </div>
 
       {filtered.length === 0 ? (
-        <div className="empty-card flex-col gap-4">
-          <span className="material-symbols-outlined text-4xl opacity-30">group_off</span>
-          <p>검색 결과가 없습니다.</p>
+        <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-4 opacity-60">
+          <span className="material-symbols-outlined text-5xl opacity-20">group_off</span>
+          <p className="text-sm font-bold">검색 결과가 없습니다.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
@@ -84,43 +85,43 @@ export default function MembersTab() {
               key={user.id}
               user={user}
               actions={
-                <div className="flex flex-col gap-1.5">
-                  {/* 어드민 토글 */}
-                  <button
-                    title={user.is_admin ? '어드민 해제' : '어드민 지정'}
-                    onClick={() => handleToggleAdmin(user)}
-                    disabled={setAdminRole.isPending || user.id === me?.id}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors border ${
-                      user.is_admin
-                        ? 'bg-primary/20 text-primary border-primary/30'
-                        : 'bg-surface-container text-on-surface-variant border-outline-variant/10 hover:bg-surface-container-high'
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-[16px]">
-                      {user.is_admin ? 'shield' : 'shield_with_heart'}
-                    </span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {/* 어드민 토글 */}
+                    <button
+                      title={user.is_admin ? '어드민 해제' : '어드민 지정'}
+                      onClick={() => handleToggleAdmin(user)}
+                      disabled={setAdminRole.isPending || user.id === me?.id}
+                      className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all border ${
+                        user.is_admin
+                          ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
+                          : 'bg-surface-container-highest text-on-surface-variant border-card-border hover:bg-primary/10 hover:text-primary hover:border-primary/30'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[18px]">
+                        {user.is_admin ? 'shield' : 'shield_with_heart'}
+                      </span>
+                    </button>
 
-                  {/* 차단 */}
-                  <button
-                    title="차단"
-                    onClick={() => setBanTarget(user)}
-                    disabled={banUser.isPending || user.id === me?.id}
-                    className="w-9 h-9 rounded-full flex items-center justify-center bg-surface-container text-on-surface-variant border border-outline-variant/10 hover:bg-error/10 hover:text-error hover:border-error/20 transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-[16px]">block</span>
-                  </button>
+                    {/* 차단 */}
+                    <button
+                      title="차단"
+                      onClick={() => setBanTarget(user)}
+                      disabled={banUser.isPending || user.id === me?.id}
+                      className="w-10 h-10 rounded-2xl flex items-center justify-center bg-surface-container-highest text-on-surface-variant border border-card-border hover:bg-error/10 hover:text-error hover:border-error/20 transition-all px-0"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">block</span>
+                    </button>
 
-                  {/* 삭제 */}
-                  <button
-                    title="계정 삭제"
-                    onClick={() => handleDelete(user)}
-                    disabled={deleteUser.isPending || user.id === me?.id}
-                    className="w-9 h-9 rounded-full flex items-center justify-center bg-surface-container text-on-surface-variant border border-outline-variant/10 hover:bg-error/10 hover:text-error hover:border-error/20 transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-[16px]">delete</span>
-                  </button>
-                </div>
+                    {/* 삭제 */}
+                    <button
+                      title="계정 삭제"
+                      onClick={() => handleDelete(user)}
+                      disabled={deleteUser.isPending || user.id === me?.id}
+                      className="w-10 h-10 rounded-2xl flex items-center justify-center bg-surface-container-highest text-on-surface-variant border border-card-border hover:bg-error/10 hover:text-error hover:border-error/20 transition-all px-0"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                  </div>
               }
             />
           ))}
@@ -149,9 +150,9 @@ export default function MembersTab() {
 
 function LoadingCard() {
   return (
-    <div className="empty-card flex-col gap-4">
+    <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-4">
       <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-      <p>목록을 불러오는 중...</p>
+      <p className="text-sm font-bold opacity-60">목록을 불러오는 중...</p>
     </div>
   );
 }

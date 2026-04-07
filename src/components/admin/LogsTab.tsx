@@ -1,20 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
+import { queryKeys } from '../../lib/queryKeys';
 import type { AdminActionLog } from '../../types';
 
 const ACTION_META: Record<AdminActionLog['action'], { label: string; color: string; icon: string }> = {
-  approve: { label: '승인',      color: 'text-green-400',  icon: 'check_circle' },
-  reject:  { label: '거절',      color: 'text-red-400',    icon: 'cancel' },
+  approve: { label: '승인',      color: 'text-primary',    icon: 'check_circle' },
+  reject:  { label: '거절',      color: 'text-error',      icon: 'cancel' },
   ban:     { label: '차단',      color: 'text-error',      icon: 'block' },
   unban:   { label: '차단 해제', color: 'text-primary',    icon: 'lock_open' },
-  promote: { label: '어드민 지정', color: 'text-tertiary', icon: 'shield' },
+  promote: { label: '어드민 지정', color: 'text-secondary',  icon: 'shield' },
   demote:  { label: '어드민 해제', color: 'text-on-surface-variant', icon: 'shield_with_heart' },
   delete:  { label: '삭제',      color: 'text-error',      icon: 'delete_forever' },
 };
 
 export default function LogsTab() {
   const { data: logs = [], isLoading } = useQuery<AdminActionLog[]>({
-    queryKey: ['admin', 'logs'],
+    queryKey: queryKeys.admin.logs,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('admin_action_log')
@@ -28,18 +29,18 @@ export default function LogsTab() {
 
   if (isLoading) {
     return (
-      <div className="empty-card flex-col gap-4">
+      <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-4">
         <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-        <p>로그를 불러오는 중...</p>
+        <p className="text-sm font-bold opacity-60">로그를 불러오는 중...</p>
       </div>
     );
   }
 
   if (logs.length === 0) {
     return (
-      <div className="empty-card flex-col gap-4">
-        <span className="material-symbols-outlined text-4xl opacity-30">history</span>
-        <p>관리 로그가 없습니다.</p>
+      <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-4 opacity-60">
+        <span className="material-symbols-outlined text-5xl opacity-20">history</span>
+        <p className="text-sm font-bold">관리 로그가 없습니다.</p>
       </div>
     );
   }
@@ -58,7 +59,7 @@ export default function LogsTab() {
         return (
           <div
             key={log.id}
-            className="glass-card rounded-2xl px-4 py-3 flex items-center gap-3"
+            className="bg-surface-container-low border border-card-border rounded-2xl px-5 py-4 flex items-center gap-4 transition-colors hover:bg-surface-container-high"
           >
             {/* 아이콘 */}
             <span className={`material-symbols-outlined text-[22px] flex-shrink-0 ${meta.color}`}>
@@ -74,11 +75,11 @@ export default function LogsTab() {
                 </span>
               </div>
               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                <span className="text-[11px] text-on-surface-variant">
+                <span className="text-[11px] font-bold text-on-surface-variant/60">
                   by {log.admin_name ?? '알 수 없음'}
                 </span>
                 {log.reason && (
-                  <span className="text-[11px] text-on-surface-variant truncate">
+                  <span className="text-[11px] font-bold text-on-surface-variant/60 truncate">
                     · {log.reason}
                   </span>
                 )}
@@ -86,7 +87,7 @@ export default function LogsTab() {
             </div>
 
             {/* 시간 */}
-            <span className="text-[10px] text-on-surface-variant flex-shrink-0">{dateStr}</span>
+            <span className="text-[10px] font-bold text-on-surface-variant/40 flex-shrink-0">{dateStr}</span>
           </div>
         );
       })}

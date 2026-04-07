@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useReservations } from '../hooks/useReservations';
+import { useAutoCleanup } from '../hooks/useAutoCleanup';
 import BottomNav from '../components/BottomNav';
 import ReservationModal from '../components/ReservationModal';
 import type { ReservationWithDetails } from '../types';
@@ -15,6 +16,9 @@ export interface AppShellContext {
 export default function AppShell() {
   const { profile, loading: authLoading } = useAuth();
   const { data: reservations = [] } = useReservations();
+  
+  // 관리자 접속 시 14일 경과 데이터 청소
+  useAutoCleanup();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingReservation, setEditingReservation] = useState<ReservationWithDetails | null>(null);

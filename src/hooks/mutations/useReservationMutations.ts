@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
+import { queryKeys } from '../../lib/queryKeys';
 import { computeIsNextDay } from '../../utils/validation';
 import type { Purpose } from '../../types';
 
@@ -49,7 +50,7 @@ export function useCreateReservation() {
       return newRes;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reservations'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.reservations.all });
     },
   });
 }
@@ -66,12 +67,20 @@ interface UpdatePayload {
   invitees: string[];
 }
 
+import { useAuth } from '../../context/AuthContext';
+import { isPastReservation } from '../../utils/time';
+
 export function useUpdateReservation() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
 
   return useMutation({
     mutationFn: async (payload: UpdatePayload) => {
       const isNextDay = computeIsNextDay(payload.startTime, payload.endTime);
+
+      if (isPastReservation(payload.date, payload.endTime, isNextDay) && !profile?.is_admin) {
+        throw new Error('지난 일정은 수정할 수 없습니다.');
+      }
 
       const { error: updateErr } = await supabase
         .from('reservations')
@@ -102,7 +111,7 @@ export function useUpdateReservation() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reservations'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.reservations.all });
     },
   });
 }

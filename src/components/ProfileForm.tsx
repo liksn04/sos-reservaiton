@@ -8,7 +8,6 @@ const PARTS: { value: Part; label: string }[] = [
   { value: 'drum',     label: '드럼' },
   { value: 'bass',     label: '베이스' },
   { value: 'keyboard', label: '키보드' },
-  { value: 'other',    label: '기타(other)' },
 ];
 
 interface ProfileFormProps {
@@ -26,7 +25,7 @@ interface ProfileFormProps {
 export default function ProfileForm({ mode, profile, onSuccess, onCancel }: ProfileFormProps) {
   const {
     displayName, setDisplayName,
-    part, setPart,
+    part, togglePart,
     bio, setBio,
     currentAvatar,
     fileInputRef,
@@ -35,9 +34,13 @@ export default function ProfileForm({ mode, profile, onSuccess, onCancel }: Prof
     isPending,
     error,
     success,
+    // [규칙 4] 동명이인 토글
+    showDuplicateToggle,
+    allowDuplicateName,
+    setAllowDuplicateName,
   } = useProfileForm({
     initialValues: profile
-      ? { displayName: profile.display_name, part: profile.part ?? 'guitar', bio: profile.bio ?? '', avatarUrl: profile.avatar_url }
+      ? { displayName: profile.display_name, part: profile.part ?? [], bio: profile.bio ?? '', avatarUrl: profile.avatar_url }
       : undefined,
     onSuccess,
   });
@@ -56,21 +59,102 @@ export default function ProfileForm({ mode, profile, onSuccess, onCancel }: Prof
           <label>닉네임 *</label>
           <input
             type="text"
-            placeholder="동아리에서 쓸 이름"
+            placeholder="실명을 입력해주세요."
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             maxLength={20}
             required
           />
+          {/* [규칙 3] 실명 안내 */}
+          <p style={{ fontSize: '11px', color: 'var(--color-on-surface-variant, #9ca3af)', marginTop: '4px' }}>
+            실명으로 등록하면 동아리원이 쉽게 알아볼 수 있습니다.
+          </p>
+
+          {/* [규칙 4] 동명이인 토글 */}
+          {showDuplicateToggle && (
+            <div
+              style={{
+                marginTop: '8px',
+                padding: '10px 12px',
+                borderRadius: '8px',
+                background: 'rgba(234, 179, 8, 0.1)',
+                border: '1px solid rgba(234, 179, 8, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '8px',
+              }}
+            >
+              <span style={{ fontSize: '12px', color: '#ca8a04', fontWeight: 600 }}>
+                동명이인이신가요?
+              </span>
+              <button
+                type="button"
+                onClick={() => setAllowDuplicateName(!allowDuplicateName)}
+                style={{
+                  width: '40px',
+                  height: '22px',
+                  borderRadius: '11px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  backgroundColor: allowDuplicateName ? 'var(--color-primary, #6366f1)' : '#d1d5db',
+                  position: 'relative',
+                  transition: 'background-color 0.2s ease',
+                  flexShrink: 0,
+                }}
+                aria-label={allowDuplicateName ? '동명이인 허용 해제' : '동명이인으로 등록 허용'}
+              >
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '3px',
+                    left: allowDuplicateName ? '21px' : '3px',
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '50%',
+                    backgroundColor: '#fff',
+                    transition: 'left 0.2s ease',
+                    display: 'block',
+                  }}
+                />
+              </button>
+            </div>
+          )}
+          {/* 동명이인 허용 안내 */}
+          {showDuplicateToggle && allowDuplicateName && (
+            <p style={{ fontSize: '11px', color: 'var(--color-primary, #6366f1)', marginTop: '4px', fontWeight: 600 }}>
+              동명이인으로 등록됩니다. 저장 버튼을 다시 눌러주세요.
+            </p>
+          )}
         </div>
 
         <div className="form-group">
-          <label>담당 파트</label>
-          <select value={part} onChange={(e) => setPart(e.target.value as Part)}>
-            {PARTS.map((p) => (
-              <option key={p.value} value={p.value}>{p.label}</option>
-            ))}
-          </select>
+          <label>담당 파트 (중복 선택 가능)</label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginTop: '8px' }}>
+            {PARTS.map((p) => {
+              const isSelected = part.includes(p.value);
+              return (
+                <button
+                  key={p.value}
+                  type="button"
+                  onClick={() => (togglePart as any)(p.value)}
+                  style={{
+                    padding: '8px 4px',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    border: isSelected ? '1px solid var(--color-primary, #6366f1)' : '1px solid #d1d5db',
+                    backgroundColor: isSelected ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
+                    color: isSelected ? 'var(--color-primary, #6366f1)' : '#6b7280',
+                  }}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="form-group">
@@ -90,7 +174,7 @@ export default function ProfileForm({ mode, profile, onSuccess, onCancel }: Prof
           type="submit"
           className="primary-btn"
           style={{ width: '100%', justifyContent: 'center' }}
-          disabled={isPending}
+          disabled={isPending || (showDuplicateToggle && !allowDuplicateName)}
         >
           {isPending ? '저장 중...' : '프로필 저장'}
         </button>
@@ -126,24 +210,74 @@ export default function ProfileForm({ mode, profile, onSuccess, onCancel }: Prof
           <input
             type="text"
             className="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg p-3 text-on-surface focus:outline-none focus:border-primary/60 transition-colors"
+            placeholder="실명을 입력해주세요."
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             maxLength={20}
             required
           />
+          {/* [규칙 3] 실명 안내 */}
+          <p className="text-[11px] text-on-surface-variant mt-1">
+            실명으로 등록하면 동아리원이 쉽게 알아볼 수 있습니다.
+          </p>
+
+          {/* [규칙 4] 동명이인 토글 */}
+          {showDuplicateToggle && (
+            <div className="mt-2 flex items-center justify-between gap-2 px-3 py-2 rounded-lg"
+              style={{
+                background: 'rgba(234, 179, 8, 0.1)',
+                border: '1px solid rgba(234, 179, 8, 0.3)',
+              }}
+            >
+              <span className="text-xs font-bold" style={{ color: '#ca8a04' }}>
+                동명이인이신가요?
+              </span>
+              <button
+                type="button"
+                onClick={() => setAllowDuplicateName(!allowDuplicateName)}
+                className="relative flex-shrink-0 transition-colors duration-200 rounded-full border-none cursor-pointer"
+                style={{
+                  width: '40px',
+                  height: '22px',
+                  backgroundColor: allowDuplicateName ? 'var(--color-primary)' : '#4b5563',
+                }}
+                aria-label={allowDuplicateName ? '동명이인 허용 해제' : '동명이인으로 등록 허용'}
+              >
+                <span
+                  className="absolute top-[3px] w-4 h-4 rounded-full bg-white transition-all duration-200"
+                  style={{ left: allowDuplicateName ? '21px' : '3px' }}
+                />
+              </button>
+            </div>
+          )}
+          {showDuplicateToggle && allowDuplicateName && (
+            <p className="text-xs text-primary font-bold mt-1">
+              동명이인으로 등록됩니다. 저장 버튼을 다시 눌러주세요.
+            </p>
+          )}
         </div>
 
         <div className="form-group">
-          <label>담당 파트</label>
-          <select
-            value={part}
-            onChange={(e) => setPart(e.target.value as Part)}
-            className="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg p-3 text-on-surface focus:outline-none focus:border-primary/60 transition-colors appearance-none"
-          >
-            {PARTS.map((p) => (
-              <option key={p.value} value={p.value}>{p.label}</option>
-            ))}
-          </select>
+          <label className="text-sm font-bold text-on-surface-variant mb-2 block">담당 세션 (다중 선택)</label>
+          <div className="grid grid-cols-3 gap-2">
+            {PARTS.map((p) => {
+              const isSelected = part.includes(p.value);
+              return (
+                <button
+                  key={p.value}
+                  type="button"
+                  onClick={() => (togglePart as any)(p.value)}
+                  className={`py-3 px-2 rounded-xl text-xs font-bold transition-all duration-200 border ${
+                    isSelected 
+                      ? 'bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(204,151,255,0.1)]' 
+                      : 'bg-surface-container-low border-outline-variant/30 text-on-surface-variant hover:border-outline-variant'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="form-group">
@@ -163,7 +297,7 @@ export default function ProfileForm({ mode, profile, onSuccess, onCancel }: Prof
         <button
           type="submit"
           className="primary-btn w-full mt-4 py-4"
-          disabled={isPending}
+          disabled={isPending || (showDuplicateToggle && !allowDuplicateName)}
         >
           {isPending ? 'SAVING...' : 'SAVE CHANGES'}
         </button>

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
+import { queryKeys } from '../../lib/queryKeys';
 import type { ProfileStatus } from '../../types';
 
 interface StatusPayload {
@@ -35,11 +36,9 @@ export function useUserStatusMutation() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'pending'] });
-      queryClient.invalidateQueries({ queryKey: ['admin', 'approved'] });
-      queryClient.invalidateQueries({ queryKey: ['admin', 'logs'] });
-      // 하위 호환 — 기존 queryKey도 무효화
-      queryClient.invalidateQueries({ queryKey: ['pendingUsers'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.pending });
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.approved });
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.logs });
     },
   });
 }
