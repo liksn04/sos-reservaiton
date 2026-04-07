@@ -73,7 +73,7 @@ export default function InviteePicker({ members, selected, currentUserId, onChan
                   )}
                 </div>
                 <div className="flex-1 flex flex-col">
-                  <span className="text-sm font-bold text-on-surface leading-tight text-white">{member.display_name}</span>
+                  <span className="text-sm font-bold text-on-surface leading-tight">{member.display_name}</span>
                   {member.part && (
                     <span className="text-[10px] text-on-surface-variant uppercase tracking-wider">
                       {PART_LABELS[member.part]}

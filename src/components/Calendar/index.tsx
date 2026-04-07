@@ -60,12 +60,12 @@ export default function Calendar({
               onClick={() => onSelectDate(cellDate)}
             >
               <div className="day-cell-content">
-                <span 
+                <span
                   className="day-number"
-                  style={{ 
-                    color: isSelected 
-                      ? 'var(--on-primary-fixed)' 
-                      : (dow === 0 ? 'var(--error)' : dow === 6 ? 'var(--primary)' : 'white')
+                  style={{
+                    color: isSelected
+                      ? '#ffffff'
+                      : (dow === 0 ? 'var(--error)' : dow === 6 ? 'var(--primary)' : 'var(--text-main)')
                   }}
                 >
                   {day}

@@ -48,9 +48,9 @@ export default function Reserve() {
       <h2 className="dashboard-title text-center">합주실 예약</h2>
 
       {/* 달력 카드 */}
-      <div style={{ background: 'var(--surface-container)', padding: '1.5rem', borderRadius: '1.5rem', border: '1px solid var(--card-border)' }}>
+      <div style={{ background: 'var(--surface-container-high)', padding: '1.5rem', borderRadius: '1.5rem', border: '1px solid var(--primary-border)', boxShadow: 'var(--primary-glow-shadow)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'white' }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-main)' }}>
             {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
           </h3>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -83,7 +83,7 @@ export default function Reserve() {
       {/* 선택 날짜 일정 */}
       <div style={{ marginTop: '2.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1rem' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: '700', color: 'white' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-main)' }}>
             선택된 날짜{' '}
             <span style={{ color: 'var(--primary)' }}>
               {selectedDate.getMonth() + 1}/{selectedDate.getDate()}

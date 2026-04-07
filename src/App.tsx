@@ -14,6 +14,8 @@ import Reserve from './routes/Reserve';
 import ProfileRoute from './routes/ProfileRoute';
 import Admin from './routes/Admin';
 import BannedPage from './routes/BannedPage';
+import OfflineBanner from './components/OfflineBanner';
+import UpdatePrompt from './components/UpdatePrompt';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,10 +42,10 @@ function AppErrorBoundary({ children }: { children: React.ReactNode }) {
 
   if (hasError) {
     return (
-      <div className="min-h-screen bg-black text-white p-10 flex flex-col items-center justify-center text-center">
-        <h1 className="text-4xl font-black text-red-500 mb-4">CRITICAL ERROR</h1>
-        <p className="text-gray-400 mb-8 max-w-md">앱 렌더링 중 치명적인 오류가 발생했습니다.<br/>{error?.message}</p>
-        <button onClick={() => window.location.reload()} className="px-6 py-2 bg-white text-black rounded-full font-bold">새로고침</button>
+      <div className="min-h-screen bg-background text-on-surface p-10 flex flex-col items-center justify-center text-center">
+        <h1 className="text-4xl font-black text-error mb-4">CRITICAL ERROR</h1>
+        <p className="text-on-surface-variant mb-8 max-w-md">앱 렌더링 중 치명적인 오류가 발생했습니다.<br/>{error?.message}</p>
+        <button onClick={() => window.location.reload()} className="primary-btn px-6">새로고침</button>
       </div>
     );
   }
@@ -54,6 +56,8 @@ function AppErrorBoundary({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <AppErrorBoundary>
+      <OfflineBanner />
+      <UpdatePrompt />
       <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>

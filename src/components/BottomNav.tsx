@@ -8,17 +8,19 @@ const TABS = [
 
 export default function BottomNav() {
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-surface max-w-2xl mx-auto right-0 border-t border-white/5">
+    <nav
+        className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 max-w-2xl mx-auto right-0 border-t"
+        style={{ backgroundColor: 'var(--nav-bg)', borderColor: 'var(--nav-border)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}
+      >
       {TABS.map(({ to, icon, label, end }) => (
         <NavLink
           key={to}
           to={to}
           end={end}
-          className={({ isActive }) =>
-            `flex flex-col items-center justify-center transition-all p-2 rounded-xl ${
-              isActive ? 'text-primary' : 'text-gray-500 hover:text-white'
-            }`
-          }
+          className="flex flex-col items-center justify-center transition-all p-2 rounded-xl"
+          style={({ isActive }) => ({
+            color: isActive ? 'var(--primary)' : 'var(--text-on-surface-var)',
+          })}
         >
           {({ isActive }) => (
             <>

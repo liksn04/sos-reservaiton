@@ -57,7 +57,13 @@ export default function DailySchedule({
               {/* Middle: Content */}
               <div className="flex-1 min-w-0 pr-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest ${res.purpose === '합주' ? 'bg-tertiary/20 text-tertiary' : 'bg-surface-container-high text-on-surface-variant'}`}>
+                  <span
+                    className="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest"
+                    style={res.purpose === '합주'
+                      ? { backgroundColor: 'var(--club-tag-bg)', color: 'var(--primary)' }
+                      : { backgroundColor: 'var(--surface-container)', color: 'var(--text-muted)' }
+                    }
+                  >
                     {res.purpose}
                   </span>
                   {isHost && (
@@ -97,14 +103,16 @@ export default function DailySchedule({
               {/* Right: Actions */}
               {isEditable && (
                 <div className="flex flex-col gap-1.5 ml-auto pl-2">
-                  <button 
-                    className="w-8 h-8 rounded-full flex items-center justify-center bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant" 
+                  <button
+                    className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                    style={{ backgroundColor: 'var(--surface-container)', color: 'var(--text-muted)', border: '1px solid var(--outline-border)' }}
                     onClick={() => onEdit(res)}
                   >
                     <span className="material-symbols-outlined text-[18px]">settings</span>
                   </button>
-                  <button 
-                    className="w-8 h-8 rounded-full flex items-center justify-center bg-surface-container hover:bg-error-container/10 hover:text-error transition-colors text-on-surface-variant" 
+                  <button
+                    className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                    style={{ backgroundColor: 'var(--surface-container)', color: 'var(--text-muted)', border: '1px solid var(--outline-border)' }}
                     onClick={() => onDelete(res.id, res.team_name)}
                   >
                     <span className="material-symbols-outlined text-[18px]">delete</span>

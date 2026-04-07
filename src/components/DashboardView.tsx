@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import type { ReservationWithDetails } from '../types';
 import { normalizeTime } from '../utils/time';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface DashboardViewProps {
   reservations: ReservationWithDetails[];
@@ -9,6 +10,7 @@ interface DashboardViewProps {
 
 export default function DashboardView({ reservations, totalUserCount }: DashboardViewProps) {
   const navigate = useNavigate();
+  const { resolvedTheme } = useTheme();
   const now = new Date();
   const todayStr = now.toISOString().split('T')[0];
   const currentTimeStr = now.toTimeString().slice(0, 5); // "HH:mm"
@@ -36,7 +38,21 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
 
   // ── 다음 일정 (진행 중인 것 제외) ─────────────────
   const nextRes = reservations
-    .filter((r) => r.date >= todayStr && r.id !== ongoing?.id)
+    .filter((r) => {
+      // 1. 현재 진행 중인 세션은 제외 (primaryRes에서 따로 세밀히 처리됨)
+      if (r.id === ongoing?.id) return false;
+      
+      // 2. 미래의 날짜인 경우 포함
+      if (r.date > todayStr) return true;
+      
+      // 3. 오늘인 경우: 현재 시간 이후에 시작하는 것만 포함
+      if (r.date === todayStr) {
+        const startTime = r.start_time.slice(0, 5);
+        return startTime > currentTimeStr;
+      }
+      
+      return false;
+    })
     .sort((a, b) => a.date.localeCompare(b.date) || a.start_time.localeCompare(b.start_time))
     .at(0);
 
@@ -58,7 +74,9 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
           빛소리 밴드 동아리
         </div>
         <h2 className="dashboard-title italic">
-          <span className="text-gradient-white-purple">오늘도 뜨겁게</span><br />
+          <span className="text-gradient-white-purple">
+            {resolvedTheme === 'light' ? '오늘도 시원하게' : '오늘도 뜨겁게'}
+          </span><br />
           <span>연주해 볼까요?</span>
         </h2>
         <p className="dashboard-subtitle">
@@ -69,7 +87,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
       {/* Main Schedule Hero Section */}
       <section style={{ marginBottom: '2.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1rem' }}>
-          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '1rem', fontWeight: '700', color: 'white' }}>
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '1rem', fontWeight: '700', color: 'var(--text-main)' }}>
             {isOngoingNow ? (
               <>
                 <div className="live-indicator pulse-green" style={{ width: '10px', height: '10px' }}></div>
@@ -117,7 +135,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
             
             {/* Bottom section of the card */}
             <div style={{ position: 'relative', zIndex: 1, marginTop: '1rem' }}>
-              <p className="upcoming-date" style={{ fontSize: '1.6rem', fontWeight: '800', color: 'white', marginBottom: '0.25rem' }}>
+              <p className="upcoming-date" style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '0.25rem' }}>
                 {formatDateLabel(primaryRes.date)}
               </p>
               <p className="upcoming-time" style={{ color: 'var(--primary)', fontWeight: '700', fontSize: '1.15rem' }}>
@@ -125,7 +143,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
               </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: '16px', color: 'var(--text-muted)' }}>info</span>
-                <p style={{ color: 'white', fontSize: '0.9rem', fontWeight: '500' }}>{primaryRes.purpose}</p>
+                <p style={{ color: 'var(--text-main)', fontSize: '0.9rem', fontWeight: '500' }}>{primaryRes.purpose}</p>
               </div>
             </div>
 

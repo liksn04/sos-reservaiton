@@ -59,8 +59,27 @@ export default function ProfileRoute() {
       return normalizeTime(a.start_time).localeCompare(normalizeTime(b.start_time));
     });
 
-  const myReservations = allMyRes.filter((r) => r.date >= today);
-  const myHistory      = allMyRes.filter((r) => r.date < today).reverse();
+  const currentTime = new Date().toTimeString().slice(0, 5); // "HH:mm"
+
+  const myReservations = allMyRes.filter((r) => {
+    // 1. 미래 날짜인 경우
+    if (r.date > today) return true;
+    // 2. 오늘인 경우: 아직 종료되지 않은 것만 포함 (전체 시간 기준)
+    if (r.date === today) {
+      return normalizeTime(r.end_time) > currentTime;
+    }
+    return false;
+  });
+
+  const myHistory = allMyRes.filter((r) => {
+    // 1. 과거 날짜인 경우
+    if (r.date < today) return true;
+    // 2. 오늘인 경우: 이미 종료된 것만 포함
+    if (r.date === today) {
+      return normalizeTime(r.end_time) <= currentTime;
+    }
+    return false;
+  }).reverse();
 
   return (
     <div className="tab-content animate-slide-up">
@@ -79,33 +98,36 @@ export default function ProfileRoute() {
               className="empty-card flex-col gap-4 border-none bg-surface-container relative overflow-hidden"
               style={{ borderRadius: '1.5rem', padding: '2rem 1.5rem' }}
             >
-              <div className="w-20 h-20 rounded-full overflow-hidden border border-outline-variant/30 flex items-center justify-center bg-surface-container-highest relative z-10">
+              <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center relative z-10" style={{ backgroundColor: 'var(--surface-container-high)', border: '1px solid var(--outline-border)' }}>
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="User Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="material-symbols-outlined text-[40px] text-outline-variant">person</span>
+                  <span className="material-symbols-outlined text-[40px]" style={{ color: 'var(--text-muted)' }}>person</span>
                 )}
               </div>
               <div className="flex flex-col items-center z-10 relative">
                 <span className="text-[10px] font-bold tracking-widest text-primary mb-1">멤버십 프로필</span>
-                <h2 className="text-xl font-bold text-white mb-4">{profile?.display_name || '게스트'}</h2>
+                <h2 className="text-xl font-bold text-on-surface mb-4">{profile?.display_name || '게스트'}</h2>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setIsEditingProfile(true)}
-                    className="px-4 py-2 rounded-lg bg-surface-container-highest text-xs font-bold text-white transition-colors border border-outline-variant/20"
+                    className="px-4 py-2 rounded-lg text-xs font-bold transition-colors"
+                    style={{ backgroundColor: 'var(--surface-container-high)', color: 'var(--text-main)', border: '1px solid var(--outline-border)' }}
                   >
                     프로필 편집
                   </button>
                   <button
                     onClick={signOut}
-                    className="px-4 py-2 rounded-lg bg-surface-container-highest text-xs font-bold text-error/80 transition-colors border border-outline-variant/20"
+                    className="px-4 py-2 rounded-lg text-xs font-bold transition-colors"
+                    style={{ backgroundColor: 'var(--surface-container-high)', color: 'var(--error)', border: '1px solid var(--outline-border)' }}
                   >
                     로그아웃
                   </button>
                   {profile?.is_admin && (
                     <Link
                       to="/admin"
-                      className="px-4 py-2 rounded-lg bg-surface-container-highest text-xs font-bold text-primary transition-colors border border-primary/30"
+                      className="px-4 py-2 rounded-lg text-xs font-bold transition-colors"
+                      style={{ backgroundColor: 'var(--club-tag-bg)', color: 'var(--primary)', border: '1px solid var(--primary-border)' }}
                     >
                       관리자
                     </Link>
@@ -148,21 +170,27 @@ export default function ProfileRoute() {
           </section>
 
           {/* 서브탭 */}
-          <div className="flex gap-4 mb-8 border-b border-outline-variant/20">
+          <div className="flex gap-4 mb-8 border-b" style={{ borderColor: 'var(--outline-border)' }}>
             <button onClick={() => setScheduleTab('upcoming')} className="relative pb-3 px-1 group">
-              <span className={`text-lg font-black italic transition-colors ${scheduleTab === 'upcoming' ? 'text-purple-300' : 'text-on-surface-variant group-hover:text-on-surface'}`}>
+              <span
+                className="text-lg font-black italic transition-colors"
+                style={{ color: scheduleTab === 'upcoming' ? 'var(--primary)' : 'var(--text-muted)' }}
+              >
                 다가오는 일정
               </span>
               {scheduleTab === 'upcoming' && (
-                <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-tertiary rounded-t-lg shadow-[0_0_10px_rgba(168,85,247,0.5)]"></div>
+                <div className="absolute bottom-0 left-0 w-full h-1 rounded-t-lg" style={{ background: 'var(--primary-btn-gradient)', boxShadow: 'var(--primary-glow-shadow)' }}></div>
               )}
             </button>
             <button onClick={() => setScheduleTab('history')} className="relative pb-3 px-1 group">
-              <span className={`text-lg font-black italic transition-colors ${scheduleTab === 'history' ? 'text-purple-300' : 'text-on-surface-variant group-hover:text-on-surface'}`}>
+              <span
+                className="text-lg font-black italic transition-colors"
+                style={{ color: scheduleTab === 'history' ? 'var(--primary)' : 'var(--text-muted)' }}
+              >
                 지난 일정
               </span>
               {scheduleTab === 'history' && (
-                <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-tertiary rounded-t-lg shadow-[0_0_10px_rgba(168,85,247,0.5)]"></div>
+                <div className="absolute bottom-0 left-0 w-full h-1 rounded-t-lg" style={{ background: 'var(--primary-btn-gradient)', boxShadow: 'var(--primary-glow-shadow)' }}></div>
               )}
             </button>
           </div>
@@ -191,7 +219,13 @@ export default function ProfileRoute() {
                     className={`glass-card rounded-[1.5rem] p-5 flex items-center gap-4 border transition-all ${isDday ? 'border-primary/40 bg-primary/5 shadow-[0_4px_20px_rgba(204,151,255,0.1)]' : 'border-outline-variant/10'}`}
                   >
                     {/* D-Day 배지 */}
-                    <div className={`flex flex-col items-center justify-center min-w-[72px] h-[72px] rounded-full border flex-shrink-0 ${isDday ? 'bg-primary/10 border-primary/30' : 'bg-surface-container-highest border-outline-variant/30'}`}>
+                    <div
+                      className="flex flex-col items-center justify-center min-w-[72px] h-[72px] rounded-full border flex-shrink-0"
+                      style={isDday
+                        ? { backgroundColor: 'var(--club-tag-bg)', borderColor: 'var(--primary-border)' }
+                        : { backgroundColor: 'var(--surface-container)', borderColor: 'var(--outline-border)' }
+                      }
+                    >
                       {isDday ? (
                         <div className="flex flex-col items-center">
                           <span className="font-black text-xl italic tracking-tighter text-primary leading-none">D-</span>

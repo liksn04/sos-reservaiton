@@ -14,8 +14,6 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 const STORAGE_KEY = 'sos-theme';
-
-/** OS의 다크 모드 미디어 쿼리 */
 const darkMQ = window.matchMedia('(prefers-color-scheme: dark)');
 
 function getSystemTheme(): 'dark' | 'light' {
@@ -24,28 +22,24 @@ function getSystemTheme(): 'dark' | 'light' {
 
 function applyTheme(resolved: 'dark' | 'light') {
   const html = document.documentElement;
-  if (resolved === 'light') {
-    html.classList.add('light');
-  } else {
-    html.classList.remove('light');
+  // 기존 테마 클래스를 모두 제거한 뒤 정확히 하나만 추가
+  html.classList.remove('dark', 'light');
+  html.classList.add(resolved);
+
+  // PWA theme-color 메타 업데이트
+  const meta = document.getElementById('theme-color-meta');
+  if (meta) {
+    meta.setAttribute('content', resolved === 'light' ? '#FFFBFE' : '#131316');
   }
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // ── AI/개발자 참고 로직 ──────────────────────────────────────────
-  // 라이트 모드 전환 시 UI 레이아웃이 깨지는 버그가 있어, 
-  // 해결 전까지 운영(Production) 환경에서는 'dark' 테마로 고정합니다.
-  // 개발(Dev) 환경(npm run dev)에서는 테스트를 위해 localStorage 설정을 허용합니다.
-  // ──────────────────────────────────────────────────────────────
-  const isDev = import.meta.env.DEV;
-
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (!isDev) return 'dark'; // 운영 환경에서는 무조건 다크 모드
-    return (localStorage.getItem(STORAGE_KEY) as Theme | null) ?? 'dark';
-  });
+  const [theme, setThemeState] = useState<Theme>(
+    () => (localStorage.getItem(STORAGE_KEY) as Theme | null) ?? 'dark',
+  );
 
   const resolvedTheme: 'dark' | 'light' =
-    !isDev ? 'dark' : (theme === 'system' ? getSystemTheme() : theme);
+    theme === 'system' ? getSystemTheme() : theme;
 
   // 테마 적용
   useEffect(() => {

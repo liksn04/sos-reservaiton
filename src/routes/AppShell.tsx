@@ -38,8 +38,8 @@ export default function AppShell() {
 
   if (authLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-black">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+      <div className="loading-screen">
+        <div className="spinner" />
       </div>
     );
   }
@@ -49,7 +49,7 @@ export default function AppShell() {
   }
 
   return (
-    <div className="min-h-screen pb-24 text-on-surface bg-background max-w-2xl mx-auto relative">
+    <div className="min-h-screen pb-24 max-w-2xl mx-auto relative" style={{ backgroundColor: 'var(--bg-dark)', color: 'var(--text-main)' }}>
 
       {/* ── Top App Bar ── */}
       <header className="top-app-bar">
@@ -70,12 +70,12 @@ export default function AppShell() {
               {profile?.display_name || '게스트'}
             </span>
           </div>
-          <div className="w-10 h-10 rounded-xl overflow-hidden bg-surface-container-highest border border-outline-variant/10 shadow-lg">
+          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg" style={{ backgroundColor: 'var(--surface-highest)', border: '1px solid var(--outline-border)' }}>
             {profile?.avatar_url ? (
               <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <span className="material-symbols-outlined text-outline-variant text-[20px]">person</span>
+                <span className="material-symbols-outlined text-[20px]" style={{ color: 'var(--text-muted)' }}>person</span>
               </div>
             )}
           </div>
