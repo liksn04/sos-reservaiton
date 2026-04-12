@@ -22,7 +22,7 @@
           document.documentElement.classList.add(resolved);
           // theme-color 메타도 즉시 업데이트
           var meta = document.getElementById('theme-color-meta');
-          if (meta) meta.setAttribute('content', resolved === 'light' ? '#FFFBFE' : '#131316');
+          if (meta) meta.setAttribute('content', resolved === 'light' ? '#F8F9FF' : '#131316');
         } catch (e) {
           // localStorage 접근 실패 시 기본값(dark) 사용
           document.documentElement.classList.add('dark');
@@ -32,7 +32,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Great+Vibes&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Pretendard:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link

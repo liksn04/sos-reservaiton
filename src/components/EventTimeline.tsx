@@ -45,10 +45,10 @@ export default function EventTimeline({ events }: Props) {
       <div className="flex items-center gap-3 overflow-x-auto pb-4 pt-2 px-1 no-scrollbar">
         <button
           onClick={() => setSelectedYear('all')}
-          className={`px-6 py-2 rounded-2xl text-xs font-black italic transition-all whitespace-nowrap shadow-sm border shrink-0 ${
+          className={`px-6 py-2 rounded-full text-xs font-black transition-all whitespace-nowrap shadow-sm border shrink-0 ${
             selectedYear === 'all'
               ? 'bg-primary text-white border-primary shadow-primary/20 scale-105 z-10'
-              : 'bg-surface-container-low border-card-border opacity-50 hover:opacity-100'
+              : 'bg-surface-container-low border-card-border text-on-surface-variant opacity-80 hover:opacity-100'
           }`}
         >
           ALL TIME
@@ -57,10 +57,10 @@ export default function EventTimeline({ events }: Props) {
           <button
             key={year}
             onClick={() => setSelectedYear(year)}
-            className={`px-6 py-2 rounded-2xl text-xs font-black italic transition-all whitespace-nowrap shadow-sm border shrink-0 ${
+            className={`px-6 py-2 rounded-full text-xs font-black transition-all whitespace-nowrap shadow-sm border shrink-0 ${
               selectedYear === year
                 ? 'bg-secondary text-white border-secondary shadow-secondary/20 scale-105 z-10'
-                : 'bg-surface-container-low border-card-border opacity-50 hover:opacity-100'
+                : 'bg-surface-container-low border-card-border text-on-surface-variant opacity-80 hover:opacity-100'
             }`}
           >
             {year}
@@ -89,8 +89,8 @@ export default function EventTimeline({ events }: Props) {
                   }}
                 >
                   <div className="flex flex-col items-center leading-none">
-                    <span className="text-[10px] font-black italic tracking-widest text-primary/50 mb-0.5">YEAR</span>
-                    <span className="text-sm font-black italic tracking-tighter text-primary">{year}</span>
+                    <span className="text-[10px] font-black tracking-widest text-primary/50 mb-0.5">YEAR</span>
+                    <span className="text-sm font-black tracking-tighter text-primary">{year}</span>
                   </div>
                 </div>
               </div>
@@ -114,7 +114,7 @@ export default function EventTimeline({ events }: Props) {
                       </div>
 
                       {/* 내용 카드 */}
-                      <div className="glass-card rounded-[2rem] p-6 border border-card-border transition-all group-hover:border-primary/30 group-hover:shadow-2xl group-hover:shadow-primary/5 overflow-hidden relative">
+                      <div className="surface-card p-6 transition-all group-hover:border-primary/30 group-hover:shadow-2xl group-hover:shadow-primary/5 overflow-hidden relative">
                         {/* 배경 데코레이션 */}
                         <div 
                           className="absolute -top-12 -right-12 w-24 h-24 rounded-full blur-3xl opacity-10 transition-opacity group-hover:opacity-30"
@@ -132,12 +132,12 @@ export default function EventTimeline({ events }: Props) {
                                   {cat.name}
                                 </span>
                               )}
-                              <span className="text-[10px] font-black italic opacity-40 uppercase tracking-tighter">
+                              <span className="text-[10px] font-black opacity-40 uppercase tracking-tighter">
                                 {format(date, 'EEEE', { locale: ko })}
                               </span>
                             </div>
                             
-                            <h3 className="text-xl font-black italic tracking-tight text-on-surface mb-2 group-hover:text-primary transition-colors">
+                            <h3 className="font-headline text-xl font-bold tracking-tight text-on-surface mb-2 group-hover:text-primary transition-colors">
                               {ev.title}
                             </h3>
                             
@@ -156,7 +156,7 @@ export default function EventTimeline({ events }: Props) {
                           </div>
 
                           <div className="flex flex-col items-end min-w-fit">
-                            <div className="text-2xl font-black italic tracking-tighter text-on-surface group-hover:text-primary transition-colors flex items-center gap-2">
+                            <div className="font-headline text-2xl font-bold tracking-tighter text-on-surface group-hover:text-primary transition-colors flex items-center gap-2">
                               <span>{format(date, 'MM.dd')}</span>
                               <span className="text-[10px] pb-1 opacity-40">
                                 {format(date, 'eee', { locale: ko })}
@@ -167,7 +167,7 @@ export default function EventTimeline({ events }: Props) {
                                 {ev.participants.slice(0, 3).map((p, idx) => (
                                   <div 
                                     key={idx}
-                                    className="w-6 h-6 rounded-full border-2 border-surface bg-gray-200 overflow-hidden flex items-center justify-center text-[8px] font-black italic"
+                                    className="w-6 h-6 rounded-full border-2 border-surface bg-gray-200 overflow-hidden flex items-center justify-center text-[8px] font-black"
                                     title={p.profile?.display_name}
                                   >
                                     {p.profile?.avatar_url ? (
@@ -178,7 +178,7 @@ export default function EventTimeline({ events }: Props) {
                                   </div>
                                 ))}
                                 {ev.participants.length > 3 && (
-                                  <div className="w-6 h-6 rounded-full border-2 border-surface bg-surface-container-high flex items-center justify-center text-[8px] font-black italic">
+                                  <div className="w-6 h-6 rounded-full border-2 border-surface bg-surface-container-high flex items-center justify-center text-[8px] font-black">
                                     +{ev.participants.length - 3}
                                   </div>
                                 )}
@@ -199,7 +199,7 @@ export default function EventTimeline({ events }: Props) {
       {events.length === 0 && (
         <div className="py-20 flex flex-col items-center justify-center opacity-40 grayscale-[0.5]">
           <span className="material-symbols-outlined text-6xl mb-4 text-primary/30">history</span>
-          <p className="text-sm font-black italic text-on-surface/40">일정 역사가 아직 없습니다.</p>
+          <p className="font-headline text-sm font-bold text-on-surface/40">일정 역사가 아직 없습니다.</p>
         </div>
       )}
     </div>

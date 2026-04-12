@@ -9,20 +9,26 @@ interface Props {
 }
 
 export default function BanDialog({ isOpen, userName, onConfirm, onClose, isPending }: Props) {
+  if (!isOpen) return null;
+
+  return (
+    <BanDialogContent
+      userName={userName}
+      onConfirm={onConfirm}
+      onClose={onClose}
+      isPending={isPending}
+    />
+  );
+}
+
+function BanDialogContent({ userName, onConfirm, onClose, isPending }: Omit<Props, 'isOpen'>) {
   const [reason, setReason] = useState('');
 
   useEffect(() => {
-    if (isOpen) setReason('');
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
+  }, [onClose]);
 
   return (
     <div
@@ -31,7 +37,7 @@ export default function BanDialog({ isOpen, userName, onConfirm, onClose, isPend
     >
       <div className="modal-container" style={{ maxWidth: 400 }}>
         <div className="modal-header">
-          <h2 className="text-xl font-black italic tracking-tighter">
+          <h2 className="font-headline text-xl font-bold tracking-tight">
             회원 <span className="text-error">차단</span>
           </h2>
           <button

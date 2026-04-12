@@ -1,7 +1,7 @@
 import { useMembers } from '../../hooks/useMembers';
 import { useReservationForm } from './useReservationForm';
 import ReservationFormFields from './ReservationFormFields';
-import type { ReservationWithDetails } from '../../types';
+import type { Profile, ReservationWithDetails } from '../../types';
 
 interface Props {
   isOpen: boolean;
@@ -22,6 +22,31 @@ export default function ReservationModal({
 }: Props) {
   const { data: members = [] } = useMembers();
 
+  if (!isOpen) return null;
+
+  const formKey = editing?.id ?? `new-${initialDate.toISOString()}`;
+
+  return (
+    <ReservationModalContent
+      key={formKey}
+      onClose={onClose}
+      initialDate={initialDate}
+      editing={editing}
+      reservations={reservations}
+      currentUserId={currentUserId}
+      members={members}
+    />
+  );
+}
+
+function ReservationModalContent({
+  onClose,
+  initialDate,
+  editing,
+  reservations,
+  currentUserId,
+  members,
+}: Omit<Props, 'isOpen'> & { members: Profile[] }) {
   const {
     date, setDate,
     startTime, setStartTime,
@@ -33,20 +58,18 @@ export default function ReservationModal({
     error,
     submitting,
     handleSubmit,
-  } = useReservationForm({ isOpen, editing, initialDate, reservations, currentUserId, onClose });
-
-  if (!isOpen) return null;
+  } = useReservationForm({ editing, initialDate, reservations, currentUserId, onClose });
 
   const isEditing = !!editing;
 
   return (
     <div
-      className={`modal-overlay ${isOpen ? 'active' : ''}`}
+      className="modal-overlay active"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="modal-container flex flex-col max-h-[90vh] overflow-hidden">
         <div className="modal-header flex-shrink-0">
-          <h2 className="text-2xl font-black italic tracking-tighter">
+          <h2 className="font-headline text-2xl font-bold tracking-tight">
             {isEditing ? '예약' : '새로운'} <span className="text-primary">{isEditing ? '수정' : '예약'}</span>
           </h2>
           <button

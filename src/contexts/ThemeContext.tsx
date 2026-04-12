@@ -29,7 +29,7 @@ function applyTheme(resolved: 'dark' | 'light') {
   // PWA theme-color 메타 업데이트
   const meta = document.getElementById('theme-color-meta');
   if (meta) {
-    meta.setAttribute('content', resolved === 'light' ? '#FFFBFE' : '#131316');
+    meta.setAttribute('content', resolved === 'light' ? '#F8F9FF' : '#131316');
   }
 }
 

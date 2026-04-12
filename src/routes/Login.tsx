@@ -46,55 +46,62 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      {/* Background glow effects */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 blur-[100px] rounded-full pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-tertiary-container/10 blur-[100px] rounded-full pointer-events-none"></div>
+      <div className="absolute inset-x-0 top-0 h-[38vh] bg-gradient-to-b from-primary/10 to-transparent pointer-events-none"></div>
 
-      <div className="w-full max-w-sm flex flex-col items-center z-10 mb-8 mt-4">
-        
-        <div className="text-center mb-6 z-10 animate-fade-in-up">
-          <h1 className="text-7xl font-normal text-on-surface leading-[1.1] text-center" style={{ fontFamily: "'Great Vibes', cursive", textShadow: '0 0 40px rgba(168,85,247,0.5)' }}>
-            Sound of<br />
-            <span className="text-primary tracking-normal">Shine</span>
-          </h1>
-          <p className="text-on-surface-variant text-[10px] font-bold tracking-[0.25em] uppercase mt-3 py-1 px-3 border border-outline-variant/30 rounded-full inline-block">
-            동방 예약 시스템 V1.0
-          </p>
+      <div className="w-full max-w-sm z-10 mt-6 animate-fade-in-up">
+        <div
+          className="rounded-[2.25rem] p-8 text-white relative overflow-hidden"
+          style={{ background: 'var(--primary-btn-gradient)', boxShadow: 'var(--primary-glow-shadow)' }}
+        >
+          <div
+            className="absolute inset-0 opacity-30 pointer-events-none"
+            style={{ background: 'radial-gradient(circle at top right, rgba(255,255,255,0.9), transparent 40%)' }}
+          />
+          <div className="relative z-10">
+            <div className="club-tag !bg-white/15 !text-white !mb-4">빛소리 예약 시스템</div>
+            <h1 className="font-headline text-[2.6rem] font-bold leading-[1.05] tracking-tight">
+              지금 연습할<br />
+              시간을 잡아볼까요?
+            </h1>
+            <p className="mt-4 text-white/80 text-sm leading-6 font-medium">
+              동아리방 예약과 일정 확인을 한 손으로 빠르게 처리할 수 있도록 라이트모드 경험을 정돈했습니다.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="w-full max-w-sm space-y-3 mb-8">
-        <div className="glass-card rounded-[1.5rem] p-5 border border-outline-variant/10 hover:border-primary/30 transition-colors">
+      <div className="w-full max-w-sm space-y-3 my-8">
+        <div className="surface-card p-5 transition-colors">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center flex-shrink-0">
+            <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
               <span className="material-symbols-outlined text-primary text-[20px]">schedule</span>
             </div>
             <div>
-              <h3 className="text-base font-black italic text-on-surface">24시간 개방</h3>
-              <p className="text-on-surface-variant text-xs font-semibold">영감이 떠오를 때 언제든 연습하세요.</p>
+              <h3 className="font-headline text-base font-bold text-on-surface">24시간 개방</h3>
+              <p className="text-on-surface-variant text-xs font-semibold">영감이 떠오를 때 언제든 합주 시간을 확인하세요.</p>
             </div>
           </div>
         </div>
 
-        <div className="glass-card rounded-[1.5rem] p-5 border border-outline-variant/10 hover:border-primary/30 transition-colors">
+        <div className="surface-card p-5 transition-colors">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center flex-shrink-0">
+            <div className="w-11 h-11 rounded-2xl bg-tertiary/10 flex items-center justify-center flex-shrink-0">
               <span className="material-symbols-outlined text-tertiary text-[20px]">bolt</span>
             </div>
             <div>
-              <h3 className="text-base font-black italic text-on-surface">간편한 예약</h3>
+              <h3 className="font-headline text-base font-bold text-on-surface">간편한 예약</h3>
               <p className="text-on-surface-variant text-xs font-semibold">몇 번의 터치로 무대를 예약하세요.</p>
             </div>
           </div>
         </div>
 
-        <div className="glass-card rounded-[1.5rem] p-5 border border-outline-variant/10 hover:border-primary/30 transition-colors">
+        <div className="surface-card p-5 transition-colors">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center flex-shrink-0">
+            <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
               <span className="material-symbols-outlined text-primary-fixed text-[20px]">verified</span>
             </div>
             <div>
-              <h3 className="text-base font-black italic text-on-surface">체계적인 예약 관리</h3>
+              <h3 className="font-headline text-base font-bold text-on-surface">체계적인 예약 관리</h3>
               <p className="text-on-surface-variant text-xs font-semibold">효율적으로 합주실 일정을 관리하세요.</p>
             </div>
           </div>
@@ -104,7 +111,7 @@ export default function Login() {
       <div className="w-full max-w-sm space-y-3 z-10">
         <button
           onClick={handleKakaoLogin}
-          className="w-full py-4 rounded-full bg-[#FEE500] text-[#191919] font-black flex items-center justify-center gap-3 hover:bg-[#FADA0A] transition-all text-[15px] shadow-[0_8px_24px_rgba(254,229,0,0.15)] active:scale-[0.98]"
+          className="w-full py-4 rounded-full bg-[#FEE500] text-[#191919] font-black flex items-center justify-center gap-3 hover:bg-[#FADA0A] transition-all text-[15px] shadow-[0_10px_24px_rgba(254,229,0,0.2)] active:scale-[0.98]"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 3C6.477 3 2 6.477 2 10.8c0 2.7 1.6 5.077 4.05 6.577L5.1 21l4.65-2.325C10.2 18.9 11.1 19.05 12 19.05c5.523 0 10-3.477 10-7.8S17.523 3 12 3z" />
@@ -124,7 +131,7 @@ export default function Login() {
       </div>
 
       <div className="absolute bottom-6 w-full text-center">
-        <p className="text-[9px] font-bold tracking-widest uppercase text-outline/50">
+        <p className="text-[9px] font-bold tracking-widest uppercase text-outline/60">
           로그인 시 <a href="#" className="underline text-on-surface-variant hover:text-on-surface">이용약관</a>에 동의하는 것으로 간주됩니다
         </p>
       </div>

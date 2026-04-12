@@ -12,7 +12,7 @@ export default function ThemeToggle() {
 
   return (
     <div
-      className="flex rounded-xl overflow-hidden border border-outline-variant/20"
+      className="segmented-control w-full"
       role="group"
       aria-label="테마 선택"
     >
@@ -22,11 +22,7 @@ export default function ThemeToggle() {
           <button
             key={value}
             onClick={() => setTheme(value)}
-            className={`flex-1 py-2.5 px-2 text-xs font-bold flex flex-col items-center gap-1 transition-colors ${
-              isActive
-                ? 'bg-primary/15 text-primary'
-                : 'text-on-surface-variant hover:bg-surface-container-high'
-            }`}
+            className={`segmented-option flex-1 flex-col ${isActive ? 'active' : ''}`}
             aria-pressed={isActive}
             aria-label={label}
           >

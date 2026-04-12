@@ -8,6 +8,12 @@ interface Props {
 }
 
 export default function DeleteAccountDialog({ isOpen, onClose }: Props) {
+  if (!isOpen) return null;
+
+  return <DeleteAccountDialogContent onClose={onClose} />;
+}
+
+function DeleteAccountDialogContent({ onClose }: Pick<Props, 'onClose'>) {
   const { profile, signOut } = useAuth();
   const deleteAccount = useDeleteAccount();
 
@@ -15,14 +21,6 @@ export default function DeleteAccountDialog({ isOpen, onClose }: Props) {
   const [confirmName, setConfirmName] = useState('');
   const [error, setError] = useState('');
   const confirmInputRef = useRef<HTMLInputElement>(null);
-
-  // 모달 열릴 때 초기화
-  useEffect(() => {
-    if (!isOpen) return;
-    setStep(1);
-    setConfirmName('');
-    setError('');
-  }, [isOpen]);
 
   // 2단계로 넘어갈 때 input 포커스
   useEffect(() => {
@@ -33,13 +31,10 @@ export default function DeleteAccountDialog({ isOpen, onClose }: Props) {
 
   // Escape 닫기
   useEffect(() => {
-    if (!isOpen) return;
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
+  }, [onClose]);
 
   const nameMatches = confirmName.trim() === profile?.display_name?.trim();
 
@@ -58,14 +53,14 @@ export default function DeleteAccountDialog({ isOpen, onClose }: Props) {
 
   return (
     <div
-      className={`modal-overlay ${isOpen ? 'active' : ''}`}
+      className="modal-overlay active"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="modal-container animate-slide-up" style={{ maxWidth: 420 }}>
 
         {/* 헤더 */}
         <div className="modal-header" style={{ paddingBottom: '1rem' }}>
-          <h2 className="text-xl font-black italic tracking-tighter">
+          <h2 className="font-headline text-xl font-bold tracking-tight">
             회원 <span className="text-error">탈퇴</span>
           </h2>
           <button

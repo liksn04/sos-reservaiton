@@ -45,25 +45,29 @@ export default function Reserve() {
 
   return (
     <div className="animate-slide-up">
-      <h2 className="dashboard-title text-center">합주실 예약</h2>
+      <section className="mb-8">
+        <div className="club-tag">예약 캘린더</div>
+        <h2 className="dashboard-title">합주실 예약</h2>
+        <p className="dashboard-subtitle">날짜를 고르고, 선택된 일정에서 바로 예약을 추가하거나 수정할 수 있어요.</p>
+      </section>
 
       {/* 달력 카드 */}
-      <div style={{ background: 'var(--surface-container-high)', padding: '1.5rem', borderRadius: '1.5rem', border: '1px solid var(--primary-border)', boxShadow: 'var(--primary-glow-shadow)' }}>
+      <div className="page-section-card p-6">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: '700', color: 'var(--text-main)' }}>
+          <h3 className="font-headline" style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-main)' }}>
             {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
           </h3>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button
               onClick={() => handleMonthChange(-1)}
-              className="material-symbols-outlined"
+              className="material-symbols-outlined w-11 h-11 rounded-full flex items-center justify-center bg-surface-container-lowest border border-card-border"
               style={{ color: 'var(--text-muted)' }}
             >
               chevron_left
             </button>
             <button
               onClick={() => handleMonthChange(1)}
-              className="material-symbols-outlined"
+              className="material-symbols-outlined w-11 h-11 rounded-full flex items-center justify-center bg-surface-container-lowest border border-card-border"
               style={{ color: 'var(--text-muted)' }}
             >
               chevron_right
@@ -83,7 +87,7 @@ export default function Reserve() {
       {/* 선택 날짜 일정 */}
       <div style={{ marginTop: '2.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1rem' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-main)' }}>
+          <h3 className="font-headline" style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-main)' }}>
             선택된 날짜{' '}
             <span style={{ color: 'var(--primary)' }}>
               {selectedDate.getMonth() + 1}/{selectedDate.getDate()}

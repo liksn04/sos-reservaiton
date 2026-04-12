@@ -105,17 +105,17 @@ export default function ReservationFormFields({
         <div className="form-group">
           <label>참여 인원</label>
           {/* 2. 인원수 입력 방식 개선 (직접 입력 + 버튼 카운터 병행) */}
-          <div className="flex items-center bg-input-bg border border-input-border rounded-lg h-[46px] px-1 overflow-hidden focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+          <div className="flex items-stretch bg-input-bg border border-input-border rounded-[1.5rem] min-h-[56px] px-1.5 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
             <button
               type="button"
-              className="w-10 h-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors disabled:opacity-20"
+              className="w-11 min-h-[52px] flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors disabled:opacity-20"
               onClick={() => onPeopleCountChange(Math.max(1, peopleCount - 1))}
               disabled={peopleCount <= 1}
             >
               <span className="material-symbols-outlined text-lg">remove</span>
             </button>
             
-            <div className="flex-1 flex items-center justify-center gap-1.5 focus-within:bg-white/5 transition-colors rounded-md py-1">
+            <div className="flex-1 flex items-center justify-center gap-2 focus-within:bg-white/5 transition-colors rounded-[1rem] min-h-[52px]">
               <input
                 type="number"
                 min={1}
@@ -128,14 +128,14 @@ export default function ReservationFormFields({
                 onBlur={() => {
                   if (peopleCount < 1) onPeopleCountChange(1);
                 }}
-                className="w-12 bg-transparent border-none outline-none text-center font-bold text-lg text-on-surface [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus:ring-0"
+                className="w-12 h-[52px] bg-transparent border-none outline-none text-center font-bold text-lg leading-none text-on-surface [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus:ring-0"
               />
-              <span className="text-sm font-semibold text-on-surface-variant select-none pb-0.5">명</span>
+              <span className="text-sm font-semibold text-on-surface-variant select-none">명</span>
             </div>
 
             <button
               type="button"
-              className="w-10 h-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors disabled:opacity-20"
+              className="w-11 min-h-[52px] flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors disabled:opacity-20"
               onClick={() => onPeopleCountChange(Math.min(9, peopleCount + 1))}
               disabled={peopleCount >= 9}
             >

@@ -1,4 +1,6 @@
-import { NavLink } from 'react-router-dom';
+import { useEffect } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { prefetchRouteModule, scheduleIdlePrefetch } from '../lib/moduleLoaders';
 
 const TABS = [
   { to: '/',        icon: 'home',           label: '홈',      end: true  },
@@ -8,30 +10,43 @@ const TABS = [
 ] as const;
 
 export default function BottomNav() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const pathsToPrefetch = TABS
+      .map((tab) => tab.to)
+      .filter((path): path is (typeof TABS)[number]['to'] => path !== pathname);
+
+    const cancelPrefetch = scheduleIdlePrefetch(() => {
+      pathsToPrefetch.forEach((path) => {
+        void prefetchRouteModule(path);
+      });
+    });
+
+    return cancelPrefetch;
+  }, [pathname]);
+
   return (
-    <nav
-        className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 max-w-2xl mx-auto right-0 border-t"
-        style={{ backgroundColor: 'var(--nav-bg)', borderColor: 'var(--nav-border)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }}
-      >
+    <nav className="bottom-nav">
       {TABS.map(({ to, icon, label, end }) => (
         <NavLink
           key={to}
           to={to}
           end={end}
-          className="flex flex-col items-center justify-center transition-all p-2 rounded-xl"
-          style={({ isActive }) => ({
-            color: isActive ? 'var(--primary)' : 'var(--text-on-surface-var)',
-          })}
+          onPointerEnter={() => { void prefetchRouteModule(to); }}
+          onFocus={() => { void prefetchRouteModule(to); }}
+          onTouchStart={() => { void prefetchRouteModule(to); }}
+          className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
         >
           {({ isActive }) => (
             <>
               <span
-                className="material-symbols-outlined font-bold"
+                className="material-symbols-outlined font-bold text-[22px]"
                 style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
               >
                 {icon}
               </span>
-              <span className="text-[10px] font-bold mt-1">{label}</span>
+              <span className="label">{label}</span>
             </>
           )}
         </NavLink>

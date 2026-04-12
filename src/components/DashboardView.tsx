@@ -59,21 +59,35 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
   // ── 메인 표시 가공 ──────────────────────────────
   const primaryRes = ongoing || nextRes;
   const isOngoingNow = !!ongoing;
+  const openReservePage = () => navigate('/reserve');
 
-  const formatDateLabel = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return `${d.getMonth() + 1}월 ${d.getDate()}일`;
+  const formatHeroDateLabel = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const weekDays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    return `${date.getMonth() + 1}월${date.getDate()}일 ${weekDays[date.getDay()]}`;
+  };
+
+  const formatHeroSupportLabel = (reservation: ReservationWithDetails, ongoingState: boolean) => {
+    const startLabel = normalizeTime(reservation.start_time);
+    const endLabel = normalizeTime(reservation.end_time);
+    return ongoingState
+      ? `${startLabel} 시작 · ${endLabel} 종료 예정`
+      : `${startLabel} 시작 예정`;
+  };
+
+  const getHeroTitle = (reservation: ReservationWithDetails) => {
+    const teamName = reservation.team_name.trim();
+    return teamName.length > 0 ? teamName : `${reservation.purpose} 일정`;
   };
 
   return (
     <div className="animate-slide-up">
-      {/* Greeting Section */}
-      <section style={{ marginBottom: '2.5rem' }}>
+      <section className="mb-10">
         <div className="club-tag">
           <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>music_note</span>
           빛소리 밴드 동아리
         </div>
-        <h2 className="dashboard-title italic">
+        <h2 className="dashboard-title">
           <span className="text-gradient-white-purple">
             {resolvedTheme === 'light' ? '오늘도 시원하게' : '오늘도 뜨겁게'}
           </span><br />
@@ -84,14 +98,13 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
         </p>
       </section>
 
-      {/* Main Schedule Hero Section */}
-      <section style={{ marginBottom: '2.5rem' }}>
+      <section className="mb-10">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1rem' }}>
-          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '1rem', fontWeight: '700', color: 'var(--text-main)' }}>
+          <h3 className="font-headline" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '1rem', fontWeight: '700', color: 'var(--text-main)' }}>
             {isOngoingNow ? (
               <>
                 <div className="live-indicator pulse-green" style={{ width: '10px', height: '10px' }}></div>
-                <span style={{ color: 'var(--success)' }}>현재 진행 중</span>
+                <span style={{ color: 'var(--success)' }}>현재 진행중</span>
               </>
             ) : (
               <>
@@ -100,85 +113,102 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
               </>
             )}
           </h3>
-          <span
-            style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '500', cursor: 'pointer' }}
-            onClick={() => navigate('/reserve')}
+          <button
+            type="button"
+            style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '500', cursor: 'pointer', background: 'transparent', border: 'none', padding: 0 }}
+            onClick={openReservePage}
           >
             전체보기 &gt;
-          </span>
+          </button>
         </div>
 
         {primaryRes ? (
           <div
             className={`upcoming-hero-card ${isOngoingNow ? 'ongoing-hero-active' : ''}`}
-            onClick={() => navigate('/reserve')}
-            style={{ 
+            onClick={openReservePage}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                openReservePage();
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={`${isOngoingNow ? '현재 진행중인' : '다가오는'} ${getHeroTitle(primaryRes)} 일정 상세 보기`}
+            style={{
               cursor: 'pointer',
-              background: 'var(--surface-container)',
               borderRadius: '1.5rem',
-              padding: '1.5rem',
+              padding: '0.6rem',
               minHeight: '190px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between'
             }}
           >
-            {isOngoingNow && <div className="ongoing-glow-bg opacity-40"></div>}
-            
-            {/* Top section of the card */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
-              <h4 style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: '600' }}>{primaryRes.team_name}</h4>
-              {isOngoingNow && (
-                <div className="live-badge">공연 중</div>
-              )}
-            </div>
-            
-            {/* Bottom section of the card */}
-            <div style={{ position: 'relative', zIndex: 1, marginTop: '1rem' }}>
-              <p className="upcoming-date" style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '0.25rem' }}>
-                {formatDateLabel(primaryRes.date)}
-              </p>
-              <p className="upcoming-time" style={{ color: 'var(--primary)', fontWeight: '700', fontSize: '1.15rem' }}>
-                {normalizeTime(primaryRes.start_time)} - {normalizeTime(primaryRes.end_time)}
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '16px', color: 'var(--text-muted)' }}>info</span>
-                <p style={{ color: 'var(--text-main)', fontSize: '0.9rem', fontWeight: '500' }}>{primaryRes.purpose}</p>
+            <div
+              className="upcoming-hero-panel rounded-[1.75rem] h-full flex flex-col justify-between"
+              style={{
+                minHeight: '210px',
+                padding: '1.75rem',
+              }}
+              >
+              {isOngoingNow && <div className="ongoing-glow-bg opacity-30"></div>}
+
+              <div className="upcoming-hero-top" style={{ position: 'relative', zIndex: 1 }}>
+                <div className="upcoming-hero-top-copy">
+                  <p className={`upcoming-hero-eyebrow ${isOngoingNow ? 'ongoing' : ''}`}>
+                    {isOngoingNow ? formatHeroDateLabel(primaryRes.date) : '다음 일정'}
+                  </p>
+                  {!isOngoingNow && (
+                    <>
+                      <h4 className="upcoming-hero-date">{formatHeroDateLabel(primaryRes.date)}</h4>
+                      <p className="upcoming-hero-date-sub">{formatHeroSupportLabel(primaryRes, false)}</p>
+                    </>
+                  )}
+                </div>
+                {isOngoingNow && (
+                  <div className="live-badge">
+                    <span className="live-badge-dot" aria-hidden="true"></span>
+                    진행중
+                  </div>
+                )}
               </div>
-            </div>
 
-            {/* Participants Avatar Group */}
-            <div className="avatar-group" style={{ position: 'absolute', bottom: '1.5rem', right: '1.5rem', zIndex: 2 }}>
-              {(() => {
-                const participants = [
-                  ...(primaryRes.host ? [primaryRes.host] : []),
-                  ...primaryRes.reservation_invitees
-                    .map((i) => i.profile)
-                    .filter((p): p is NonNullable<typeof p> => !!p),
-                ];
-                const maxDisplay = 4;
-                const displayParticipants = participants.slice(0, maxDisplay);
-                const hasMore = participants.length > maxDisplay;
-
-                return (
+              <div className="upcoming-hero-body" style={{ position: 'relative', zIndex: 1 }}>
+                {isOngoingNow && (
                   <>
-                    {hasMore && (
-                      <div className="avatar-more">+{participants.length - maxDisplay}</div>
-                    )}
-                    {displayParticipants.reverse().map((p) => (
-                      <div key={p.id} className="avatar-item" title={p.display_name}>
-                        {p.avatar_url ? (
-                          <img src={p.avatar_url} alt={p.display_name} className="avatar-img" />
-                        ) : (
-                          <div className="avatar-placeholder">
-                            {p.display_name.charAt(0)}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                    <h4 className="upcoming-hero-title ongoing">{getHeroTitle(primaryRes)}</h4>
                   </>
-                );
-              })()}
+                )}
+                {!isOngoingNow && (
+                  <h5 className="upcoming-hero-title">{getHeroTitle(primaryRes)}</h5>
+                )}
+                <div className={`upcoming-hero-meta-row ${isOngoingNow ? 'ongoing' : ''}`}>
+                  <div className="upcoming-hero-meta-chip">
+                    <span className="material-symbols-outlined upcoming-hero-meta-icon">schedule</span>
+                    <span>{normalizeTime(primaryRes.start_time)} - {normalizeTime(primaryRes.end_time)}</span>
+                  </div>
+                  <div className="upcoming-hero-meta-chip purpose">
+                    <span className="material-symbols-outlined upcoming-hero-meta-icon">music_note</span>
+                    <span>{primaryRes.purpose}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="upcoming-hero-bottom" style={{ position: 'relative', zIndex: 1 }}>
+                <span className="upcoming-hero-cta" aria-hidden="true">
+                  {isOngoingNow ? '지금 일정 보기' : '일정 보러가기'}
+                </span>
+                {isOngoingNow ? (
+                  <div className="upcoming-hero-orb" aria-hidden="true">
+                    <span className="material-symbols-outlined">calendar_month</span>
+                  </div>
+                ) : (
+                  <div className="upcoming-hero-sidecard" aria-hidden="true">
+                    <span className="upcoming-hero-sidecard-label">시작 예정</span>
+                    <strong className="upcoming-hero-sidecard-value">
+                      {normalizeTime(primaryRes.start_time)}
+                    </strong>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ) : (

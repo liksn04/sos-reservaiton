@@ -1,12 +1,12 @@
-import { useState, useMemo } from 'react';
+import { Suspense, lazy, useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBudgetTransactions } from '../hooks/useBudgetTransactions';
 import { useBudgetMutations } from '../hooks/mutations/useBudgetMutations';
 import { useAuth } from '../context/AuthContext';
-import BudgetCharts from '../components/BudgetCharts';
 import BudgetTransactionModal from '../components/BudgetTransactionModal';
 import MembershipFeePanel from '../components/MembershipFeePanel';
 import YearArchiveSelector from '../components/YearArchiveSelector';
+import { routeModuleLoaders, scheduleIdlePrefetch } from '../lib/moduleLoaders';
 import { format } from 'date-fns';
 import { formatCurrency } from '../utils/format';
 import { ko } from 'date-fns/locale';
@@ -14,6 +14,18 @@ import type { BudgetTransaction } from '../types';
 
 type Tab = 'transactions' | 'charts' | 'fees';
 type FilterHalf = 1 | 2;
+
+const BudgetCharts = lazy(routeModuleLoaders.budgetCharts);
+
+function BudgetChartsFallback() {
+  return (
+    <div className="surface-card p-10 flex flex-col items-center justify-center text-center">
+      <div className="mb-4 h-10 w-10 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+      <p className="font-headline text-lg font-bold tracking-tight text-on-surface">통계 리포트를 준비하고 있습니다</p>
+      <p className="mt-2 text-sm text-on-surface-variant">차트 라이브러리를 필요할 때만 로드하도록 분리했습니다.</p>
+    </div>
+  );
+}
 
 export default function BudgetRoute() {
   const navigate = useNavigate();
@@ -35,6 +47,16 @@ export default function BudgetRoute() {
   const { data: transactions, isLoading } = useBudgetTransactions(fiscalYear, fiscalHalf);
 
   const isAdmin = profile?.is_admin ?? false;
+
+  useEffect(() => {
+    if (activeTab === 'charts') {
+      return undefined;
+    }
+
+    return scheduleIdlePrefetch(() => {
+      void routeModuleLoaders.budgetCharts();
+    }, 600);
+  }, [activeTab]);
 
   // 요약 산출
   const summary = useMemo(() => {
@@ -73,11 +95,11 @@ export default function BudgetRoute() {
 
   return (
     <div className="app-shell pb-20">
-      <header className="top-app-bar border-b border-card-border">
+      <header className="top-app-bar">
         <div className="logo-area">
           <button
             onClick={() => navigate(-1)}
-            className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-high transition-colors text-on-surface"
+            className="w-11 h-11 rounded-full flex items-center justify-center bg-surface-container-lowest border border-card-border hover:bg-surface-container-high transition-colors text-on-surface"
           >
             <span className="material-symbols-outlined text-[24px]">arrow_back</span>
           </button>
@@ -87,25 +109,21 @@ export default function BudgetRoute() {
 
       <main className="shell-main">
         <div className="animate-slide-up">
-          <div className="club-tag tracking-wider mb-2">예산 관리</div>
+          <div className="club-tag tracking-wider mb-2">재정 대시보드</div>
           <h1 className="dashboard-title mb-8">
-            <span className="text-gradient-white-purple">{`'${fiscalYear.toString().slice(2)}년 ${fiscalHalf}학기`}</span>
+            <span className="text-gradient-white-purple">{`${fiscalYear}년 ${fiscalHalf}학기 예산`}</span>
           </h1>
 
           {/* ── 연도 아카이브 셀렉터 ── */}
           <YearArchiveSelector selectedYear={fiscalYear} onYearChange={setFiscalYear} />
 
           {/* ── 학기 필터 섹션 ── */}
-          <div className="flex items-center gap-3 mb-8 bg-surface-container-low p-2 rounded-2xl border border-card-border w-fit">
+          <div className="segmented-control mb-8 w-fit">
             {[1, 2].map((half) => (
               <button
                 key={half}
                 onClick={() => setFiscalHalf(half as FilterHalf)}
-                className={`px-6 py-2 rounded-xl text-xs font-black italic transition-all ${
-                  fiscalHalf === half
-                    ? 'bg-secondary text-white shadow-lg shadow-secondary/30'
-                    : 'text-on-surface-variant opacity-60 hover:opacity-100 hover:bg-white/5'
-                }`}
+                className={`segmented-option ${fiscalHalf === half ? 'active' : ''}`}
               >
                 {half === 1 ? '1학기' : '2학기'}
               </button>
@@ -115,12 +133,12 @@ export default function BudgetRoute() {
           {/* ── 요약 카드 ── */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10">
             {/* 수입 카드 */}
-            <div className="bg-surface-container-low border border-card-border p-6 rounded-[2.5rem] relative overflow-hidden group">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <div className="surface-card p-6 relative overflow-hidden group">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-emerald-500">add_circle</span>
               </div>
               <div className="space-y-1">
-                <p className="text-2xl font-black text-on-surface leading-tight">
+                <p className="font-headline text-[2rem] font-bold text-on-surface leading-tight tracking-tight">
                   {formatCurrency(summary.income)}
                 </p>
                 <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
@@ -130,12 +148,12 @@ export default function BudgetRoute() {
             </div>
 
             {/* 지출 카드 */}
-            <div className="bg-surface-container-low border border-card-border p-6 rounded-[2.5rem] relative overflow-hidden group">
-              <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <div className="surface-card p-6 relative overflow-hidden group">
+              <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-rose-500">remove_circle</span>
               </div>
               <div className="space-y-1">
-                <p className="text-2xl font-black text-on-surface leading-tight">
+                <p className="font-headline text-[2rem] font-bold text-on-surface leading-tight tracking-tight">
                   {formatCurrency(summary.expense)}
                 </p>
                 <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
@@ -145,15 +163,18 @@ export default function BudgetRoute() {
             </div>
 
             {/* 잔액 카드 (Full Width on Mobile) */}
-            <div className="col-span-2 md:col-span-1 bg-surface-container-low border border-card-border p-6 rounded-[2.5rem] relative overflow-hidden group">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-primary">account_balance_wallet</span>
+            <div
+              className="col-span-2 md:col-span-1 p-6 rounded-[2rem] relative overflow-hidden group text-white"
+              style={{ background: 'var(--primary-btn-gradient)', boxShadow: 'var(--primary-glow-shadow)' }}
+            >
+              <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined text-white">account_balance_wallet</span>
               </div>
               <div className="space-y-1">
-                <p className="text-2xl font-black text-gradient-white-purple leading-tight">
+                <p className="font-headline text-[2rem] font-bold text-white leading-tight tracking-tight">
                   {formatCurrency(summary.balance)}
                 </p>
-                <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
+                <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">
                   현재 예산 잔액
                 </p>
               </div>
@@ -161,7 +182,7 @@ export default function BudgetRoute() {
           </div>
 
           {/* 탭 네비게이션 */}
-          <div className="flex items-center gap-2 mb-8 bg-surface-container-low p-1.5 rounded-[1.5rem] border border-card-border w-fit">
+          <div className="segmented-control mb-8 w-fit">
             {[
               { id: 'transactions', label: '거래 내역', icon: 'list_alt' },
               { id: 'charts', label: '통계 리포트', icon: 'analytics' },
@@ -170,11 +191,7 @@ export default function BudgetRoute() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as Tab)}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs font-bold transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                    : 'hover:bg-white/10 text-on-surface-variant opacity-60 hover:opacity-100'
-                }`}
+                className={`segmented-option ${activeTab === tab.id ? 'active' : ''}`}
               >
                 <span className="material-symbols-outlined text-sm">{tab.icon}</span>
                 {tab.label}
@@ -185,16 +202,16 @@ export default function BudgetRoute() {
           <div className="relative">
             {activeTab === 'transactions' && (
               <div className="animate-fade-in-up">
-                <div className="bg-surface-container border border-card-border shadow-2xl rounded-[40px] overflow-hidden">
+                <div className="page-section-card overflow-hidden">
                   <div className="p-8 border-b border-card-border flex items-center justify-between">
-                    <h3 className="text-sm font-black italic uppercase tracking-widest flex items-center gap-2">
+                    <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
                       <span className="material-symbols-outlined text-primary">history</span>
                       거래 내역
                     </h3>
                     {isAdmin && (
                       <button
                         onClick={openCreate}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black italic uppercase tracking-widest transition-all bg-primary-btn text-white shadow-lg shadow-primary/25"
+                        className="flex items-center gap-2 px-5 py-3 rounded-full text-xs font-black uppercase tracking-widest transition-all bg-primary-btn text-white shadow-lg shadow-primary/25"
                       >
                         <span className="material-symbols-outlined text-lg">add</span>
                         내역 추가
@@ -210,21 +227,21 @@ export default function BudgetRoute() {
                     ) : transactions?.length === 0 ? (
                       <div className="p-20 flex flex-col items-center justify-center opacity-30">
                         <span className="material-symbols-outlined text-6xl mb-4">account_balance_wallet</span>
-                        <p className="text-sm font-black italic">표시할 거래 내역이 없습니다.</p>
+                        <p className="font-headline text-sm font-bold">표시할 거래 내역이 없습니다.</p>
                       </div>
                     ) : (
                       transactions?.map((t) => (
-                        <div key={t.id} className="p-6 hover:bg-black/5 dark:hover:bg-white/5 transition-colors group">
+                        <div key={t.id} className="p-6 hover:bg-white/60 transition-colors group">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-6">
-                              <div className="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center border border-card-border group-hover:scale-110 transition-transform">
+                              <div className="w-12 h-12 rounded-2xl bg-surface-container-lowest flex items-center justify-center border border-card-border group-hover:scale-110 transition-transform">
                                 <span className="material-symbols-outlined" style={{ color: t.category?.color ?? '#6b7280' }}>
                                   {t.category?.icon ?? (t.type === 'income' ? 'add_circle' : 'remove_circle')}
                                 </span>
                               </div>
                               <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className="text-xs font-black italic">{t.description}</span>
+                                  <span className="text-xs font-black">{t.description}</span>
                                   {t.category && (
                                     <span
                                       className="text-[9px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter"
@@ -252,7 +269,7 @@ export default function BudgetRoute() {
                               </div>
                             </div>
                             <div className="flex items-center gap-3">
-                              <p className={`text-sm font-black italic ${t.type === 'income' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                              <p className={`text-sm font-black ${t.type === 'income' ? 'text-emerald-500' : 'text-rose-500'}`}>
                                 {t.type === 'income' ? '+' : '-'}{Number(t.amount).toLocaleString()}원
                               </p>
                               {isAdmin && (
@@ -285,7 +302,9 @@ export default function BudgetRoute() {
             )}
 
             {activeTab === 'charts' && (
-              <BudgetCharts transactions={transactions || []} />
+              <Suspense fallback={<BudgetChartsFallback />}>
+                <BudgetCharts transactions={transactions || []} />
+              </Suspense>
             )}
 
             {activeTab === 'fees' && (

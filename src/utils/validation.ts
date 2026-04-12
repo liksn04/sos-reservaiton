@@ -1,8 +1,8 @@
-import { normalizeTime, hasOverlap } from './time';
+import { normalizeTime, hasOverlap, getReservationTimestamp } from './time';
 import type { Reservation, Purpose } from '../types';
 
 export interface OverlapError {
-  type: 'same_time' | 'overlap' | 'same_day_hanju' | 'max_duration_hanju';
+  type: 'same_time' | 'overlap' | 'same_day_hanju' | 'max_duration_hanju' | 'past_start_time' | 'past_date';
   message: string;
 }
 
@@ -51,6 +51,39 @@ export function validateSameDayPolicy(
 }
 
 /**
+ * 과거 날짜 예약을 차단합니다.
+ *
+ * 처리하는 예외:
+ * 1. 날짜 값이 비어 있거나 형식이 잘못된 경우에는 상위 required 검증에 위임합니다.
+ * 2. 브라우저 min 속성을 우회해 과거 날짜를 수동 입력한 경우를 차단합니다.
+ * 3. 오래 열린 모달/직접 mutation 호출 등 UI 바깥 경로에서도 동일 정책을 적용합니다.
+ *
+ * @param date YYYY-MM-DD 형식의 예약 날짜
+ * @param now 비교 기준 시각. 테스트 가능성을 위해 주입 가능하게 둡니다.
+ */
+export function validatePastDatePolicy(
+  date: string,
+  now: Date = new Date(),
+): OverlapError | null {
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+
+  const todayStr = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
+  ].join('-');
+
+  if (date < todayStr) {
+    return {
+      type: 'past_date',
+      message: '지난 날짜는 예약할 수 없습니다. 오늘 이후 날짜를 선택해주세요.',
+    };
+  }
+
+  return null;
+}
+
+/**
  * [규칙 2] 합주 카테고리 최대 1시간 예약 제한.
  * 다른 카테고리는 시간 제한 없음.
  *
@@ -87,8 +120,41 @@ export function validateMaxDurationPolicy(
 }
 
 /**
+ * 현재 시각 이전 또는 이미 시작된 시간으로의 예약을 차단합니다.
+ *
+ * 처리하는 예외:
+ * 1. 날짜/시간 값이 비어 있거나 형식이 잘못된 경우에는 상위 required 검증에 위임합니다.
+ * 2. 사용자가 DOM 조작으로 오늘 지난 시간을 강제로 선택한 경우를 차단합니다.
+ * 3. 모달을 오래 열어 둔 뒤 시간이 지나 슬롯이 과거가 된 경우 제출 시점에 다시 차단합니다.
+ *
+ * @param date YYYY-MM-DD 형식의 예약 날짜
+ * @param startTime HH:MM 형식 시작 시간
+ * @param now 비교 기준 시각. 테스트 가능성을 위해 주입 가능하게 둡니다.
+ */
+export function validatePastStartTimePolicy(
+  date: string,
+  startTime: string,
+  now: Date = new Date(),
+): OverlapError | null {
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  if (!startTime || !/^\d{2}:\d{2}$/.test(normalizeTime(startTime))) return null;
+
+  const startTs = getReservationTimestamp(date, normalizeTime(startTime), false);
+  if (!startTs) return null;
+
+  if (startTs <= now.getTime()) {
+    return {
+      type: 'past_start_time',
+      message: '현재 시간 이전은 예약할 수 없습니다. 이후 시간대를 선택해주세요.',
+    };
+  }
+
+  return null;
+}
+
+/**
  * 예약 제출 전 전체 유효성 검사.
- * 순서: 당일 정책 → 최대 시간 정책 → 시간 동일 → 겹침 검사
+ * 순서: 과거 날짜 → 당일 정책 → 최대 시간 정책 → 과거 시간 → 시간 동일 → 겹침 검사
  *
  * @returns null = 유효, OverlapError = 오류
  */
@@ -100,6 +166,9 @@ export function validateReservationTime(
   editingId: string | null,
   purpose: Purpose = '합주',
 ): OverlapError | null {
+  const pastDateErr = validatePastDatePolicy(date);
+  if (pastDateErr) return pastDateErr;
+
   // [규칙 1] 합주 당일 예약 불가
   const sameDayErr = validateSameDayPolicy(date, purpose);
   if (sameDayErr) return sameDayErr;
@@ -107,6 +176,9 @@ export function validateReservationTime(
   // [규칙 2] 합주 최대 1시간
   const durationErr = validateMaxDurationPolicy(startTime, endTime, purpose);
   if (durationErr) return durationErr;
+
+  const pastStartErr = validatePastStartTimePolicy(date, startTime);
+  if (pastStartErr) return pastStartErr;
 
   const start = normalizeTime(startTime);
   const end = normalizeTime(endTime);

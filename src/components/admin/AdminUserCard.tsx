@@ -10,9 +10,9 @@ interface Props {
 
 export default function AdminUserCard({ user, badge, meta, actions }: Props) {
   return (
-    <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-6 flex items-center gap-5 animate-fade-in-up group hover:bg-surface-container-high transition-colors">
+    <div className="surface-card p-6 flex items-center gap-5 animate-fade-in-up group hover:bg-surface-container-lowest transition-colors">
       {/* 아바타 */}
-      <div className="w-16 h-16 bg-surface-container-highest rounded-2xl overflow-hidden flex-shrink-0 border border-card-border relative shadow-sm group-hover:scale-105 transition-transform">
+      <div className="w-16 h-16 bg-surface-container-highest rounded-full overflow-hidden flex-shrink-0 border border-card-border relative shadow-sm group-hover:scale-105 transition-transform">
         {user.avatar_url ? (
           <img src={user.avatar_url} alt={user.display_name} className="w-full h-full object-cover" />
         ) : (
@@ -29,7 +29,7 @@ export default function AdminUserCard({ user, badge, meta, actions }: Props) {
             {user.display_name || '(닉네임 미설정)'}
           </h4>
           {user.is_admin && (
-            <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded font-black tracking-widest uppercase flex-shrink-0">
+            <span className="text-[9px] bg-primary/10 text-primary px-2 py-1 rounded-full font-black tracking-widest uppercase flex-shrink-0">
               ADMIN
             </span>
           )}
@@ -37,7 +37,7 @@ export default function AdminUserCard({ user, badge, meta, actions }: Props) {
         </div>
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           {user.part && user.part.length > 0 && (
-            <span className="text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-xl">
+            <span className="text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full">
               {user.part.join(', ')}
             </span>
           )}

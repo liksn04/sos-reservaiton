@@ -14,6 +14,7 @@ import {
   AreaChart,
   Area,
 } from 'recharts'
+import type { TooltipContentProps, TooltipPayloadEntry, TooltipValueType } from 'recharts'
 import { useTheme } from '../contexts/ThemeContext'
 import type { BudgetTransaction } from '../types'
 
@@ -22,6 +23,74 @@ interface Props {
 }
 
 const MONTHS = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+type BudgetTooltipName = string | number
+type BudgetTooltipEntry = TooltipPayloadEntry<TooltipValueType, BudgetTooltipName>
+
+interface TooltipDatum {
+  name?: string
+  date?: string
+}
+
+interface BudgetChartsTooltipProps extends Partial<TooltipContentProps<TooltipValueType, BudgetTooltipName>> {
+  isDark: boolean
+}
+
+function getTooltipNumericValue(value: TooltipValueType | undefined) {
+  if (typeof value === 'number') {
+    return value
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : 0
+  }
+
+  if (Array.isArray(value)) {
+    const [firstValue] = value
+    if (typeof firstValue === 'number') {
+      return firstValue
+    }
+
+    if (typeof firstValue === 'string') {
+      const parsed = Number(firstValue)
+      return Number.isFinite(parsed) ? parsed : 0
+    }
+  }
+
+  return 0
+}
+
+function BudgetChartsTooltip({ active, payload, isDark }: BudgetChartsTooltipProps) {
+  if (!active || !payload?.length) {
+    return null
+  }
+
+  const currentPayload = payload[0] as BudgetTooltipEntry | undefined
+  const currentDatum = currentPayload?.payload as TooltipDatum | undefined
+
+  return (
+    <div
+      className="rounded-2xl p-4 text-[11px] font-bold shadow-2xl border backdrop-blur-xl"
+      style={{
+        background: isDark ? 'rgba(30, 41, 59, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+        borderColor: 'var(--card-border)',
+        color: 'var(--text-main)',
+      }}
+    >
+      <p className="mb-2 opacity-50 uppercase tracking-widest">{currentDatum?.name || currentDatum?.date}</p>
+      <div className="space-y-1">
+        {payload.map((entry, idx) => (
+          <div key={idx} className="flex items-center justify-between gap-4">
+            <span style={{ color: entry.color || entry.fill }}>{entry.name}</span>
+            <span className="font-black">
+              {getTooltipNumericValue(entry.value).toLocaleString('ko-KR', { maximumFractionDigits: 1 })}만원
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default function BudgetCharts({ transactions }: Props) {
   const { resolvedTheme } = useTheme()
@@ -67,45 +136,33 @@ export default function BudgetCharts({ transactions }: Props) {
     const sorted = [...transactions].sort(
       (a, b) => new Date(a.transaction_date).getTime() - new Date(b.transaction_date).getTime()
     )
-    let balance = 0
-    return sorted.map((t) => {
-      balance += t.type === 'income' ? Number(t.amount) : -Number(t.amount)
-      return {
-        date: new Date(t.transaction_date + 'T00:00:00').toLocaleDateString('ko-KR', {
-          month: 'short',
-          day: 'numeric',
-        }),
-        balance: balance / 10000,
-      }
-    })
-  }, [transactions])
+    return sorted.reduce<{ balance: number; items: { date: string; balance: number }[] }>(
+      (acc, transaction) => {
+        const nextBalance =
+          acc.balance + (transaction.type === 'income' ? Number(transaction.amount) : -Number(transaction.amount))
 
-  const CustomTooltip = ({ active, payload }: any) =>
-    active && payload?.length ? (
-      <div
-        className="rounded-2xl p-4 text-[11px] font-bold shadow-2xl border backdrop-blur-xl"
-        style={{
-          background: isDark ? 'rgba(30, 41, 59, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-          borderColor: 'var(--card-border)',
-          color: 'var(--on-surface)',
-        }}
-      >
-        <p className="mb-2 opacity-50 uppercase tracking-widest">{payload[0].payload.name || payload[0].payload.date}</p>
-        <div className="space-y-1">
-          {payload.map((p: any, idx: number) => (
-            <div key={idx} className="flex items-center justify-between gap-4">
-              <span style={{ color: p.color || p.fill }}>{p.name}</span>
-              <span className="font-black">{p.value.toLocaleString('ko-KR', { maximumFractionDigits: 1 })}만원</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    ) : null
+        return {
+          balance: nextBalance,
+          items: [
+            ...acc.items,
+            {
+              date: new Date(transaction.transaction_date + 'T00:00:00').toLocaleDateString('ko-KR', {
+                month: 'short',
+                day: 'numeric',
+              }),
+              balance: nextBalance / 10000,
+            },
+          ],
+        }
+      },
+      { balance: 0, items: [] }
+    ).items
+  }, [transactions])
 
   return (
     <div className="space-y-6 animate-slide-up">
       {/* 월별 수입/지출 */}
-      <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-8">
+      <div className="surface-card p-8">
         <h3 className="text-sm font-black uppercase tracking-widest mb-8 flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
             <span className="material-symbols-outlined text-primary text-sm">bar_chart</span>
@@ -118,7 +175,10 @@ export default function BudgetCharts({ transactions }: Props) {
               <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
               <XAxis dataKey="name" tick={axisStyle} axisLine={false} tickLine={false} />
               <YAxis tick={axisStyle} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} />
+              <Tooltip
+                content={<BudgetChartsTooltip isDark={isDark} />}
+                cursor={{ fill: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}
+              />
               <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontSize: '11px', fontWeight: 900 }} />
               <Bar dataKey="수입" fill="#10b981" radius={[4, 4, 0, 0]} />
               <Bar dataKey="지출" fill="#ef4444" radius={[4, 4, 0, 0]} />
@@ -130,7 +190,7 @@ export default function BudgetCharts({ transactions }: Props) {
       {/* 카테고리별 지출 & 누적 잔액 (그리드) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 카테고리별 지출 */}
-        <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-8">
+        <div className="surface-card p-8">
           <h3 className="text-sm font-black uppercase tracking-widest mb-8 flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center">
               <span className="material-symbols-outlined text-secondary text-sm">pie_chart</span>
@@ -157,7 +217,7 @@ export default function BudgetCharts({ transactions }: Props) {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip content={<CustomTooltip />} />
+                    <Tooltip content={<BudgetChartsTooltip isDark={isDark} />} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -182,7 +242,7 @@ export default function BudgetCharts({ transactions }: Props) {
         </div>
 
         {/* 누적 잔액 추이 */}
-        <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-8">
+        <div className="surface-card p-8">
           <h3 className="text-sm font-black uppercase tracking-widest mb-8 flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="material-symbols-outlined text-primary text-sm">show_chart</span>
@@ -201,7 +261,7 @@ export default function BudgetCharts({ transactions }: Props) {
                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
                 <XAxis dataKey="date" tick={axisStyle} axisLine={false} tickLine={false} />
                 <YAxis tick={axisStyle} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<BudgetChartsTooltip isDark={isDark} />} />
                 <Area
                   type="monotone"
                   dataKey="balance"

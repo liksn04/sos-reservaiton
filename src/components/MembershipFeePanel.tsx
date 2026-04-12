@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMembershipFees } from '../hooks/useMembershipFees'
 import { useBudgetMutations } from '../hooks/mutations/useBudgetMutations'
-import { useToast } from '../contexts/ToastContext'
+import { useToast } from '../contexts/useToast'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { formatCurrency } from '../utils/format'
@@ -40,7 +40,7 @@ export default function MembershipFeePanel({ year, half }: Props) {
       {/* ── 학기 요약 및 정책 ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* 정책 카드 */}
-        <div className="bg-surface-container-low border border-card-border p-6 rounded-[2.5rem] relative overflow-hidden group">
+        <div className="surface-card p-6 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl -mr-16 -mt-16 rounded-full" />
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-6">
@@ -70,7 +70,7 @@ export default function MembershipFeePanel({ year, half }: Props) {
         </div>
 
         {/* 납부 현황 카드 */}
-        <div className="bg-surface-container-low border border-card-border p-6 rounded-[2.5rem] relative overflow-hidden group">
+        <div className="surface-card p-6 relative overflow-hidden group">
           <div className="relative z-10 h-full flex flex-col justify-between">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
@@ -103,7 +103,7 @@ export default function MembershipFeePanel({ year, half }: Props) {
       </div>
 
       {/* ── 명단 리스트 ── */}
-      <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-6 lg:p-8">
+      <div className="page-section-card p-6 lg:p-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-on-surface/5 flex items-center justify-center">

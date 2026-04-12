@@ -137,7 +137,7 @@ export default function ProfileForm({ mode, profile, onSuccess, onCancel }: Prof
                 <button
                   key={p.value}
                   type="button"
-                  onClick={() => (togglePart as any)(p.value)}
+                  onClick={() => togglePart(p.value)}
                   style={{
                     padding: '8px 4px',
                     borderRadius: '8px',
@@ -195,7 +195,7 @@ export default function ProfileForm({ mode, profile, onSuccess, onCancel }: Prof
         </button>
       )}
 
-      <h2 className="text-2xl font-black italic text-on-surface mb-6 mt-2">프로필 수정</h2>
+      <h2 className="font-headline text-2xl font-bold text-on-surface mb-6 mt-2">프로필 수정</h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <AvatarUploader
@@ -266,7 +266,7 @@ export default function ProfileForm({ mode, profile, onSuccess, onCancel }: Prof
                 <button
                   key={p.value}
                   type="button"
-                  onClick={() => (togglePart as any)(p.value)}
+                  onClick={() => togglePart(p.value)}
                   className={`py-3 px-2 rounded-xl text-xs font-bold transition-all duration-200 border ${
                     isSelected 
                       ? 'bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(204,151,255,0.1)]' 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useCreateReservation, useUpdateReservation } from '../../hooks/mutations/useReservationMutations';
-import { useToast } from '../../contexts/ToastContext';
+import { useToast } from '../../contexts/useToast';
 import { validateReservationTime } from '../../utils/validation';
 import { formatDate, normalizeTime } from '../../utils/time';
 import type { ReservationWithDetails, Purpose } from '../../types';
@@ -9,7 +9,6 @@ const DEFAULT_START = '10:00';
 const DEFAULT_END = '11:00';
 
 interface UseReservationFormOptions {
-  isOpen: boolean;
   editing: ReservationWithDetails | null;
   initialDate: Date;
   reservations: ReservationWithDetails[];
@@ -18,7 +17,6 @@ interface UseReservationFormOptions {
 }
 
 export function useReservationForm({
-  isOpen,
   editing,
   initialDate,
   reservations,
@@ -27,49 +25,32 @@ export function useReservationForm({
 }: UseReservationFormOptions) {
   const createReservation = useCreateReservation();
   const updateReservation = useUpdateReservation();
+  const initialDateValue = editing?.date ?? formatDate(initialDate);
+  const initialStartTime = editing ? normalizeTime(editing.start_time) : DEFAULT_START;
+  const initialEndTime = editing ? normalizeTime(editing.end_time) : DEFAULT_END;
+  const initialTeamName = editing?.team_name ?? '';
+  const initialPeopleCount = editing?.people_count ?? 1;
+  const initialPurpose = editing?.purpose ?? '합주';
+  const initialInvitees = editing?.reservation_invitees?.map((invitee) => invitee.user_id) ?? [];
 
-  const [date, setDate]               = useState(formatDate(initialDate));
-  const [startTime, setStartTime]     = useState(DEFAULT_START);
-  const [endTime, setEndTime]         = useState(DEFAULT_END);
-  const [teamName, setTeamName]       = useState('');
-  const [peopleCount, setPeopleCount] = useState(1);
-  const [purpose, setPurpose]         = useState<Purpose>('합주');
-  const [invitees, setInvitees]       = useState<string[]>([]);
+  const [date, setDate]               = useState(initialDateValue);
+  const [startTime, setStartTime]     = useState(initialStartTime);
+  const [endTime, setEndTime]         = useState(initialEndTime);
+  const [teamName, setTeamName]       = useState(initialTeamName);
+  const [peopleCount, setPeopleCount] = useState(initialPeopleCount);
+  const [purpose, setPurpose]         = useState<Purpose>(initialPurpose);
+  const [invitees, setInvitees]       = useState<string[]>(initialInvitees);
   const [error, setError]             = useState('');
   const { addToast }                  = useToast();
 
   const submitting = createReservation.isPending || updateReservation.isPending;
 
-  // 모달 열릴 때 폼 초기화
-  useEffect(() => {
-    if (!isOpen) return;
-    if (editing) {
-      setDate(editing.date);
-      setStartTime(normalizeTime(editing.start_time));
-      setEndTime(normalizeTime(editing.end_time));
-      setTeamName(editing.team_name);
-      setPeopleCount(editing.people_count);
-      setPurpose(editing.purpose);
-      setInvitees(editing.reservation_invitees?.map((i) => i.user_id) ?? []);
-    } else {
-      setDate(formatDate(initialDate));
-      setStartTime(DEFAULT_START);
-      setEndTime(DEFAULT_END);
-      setTeamName('');
-      setPeopleCount(1);
-      setPurpose('합주');
-      setInvitees([]);
-    }
-    setError('');
-  }, [isOpen, editing, initialDate]);
-
   // Escape 키로 닫기
   useEffect(() => {
-    if (!isOpen) return;
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
+  }, [onClose]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

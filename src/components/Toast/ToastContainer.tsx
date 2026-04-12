@@ -1,5 +1,5 @@
 import React from 'react';
-import { useToastInternal } from '../../contexts/ToastContext';
+import { useToastInternal } from '../../contexts/useToast';
 import { ToastItem } from './ToastItem';
 import { createPortal } from 'react-dom';
 

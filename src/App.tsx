@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { Suspense, lazy, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
@@ -6,21 +6,22 @@ import { RequireAuth, RequireApproved, RequireAdmin } from './components/RouteGu
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { ToastContainer } from './components/Toast';
-
-import Login from './routes/Login';
-import PendingApproval from './routes/PendingApproval';
-import ProfileSetup from './routes/ProfileSetup';
-import AppShell from './routes/AppShell';
-import HomeRoute from './routes/HomeRoute';
-import Reserve from './routes/Reserve';
-import EventsRoute from './routes/EventsRoute';
-import BudgetRoute from './routes/BudgetRoute';
-import ProfileRoute from './routes/ProfileRoute';
-import Admin from './routes/Admin';
-import BannedPage from './routes/BannedPage';
-import OfflineBanner from './components/OfflineBanner';
-import UpdatePrompt from './components/UpdatePrompt';
 import { RealtimeProvider } from './lib/RealtimeProvider';
+import { routeModuleLoaders } from './lib/moduleLoaders';
+
+const Login = lazy(routeModuleLoaders.login);
+const PendingApproval = lazy(routeModuleLoaders.pendingApproval);
+const ProfileSetup = lazy(routeModuleLoaders.profileSetup);
+const AppShell = lazy(routeModuleLoaders.appShell);
+const HomeRoute = lazy(routeModuleLoaders.home);
+const Reserve = lazy(routeModuleLoaders.reserve);
+const EventsRoute = lazy(routeModuleLoaders.events);
+const BudgetRoute = lazy(routeModuleLoaders.budget);
+const ProfileRoute = lazy(routeModuleLoaders.profile);
+const Admin = lazy(routeModuleLoaders.admin);
+const BannedPage = lazy(routeModuleLoaders.banned);
+const OfflineBanner = lazy(routeModuleLoaders.offlineBanner);
+const UpdatePrompt = lazy(routeModuleLoaders.updatePrompt);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,41 +59,59 @@ function AppErrorBoundary({ children }: { children: React.ReactNode }) {
   return children;
 }
 
+function AppRouteFallback() {
+  return (
+    <div className="min-h-screen bg-background text-on-surface flex items-center justify-center px-6">
+      <div className="surface-card w-full max-w-sm p-8 text-center">
+        <div className="mx-auto mb-4 h-10 w-10 rounded-full border-4 border-primary/25 border-t-primary animate-spin" />
+        <p className="font-headline text-lg font-bold tracking-tight">화면을 불러오는 중입니다</p>
+        <p className="mt-2 text-sm text-on-surface-variant">필요한 화면 코드만 순차적으로 로드하고 있어요.</p>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <AppErrorBoundary>
-      <OfflineBanner />
-      <UpdatePrompt />
+      <Suspense fallback={null}>
+        <OfflineBanner />
+      </Suspense>
+      <Suspense fallback={null}>
+        <UpdatePrompt />
+      </Suspense>
       <ThemeProvider>
         <ToastProvider>
           <QueryClientProvider client={queryClient}>
             <RealtimeProvider>
             <AuthProvider>
               <BrowserRouter>
-                <Routes>
-                  {/* ... routes ... */}
-                  <Route path="/login" element={<Login />} />
-                  <Route element={<RequireAuth />}>
-                    <Route path="/profile/setup" element={<ProfileSetup />} />
-                    <Route path="/pending-approval" element={<PendingApproval />} />
-                    <Route path="/banned" element={<BannedPage />} />
+                <Suspense fallback={<AppRouteFallback />}>
+                  <Routes>
+                    {/* ... routes ... */}
+                    <Route path="/login" element={<Login />} />
+                    <Route element={<RequireAuth />}>
+                      <Route path="/profile/setup" element={<ProfileSetup />} />
+                      <Route path="/pending-approval" element={<PendingApproval />} />
+                      <Route path="/banned" element={<BannedPage />} />
 
-                    <Route element={<RequireApproved />}>
-                      <Route element={<AppShell />}>
-                        <Route index element={<HomeRoute />} />
-                        <Route path="reserve" element={<Reserve />} />
-                        <Route path="events" element={<EventsRoute />} />
-                        <Route path="profile" element={<ProfileRoute />} />
-                      </Route>
+                      <Route element={<RequireApproved />}>
+                        <Route element={<AppShell />}>
+                          <Route index element={<HomeRoute />} />
+                          <Route path="reserve" element={<Reserve />} />
+                          <Route path="events" element={<EventsRoute />} />
+                          <Route path="profile" element={<ProfileRoute />} />
+                        </Route>
 
-                      <Route element={<RequireAdmin />}>
-                        <Route path="admin" element={<Admin />} />
-                        <Route path="budget" element={<BudgetRoute />} />
+                        <Route element={<RequireAdmin />}>
+                          <Route path="admin" element={<Admin />} />
+                          <Route path="budget" element={<BudgetRoute />} />
+                        </Route>
                       </Route>
                     </Route>
-                  </Route>
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </Suspense>
               </BrowserRouter>
             </AuthProvider>
             </RealtimeProvider>

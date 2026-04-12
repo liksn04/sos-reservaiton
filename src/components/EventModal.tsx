@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useEventCategories } from '../hooks/useEventCategories';
-import { useToast } from '../contexts/ToastContext';
+import { useToast } from '../contexts/useToast';
 import {
   useCreateEvent,
   useUpdateEvent,
   useCreateCategory,
   useDeleteCategory,
 } from '../hooks/mutations/useEventMutations';
-import type { ClubEventWithDetails, ClubEventInput } from '../types';
+import type { ClubEventWithDetails, ClubEventInput, EventCategory } from '../types';
 import DatePicker from './Calendar/DatePicker';
 import { getTimeSlots } from '../utils/time';
 
@@ -30,6 +30,28 @@ const COLOR_PRESETS = [
 
 export default function EventModal({ isOpen, onClose, editing, initialDate }: Props) {
   const { data: categories = [] } = useEventCategories();
+
+  if (!isOpen) return null;
+
+  const formKey = editing?.id ?? `new-${initialDate?.toISOString() ?? 'default'}`;
+
+  return (
+    <EventModalContent
+      key={formKey}
+      onClose={onClose}
+      editing={editing}
+      initialDate={initialDate}
+      categories={categories}
+    />
+  );
+}
+
+function EventModalContent({
+  onClose,
+  editing,
+  initialDate,
+  categories,
+}: Omit<Props, 'isOpen'> & { categories: EventCategory[] }) {
   const createEvent = useCreateEvent();
   const updateEvent = useUpdateEvent();
   const createCategory = useCreateCategory();
@@ -37,17 +59,6 @@ export default function EventModal({ isOpen, onClose, editing, initialDate }: Pr
   const { addToast } = useToast();
 
   const [showCategoryEditor, setShowCategoryEditor] = useState(false);
-
-  // form state
-  const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [location, setLocation] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [error, setError] = useState<string | null>(null);
 
   // picker state
   const [pickerOpen, setPickerOpen] = useState<'start_date' | 'end_date' | null>(null);
@@ -58,34 +69,20 @@ export default function EventModal({ isOpen, onClose, editing, initialDate }: Pr
   const [newCatName, setNewCatName] = useState('');
   const [newCatColor, setNewCatColor] = useState(COLOR_PRESETS[0]);
   const [newCatIcon, setNewCatIcon] = useState('event');
-
-  useEffect(() => {
-    if (!isOpen) return;
-    if (editing) {
-      setCategoryId(editing.category_id);
-      setTitle(editing.title);
-      setDescription(editing.description ?? '');
-      setLocation(editing.location ?? '');
-      setStartDate(editing.start_date);
-      setStartTime(editing.start_time?.slice(0, 5) ?? '');
-      setEndDate(editing.end_date ?? '');
-      setEndTime(editing.end_time?.slice(0, 5) ?? '');
-    } else {
-      const d = initialDate ?? new Date();
-      const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      setCategoryId(categories[0]?.id ?? null);
-      setTitle('');
-      setDescription('');
-      setLocation('');
-      setStartDate(iso);
-      setStartTime('');
-      setEndDate('');
-      setEndTime('');
-    }
-    setError(null);
-  }, [isOpen, editing, initialDate, categories]);
-
-  if (!isOpen) return null;
+  const [initialStartDate] = useState(() => {
+    const date = initialDate ?? new Date();
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  });
+  const [categoryId, setCategoryId] = useState<string | null>(editing?.category_id ?? null);
+  const [title, setTitle] = useState(editing?.title ?? '');
+  const [description, setDescription] = useState(editing?.description ?? '');
+  const [location, setLocation] = useState(editing?.location ?? '');
+  const [startDate, setStartDate] = useState(editing?.start_date ?? initialStartDate);
+  const [startTime, setStartTime] = useState(editing?.start_time?.slice(0, 5) ?? '');
+  const [endDate, setEndDate] = useState(editing?.end_date ?? '');
+  const [endTime, setEndTime] = useState(editing?.end_time?.slice(0, 5) ?? '');
+  const [error, setError] = useState<string | null>(null);
+  const effectiveCategoryId = categoryId ?? (!editing ? categories[0]?.id ?? null : null);
 
   async function handleSubmit() {
     setError(null);
@@ -94,7 +91,7 @@ export default function EventModal({ isOpen, onClose, editing, initialDate }: Pr
     if (endDate && endDate < startDate) return setError('종료일은 시작일 이후여야 합니다.');
 
     const payload: ClubEventInput = {
-      category_id: categoryId,
+      category_id: effectiveCategoryId,
       title: title.trim(),
       description: description.trim() || null,
       location: location.trim() || null,
@@ -140,7 +137,7 @@ export default function EventModal({ isOpen, onClose, editing, initialDate }: Pr
     if (!confirm('이 카테고리를 삭제하시겠습니까? 연결된 일정의 카테고리는 비워집니다.')) return;
     try {
       await deleteCategory.mutateAsync(id);
-      if (categoryId === id) setCategoryId(null);
+      if (effectiveCategoryId === id) setCategoryId(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : '카테고리 삭제에 실패했습니다.');
     }
@@ -157,7 +154,7 @@ export default function EventModal({ isOpen, onClose, editing, initialDate }: Pr
       >
         <div className="modal-container animate-slide-up" style={{ maxHeight: 'calc(100vh - 160px)' }}>
           <div className="modal-header" style={{ paddingTop: '2.5rem' }}>
-            <h2 className="text-2xl font-black italic tracking-tighter">
+            <h2 className="font-headline text-2xl font-bold tracking-tight">
               {editing ? '일정' : '새 일정'} <span className="text-primary">{editing ? '수정' : '등록'}</span>
             </h2>
             <button
@@ -182,7 +179,7 @@ export default function EventModal({ isOpen, onClose, editing, initialDate }: Pr
               </div>
               <div className="chip-group-wrap">
                 {categories.map((c) => {
-                  const active = c.id === categoryId;
+                  const active = c.id === effectiveCategoryId;
                   return (
                     <button
                       key={c.id}

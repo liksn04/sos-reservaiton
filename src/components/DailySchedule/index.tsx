@@ -45,15 +45,15 @@ export default function DailySchedule({
           const isEditable = (isHost && !isPast) || isAdmin;
 
           return (
-            <div key={res.id} className={`glass-card rounded-3xl p-4 flex items-center gap-4 border transition-all ${isHost ? 'border-primary/30 bg-primary/5' : 'border-outline-variant/10'}`}>
+            <div key={res.id} className={`surface-card p-4 flex items-center gap-4 transition-all ${isHost ? 'bg-primary/5 border-primary/20' : ''}`}>
               
               {/* Left: Time Column */}
-              <div className="flex flex-col items-center justify-center min-w-[64px] py-1 border-r border-outline-variant/20 pr-4">
-                <span className={`text-lg font-black italic tracking-tighter leading-none ${isHost ? 'text-primary' : 'text-on-surface'}`}>
+              <div className="flex flex-col items-center justify-center min-w-[74px] py-3 rounded-[1.5rem] bg-surface-container-low">
+                <span className={`text-lg font-black tracking-tighter leading-none ${isHost ? 'text-primary' : 'text-on-surface'}`}>
                   {start}
                 </span>
-                <span className="text-[10px] font-bold text-on-surface-variant/50 my-1 italic lowercase">to</span>
-                <span className={`text-base font-black italic tracking-tighter leading-none ${isHost ? 'text-primary/70' : 'text-on-surface-variant'}`}>
+                <span className="text-[10px] font-bold text-on-surface-variant/50 my-1 lowercase">to</span>
+                <span className={`text-base font-black tracking-tighter leading-none ${isHost ? 'text-primary/70' : 'text-on-surface-variant'}`}>
                   {end}
                 </span>
               </div>
@@ -87,7 +87,7 @@ export default function DailySchedule({
                   )}
                 </div>
                 
-                <h4 className="text-lg font-black italic tracking-tight text-on-surface truncate mb-1">
+                <h4 className="font-headline text-lg font-bold tracking-tight text-on-surface truncate mb-1">
                   {res.team_name}
                 </h4>
                 
@@ -109,14 +109,14 @@ export default function DailySchedule({
                 <div className="flex flex-col gap-2 ml-auto pl-2">
                   <button
                     title="수정"
-                    className="w-9 h-9 rounded-full flex items-center justify-center transition-all bg-surface-container-high text-on-surface-variant border border-card-border hover:border-primary/50 hover:text-primary hover:bg-surface-highest shadow-sm"
+                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-surface-container-low text-on-surface-variant border border-card-border hover:border-primary/50 hover:text-primary hover:bg-surface-highest shadow-sm"
                     onClick={() => onEdit(res)}
                   >
                     <span className="material-symbols-outlined text-[18px]">settings</span>
                   </button>
                   <button
                     title="삭제"
-                    className="w-9 h-9 rounded-full flex items-center justify-center transition-all bg-surface-container-high text-on-surface-variant border border-card-border hover:border-error/50 hover:text-error hover:bg-error/5 shadow-sm"
+                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-surface-container-low text-on-surface-variant border border-card-border hover:border-error/50 hover:text-error hover:bg-error/5 shadow-sm"
                     onClick={() => onDelete(res.id, res.team_name)}
                   >
                     <span className="material-symbols-outlined text-[18px]">delete</span>

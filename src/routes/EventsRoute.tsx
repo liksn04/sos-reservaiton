@@ -87,7 +87,7 @@ export default function EventsRoute() {
           <span className="material-symbols-outlined text-sm">calendar_month</span>
           동아리 일정
         </div>
-        <h2 className="dashboard-title italic">
+        <h2 className="dashboard-title">
           <span className="text-gradient-white-purple">우리의 큰</span><br />
           <span>일정 모아보기</span>
         </h2>
@@ -97,11 +97,11 @@ export default function EventsRoute() {
       </section>
 
       {/* 탭 */}
-      <div className="flex gap-4 mb-6 border-b" style={{ borderColor: 'var(--outline-border)' }}>
+      <div className="flex gap-6 mb-6 border-b" style={{ borderColor: 'var(--outline-border)' }}>
         {(['upcoming', 'past', 'timeline'] as Tab[]).map((t) => (
           <button key={t} onClick={() => setTab(t)} className="relative pb-3 px-1">
             <span
-              className="text-lg font-black italic transition-colors"
+              className="font-headline text-lg font-bold transition-colors"
               style={{ color: tab === t ? 'var(--primary)' : 'var(--text-muted)' }}
             >
               {t === 'upcoming' ? '다가오는 일정' : t === 'past' ? '지난 일정' : '타임라인'}
@@ -119,11 +119,9 @@ export default function EventsRoute() {
         <div className="flex flex-wrap gap-2 pb-2 mb-6">
           <button
             onClick={() => setFilterCategory(null)}
-            className="flex-shrink-0 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border"
+            className={`soft-chip flex-shrink-0 ${filterCategory === null ? 'active' : ''}`}
             style={{
-              backgroundColor: filterCategory === null ? 'var(--club-tag-bg)' : 'rgba(var(--color-surface-container-highest), 0.3)',
-              color: filterCategory === null ? 'var(--primary)' : 'var(--text-on-surface-variant)',
-              borderColor: filterCategory === null ? 'var(--primary-border)' : 'rgba(255, 255, 255, 0.08)',
+              borderColor: filterCategory === null ? 'var(--primary-border)' : 'transparent',
             }}
           >
             ALL
@@ -134,12 +132,12 @@ export default function EventsRoute() {
               onClick={() => setFilterCategory(c.id)}
               className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border ${
                 filterCategory === c.id
-                  ? 'shadow-lg scale-105'
-                  : 'bg-surface-container-highest/30 text-on-surface-variant border-white/5 hover:bg-surface-container-highest/50 hover:text-white'
+                  ? 'shadow-lg scale-105 text-white'
+                  : 'bg-surface-container-high text-on-surface-variant border-transparent'
               }`}
               style={{
-                backgroundColor: filterCategory === c.id ? `${c.color}25` : '',
-                color: filterCategory === c.id ? c.color : '',
+                backgroundColor: filterCategory === c.id ? c.color : '',
+                color: filterCategory === c.id ? '#ffffff' : '',
                 borderColor: filterCategory === c.id ? c.color : '',
               }}
             >
@@ -188,7 +186,7 @@ export default function EventsRoute() {
       {/* 일정 등록 버튼 (Admin 전용, Reserve 페이지 스타일) */}
       {isAdmin && (
         <button 
-          className="reserve-now-btn min-w-[200px] mx-auto mt-10 block shadow-2xl hover:scale-105 transition-all" 
+          className="reserve-now-btn min-w-[220px] mx-auto mt-10 block shadow-2xl hover:scale-105 transition-all" 
           onClick={openNew}
         >
           <span className="material-symbols-outlined" style={{ fontWeight: 'bold' }}>add_circle</span>
@@ -254,116 +252,155 @@ function EventCard({
 
   return (
     <div
-      className="glass-card rounded-[2rem] p-6 border transition-all hover:translate-y-[-2px] hover:border-primary/40 group"
+      className="surface-card p-6 transition-all hover:translate-y-[-2px] group relative overflow-hidden"
       style={{
-        borderColor: isDday ? (cat?.color ?? 'var(--primary)') : 'rgba(255, 255, 255, 0.1)',
+        borderColor: isDday ? (cat?.color ?? 'var(--primary)') : 'var(--card-border)',
         backgroundColor: isDday ? `${cat?.color ?? '#cc97ff'}15` : undefined,
-        boxShadow: isDday ? `0 8px 30px ${cat?.color ?? '#cc97ff'}25` : undefined,
+        boxShadow: isDday ? `0 8px 30px ${cat?.color ?? '#cc97ff'}18` : undefined,
       }}
     >
-      <div className="flex items-start gap-4">
-        {/* D-Day 원형 배지 */}
+      <div className="absolute top-4 right-5 text-[3rem] font-headline font-bold tracking-[-0.08em] select-none opacity-5" style={{ color: cat?.color ?? 'var(--primary)' }}>
+        {tab === 'upcoming' ? `D-${Math.max(dDays, 0)}` : `D+${Math.abs(dDays)}`}
+      </div>
+
+      <div className="relative z-10">
         <div
-          className="flex flex-col items-center justify-center min-w-[72px] h-[72px] rounded-2xl border flex-shrink-0"
+          className="sm:hidden absolute top-0 right-0 flex items-center justify-center min-w-[78px] h-[40px] px-3 rounded-full border"
           style={{
-            backgroundColor: cat ? `${cat.color}1A` : 'var(--surface-container)',
+            backgroundColor: cat ? `${cat.color}14` : 'var(--surface-container)',
             borderColor: cat?.color ?? 'var(--outline-border)',
+            color: cat?.color ?? 'var(--primary)',
           }}
         >
-          {isDday ? (
-            <>
-              <span className="font-black text-xl italic tracking-tighter leading-none" style={{ color: cat?.color ?? 'var(--primary)' }}>D-</span>
-              <span className="font-black text-sm italic tracking-tighter leading-none uppercase" style={{ color: cat?.color ?? 'var(--primary)' }}>Day</span>
-            </>
-          ) : (
-            <span className="font-black text-2xl italic tracking-tighter" style={{ color: cat?.color ?? 'var(--text-on-surface-var)' }}>
-              {tab === 'upcoming' ? `D-${dDays}` : `D+${Math.abs(dDays)}`}
-            </span>
-          )}
+          <span className="font-black text-base tracking-tighter">
+            {tab === 'upcoming' ? `D-${Math.max(dDays, 0)}` : `D+${Math.abs(dDays)}`}
+          </span>
         </div>
 
-        {/* 본문 */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            {cat && (
-              <span
-                className="flex items-center gap-1 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest"
-                style={{ backgroundColor: `${cat.color}25`, color: cat.color }}
-              >
-                <span className="material-symbols-outlined text-xs">{cat.icon}</span>
-                {cat.name}
-              </span>
-            )}
-            {!ev.is_public && (
-              <span className="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest bg-yellow-500/20 text-yellow-500">
-                비공개
-              </span>
-            )}
+        <div className="flex items-start gap-4 pr-[92px] sm:pr-0">
+          <div
+            className="w-24 h-24 rounded-[1.75rem] flex-shrink-0 flex flex-col items-start justify-end p-4 text-white shadow-lg"
+            style={{
+              background: cat
+                ? `linear-gradient(135deg, ${cat.color} 0%, ${cat.color}CC 100%)`
+                : 'var(--primary-btn-gradient)',
+            }}
+          >
+            <span className="material-symbols-outlined text-[28px] mb-2">{cat?.icon ?? 'event'}</span>
+            <span className="text-[10px] font-bold tracking-[0.18em] uppercase">{cat?.name ?? 'Event'}</span>
           </div>
-          <h3 className="text-lg font-black italic tracking-tight text-on-surface mb-1 truncate">{ev.title}</h3>
-          
-          <div className="space-y-1">
-            <p className="text-[11px] font-bold text-on-surface-variant flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-sm">schedule</span>
-              {formatKDate(ev.start_date)}
-              {ev.start_time && ` ${ev.start_time.slice(0, 5)}`}
-              {ev.end_date && ev.end_date !== ev.start_date && ` ~ ${formatKDate(ev.end_date)}`}
-            </p>
-            {ev.location && (
-              <p className="text-[11px] font-bold text-on-surface-variant flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-sm">place</span>
-                {ev.location}
-              </p>
+
+          <div
+            className="hidden sm:flex flex-col items-center justify-center min-w-[72px] h-[72px] rounded-2xl border flex-shrink-0"
+            style={{
+              backgroundColor: cat ? `${cat.color}1A` : 'var(--surface-container)',
+              borderColor: cat?.color ?? 'var(--outline-border)',
+            }}
+          >
+            {isDday ? (
+              <>
+                <span className="font-black text-xl tracking-tighter leading-none" style={{ color: cat?.color ?? 'var(--primary)' }}>D-</span>
+                <span className="font-black text-sm tracking-tighter leading-none uppercase" style={{ color: cat?.color ?? 'var(--primary)' }}>Day</span>
+              </>
+            ) : (
+              <span className="font-black text-2xl tracking-tighter" style={{ color: cat?.color ?? 'var(--text-on-surface-var)' }}>
+                {tab === 'upcoming' ? `D-${dDays}` : `D+${Math.abs(dDays)}`}
+              </span>
             )}
           </div>
 
-          {/* 참가자 정보 및 버튼 */}
-          <div className="mt-4 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 cursor-pointer group" onClick={onViewParticipants}>
-              <div className="flex -space-x-2">
-                {participants.slice(0, 3).map((p) => (
+          {/* 본문 */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              {cat && (
+                <span
+                  className="flex items-center gap-1 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest"
+                  style={{ backgroundColor: `${cat.color}25`, color: cat.color }}
+                >
+                  <span className="material-symbols-outlined text-xs">{cat.icon}</span>
+                  {cat.name}
+                </span>
+              )}
+              {!ev.is_public && (
+                <span className="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest bg-yellow-500/20 text-yellow-500">
+                  비공개
+                </span>
+              )}
+            </div>
+            <h3 className="font-headline text-[1.4rem] font-bold tracking-tight text-on-surface mb-2 leading-tight">{ev.title}</h3>
+            
+            <div className="space-y-1">
+              <p className="text-[11px] font-bold text-on-surface-variant flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm">schedule</span>
+                {formatKDate(ev.start_date)}
+                {ev.start_time && ` ${ev.start_time.slice(0, 5)}`}
+                {ev.end_date && ev.end_date !== ev.start_date && ` ~ ${formatKDate(ev.end_date)}`}
+              </p>
+              {ev.location && (
+                <p className="text-[11px] font-bold text-on-surface-variant flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-sm">place</span>
+                  {ev.location}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* 참가자 정보 및 버튼 */}
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 cursor-pointer group min-w-0" onClick={onViewParticipants}>
+            <div className="flex -space-x-2 flex-shrink-0">
+              {participants.slice(0, 3).map((p) => (
+                p.profile?.avatar_url ? (
                   <img
                     key={p.id}
-                    src={p.profile?.avatar_url || '/placeholder-avatar.png'}
+                    src={p.profile.avatar_url}
                     className="w-6 h-6 rounded-full border-2 border-surface object-cover"
                     title={p.profile?.display_name}
                   />
-                ))}
-
-                {participants.length > 3 && (
-                  <div className="w-6 h-6 rounded-full border-2 border-surface bg-surface-container flex items-center justify-center text-[8px] font-black italic">
-                    +{participants.length - 3}
+                ) : (
+                  <div
+                    key={p.id}
+                    className="w-6 h-6 rounded-full border-2 border-surface bg-surface-container flex items-center justify-center text-[8px] font-black"
+                    title={p.profile?.display_name}
+                  >
+                    {p.profile?.display_name?.charAt(0) ?? '?'}
                   </div>
-                )}
-              </div>
-              <span className="text-[10px] font-black italic text-muted group-hover:text-primary transition-colors">
-                {participants.length}명 참여 중
-              </span>
+                )
+              ))}
+
+              {participants.length > 3 && (
+                <div className="w-6 h-6 rounded-full border-2 border-surface bg-surface-container flex items-center justify-center text-[8px] font-black">
+                  +{participants.length - 3}
+                </div>
+              )}
             </div>
-
-            {tab === 'upcoming' && (
-              <button
-                onClick={handleJoinToggle}
-                disabled={joinEvent.isPending || leaveEvent.isPending}
-                className="flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter transition-all"
-                style={{
-                  backgroundColor: isJoined ? `${cat?.color ?? '#cc97ff'}20` : 'var(--primary)',
-                  color: isJoined ? (cat?.color ?? 'var(--primary)') : 'var(--on-primary)',
-                  border: isJoined ? `1px solid ${cat?.color ?? '#cc97ff'}40` : 'none',
-                }}
-              >
-                <span className="material-symbols-outlined text-sm">
-                  {isJoined ? 'check_circle' : 'add_circle'}
-                </span>
-                {isJoined ? '참여 완료' : '참여하기'}
-              </button>
-            )}
+            <span className="text-[10px] font-black text-muted group-hover:text-primary transition-colors whitespace-nowrap">
+              {participants.length}명 참여 중
+            </span>
           </div>
-        </div>
 
+          {tab === 'upcoming' && (
+            <button
+              onClick={handleJoinToggle}
+              disabled={joinEvent.isPending || leaveEvent.isPending}
+              className="flex items-center gap-1 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-tighter transition-all shadow-sm sm:ml-auto"
+              style={{
+                backgroundColor: isJoined ? `${cat?.color ?? '#cc97ff'}20` : 'var(--primary)',
+                color: isJoined ? (cat?.color ?? 'var(--primary)') : 'var(--on-primary)',
+                border: isJoined ? `1px solid ${cat?.color ?? '#cc97ff'}40` : 'none',
+              }}
+            >
+              <span className="material-symbols-outlined text-sm">
+                {isJoined ? 'check_circle' : 'add_circle'}
+              </span>
+              {isJoined ? '참여 완료' : '참여하기'}
+            </button>
+          )}
+        </div>
         {/* 액션 (admin) */}
         {isAdmin && (
-          <div className="flex flex-col gap-2 flex-shrink-0">
+          <div className="mt-3 flex justify-end gap-2">
             <button
               onClick={onEdit}
               title="수정"
@@ -384,4 +421,3 @@ function EventCard({
     </div>
   );
 }
-

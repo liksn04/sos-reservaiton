@@ -45,7 +45,7 @@ export default function EventParticipantsModal({ isOpen, onClose, event }: Props
         }}
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-black italic tracking-tighter">
+          <h2 className="font-headline text-2xl font-bold tracking-tight">
             PARTICIPANTS <span className="text-primary">{participants.length}</span>
           </h2>
           <button
@@ -63,14 +63,14 @@ export default function EventParticipantsModal({ isOpen, onClose, event }: Props
             style={{ backgroundColor: 'var(--surface-container)' }}
           >
             <p className="text-[10px] text-muted font-bold uppercase tracking-widest">RSVP</p>
-            <p className="text-2xl font-black italic mt-1">{participants.length}</p>
+            <p className="font-headline text-2xl font-bold mt-1">{participants.length}</p>
           </div>
           <div
             className="rounded-xl p-3 text-center border border-white/5"
             style={{ backgroundColor: 'var(--surface-container)' }}
           >
             <p className="text-[10px] text-muted font-bold uppercase tracking-widest">ATTENDED</p>
-            <p className="text-2xl font-black italic mt-1" style={{ color: 'var(--primary)' }}>
+            <p className="font-headline text-2xl font-bold mt-1" style={{ color: 'var(--primary)' }}>
               {attendedCount}
             </p>
           </div>
@@ -88,11 +88,17 @@ export default function EventParticipantsModal({ isOpen, onClose, event }: Props
                 className="flex items-center gap-3 p-3 rounded-xl border border-white/5 transition-colors"
                 style={{ backgroundColor: 'var(--surface-container)' }}
               >
-                <img
-                  src={p.profile?.avatar_url || '/placeholder-avatar.png'}
-                  alt={p.profile?.display_name}
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-white/10"
-                />
+                {p.profile?.avatar_url ? (
+                  <img
+                    src={p.profile.avatar_url}
+                    alt={p.profile?.display_name}
+                    className="w-10 h-10 rounded-full object-cover ring-2 ring-white/10"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center font-bold text-sm text-on-surface ring-2 ring-white/10">
+                    {p.profile?.display_name?.charAt(0) ?? '?'}
+                  </div>
+                )}
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm tracking-tight">{p.profile?.display_name}</span>

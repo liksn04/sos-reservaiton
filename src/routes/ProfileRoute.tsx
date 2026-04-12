@@ -96,10 +96,10 @@ export default function ProfileRoute() {
           {/* ── 프로필 카드 ── */}
           <section className="mb-10">
             <div
-              className="empty-card flex-col gap-4 border-none bg-surface-container relative overflow-hidden"
-              style={{ borderRadius: '1.5rem', padding: '2rem 1.5rem' }}
+              className="surface-card flex flex-col items-center gap-4 relative overflow-hidden text-center"
+              style={{ padding: '2.25rem 1.5rem' }}
             >
-              <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center relative z-10" style={{ backgroundColor: 'var(--surface-container-high)', border: '1px solid var(--outline-border)' }}>
+              <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center relative z-10 mx-auto" style={{ backgroundColor: 'var(--surface-container-high)', border: '2px solid rgba(var(--color-primary) / 0.08)' }}>
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt="User Avatar" className="w-full h-full object-cover" />
                 ) : (
@@ -107,8 +107,8 @@ export default function ProfileRoute() {
                 )}
               </div>
               <div className="flex flex-col items-center z-10 relative">
-                <span className="text-[10px] font-bold tracking-widest text-primary mb-1">멤버십 프로필</span>
-                <h2 className="text-xl font-bold text-on-surface mb-2">{profile?.display_name || '게스트'}</h2>
+                <span className="text-[10px] font-bold tracking-[0.22em] text-primary mb-2 uppercase">멤버십 프로필</span>
+                <h2 className="font-headline text-2xl font-bold text-on-surface mb-2">{profile?.display_name || '게스트'}</h2>
                 
                 {/* 파트 뱃지 영역 */}
                 <div className="flex flex-wrap justify-center gap-1.5 mb-5">
@@ -128,24 +128,23 @@ export default function ProfileRoute() {
                   )}
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex flex-wrap justify-center gap-2">
                   <button
                     onClick={() => setIsEditingProfile(true)}
-                    className="px-4 py-2 rounded-lg text-xs font-bold transition-colors"
-                    style={{ backgroundColor: 'var(--surface-container-high)', color: 'var(--text-main)', border: '1px solid var(--outline-border)' }}
+                    className="secondary-btn !h-11 !px-4 !text-xs"
                   >
                     프로필 편집
                   </button>
                   <button
                     onClick={signOut}
-                    className="px-4 py-2 rounded-lg text-xs font-bold transition-colors bg-surface-container-high text-error border border-outline-border"
+                    className="px-4 py-2 rounded-full text-xs font-bold transition-colors bg-surface-container-high text-error border border-outline-border"
                   >
                     로그아웃
                   </button>
                   {profile?.is_admin && (
                     <Link
                       to="/admin"
-                      className="px-4 py-2 rounded-lg text-xs font-bold transition-colors"
+                      className="px-4 py-2 rounded-full text-xs font-bold transition-colors"
                       style={{ backgroundColor: 'var(--club-tag-bg)', color: 'var(--primary)', border: '1px solid var(--primary-border)' }}
                     >
                       관리자
@@ -165,10 +164,10 @@ export default function ProfileRoute() {
 
           {/* ── 테마 설정 ── */}
           <section className="mb-8">
-            <div className="glass-card rounded-2xl p-5">
+            <div className="surface-card p-5">
               <div className="flex items-center gap-2 mb-4">
                 <span className="material-symbols-outlined text-[20px] text-on-surface-variant">palette</span>
-                <h4 className="text-sm font-black text-on-surface tracking-tight">화면 테마</h4>
+                <h4 className="font-headline text-sm font-bold text-on-surface tracking-tight">화면 테마</h4>
               </div>
               <ThemeToggle />
             </div>
@@ -183,7 +182,7 @@ export default function ProfileRoute() {
           {/* ── 내 합주 일정 ── */}
           <section className="mb-6 flex justify-between items-end">
             <div>
-              <h3 className="text-3xl font-black italic tracking-tight text-on-surface">내 합주 일정</h3>
+              <h3 className="font-headline text-3xl font-bold tracking-tight text-on-surface">내 합주 일정</h3>
               <p className="text-on-surface-variant text-sm mt-1">당신의 합주 일정을 확인해보세요</p>
             </div>
           </section>
@@ -192,7 +191,7 @@ export default function ProfileRoute() {
           <div className="flex gap-4 mb-8 border-b" style={{ borderColor: 'var(--outline-border)' }}>
             <button onClick={() => setScheduleTab('upcoming')} className="relative pb-3 px-1 group">
               <span
-                className="text-lg font-black italic transition-colors"
+                className="font-headline text-lg font-bold transition-colors"
                 style={{ color: scheduleTab === 'upcoming' ? 'var(--primary)' : 'var(--text-muted)' }}
               >
                 다가오는 일정
@@ -203,7 +202,7 @@ export default function ProfileRoute() {
             </button>
             <button onClick={() => setScheduleTab('history')} className="relative pb-3 px-1 group">
               <span
-                className="text-lg font-black italic transition-colors"
+                className="font-headline text-lg font-bold transition-colors"
                 style={{ color: scheduleTab === 'history' ? 'var(--primary)' : 'var(--text-muted)' }}
               >
                 지난 일정
@@ -235,7 +234,7 @@ export default function ProfileRoute() {
                 return (
                   <div
                     key={res.id}
-                    className={`glass-card rounded-[1.5rem] p-5 flex items-center gap-4 border transition-all ${isDday ? 'border-primary/40 bg-primary/5 shadow-[0_4px_20px_rgba(204,151,255,0.1)]' : 'border-outline-variant/10'}`}
+                    className={`surface-card p-5 flex items-center gap-4 transition-all ${isDday ? 'border-primary/40 bg-primary/5 shadow-[0_4px_20px_rgba(0,100,255,0.08)]' : ''}`}
                   >
                     {/* D-Day 배지 */}
                     <div
@@ -247,11 +246,11 @@ export default function ProfileRoute() {
                     >
                       {isDday ? (
                         <div className="flex flex-col items-center">
-                          <span className="font-black text-xl italic tracking-tighter text-primary leading-none">D-</span>
-                          <span className="font-black text-sm italic tracking-tighter text-primary leading-none uppercase">Day</span>
+                          <span className="font-black text-xl tracking-tighter text-primary leading-none">D-</span>
+                          <span className="font-black text-sm tracking-tighter text-primary leading-none uppercase">Day</span>
                         </div>
                       ) : (
-                        <span className="font-black text-2xl italic tracking-tighter text-on-surface-variant">
+                        <span className="font-black text-2xl tracking-tighter text-on-surface-variant">
                           {scheduleTab === 'upcoming' ? `D-${diffDays}` : `D+${diffDays}`}
                         </span>
                       )}
@@ -273,7 +272,7 @@ export default function ProfileRoute() {
                       </p>
                       <div className="flex items-center gap-2 text-on-surface-variant">
                         <span className="material-symbols-outlined text-[16px]">groups</span>
-                        <p className="font-black italic text-base text-on-surface/80 truncate leading-none">{res.team_name}</p>
+                        <p className="font-headline font-bold text-base text-on-surface/80 truncate leading-none">{res.team_name}</p>
                       </div>
                     </div>
 

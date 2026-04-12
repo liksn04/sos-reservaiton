@@ -33,7 +33,7 @@ export default function TimePicker({ isOpen, onClose, selectedTime, onSelect }: 
         className="modal-container p-6" 
         style={{ maxWidth: '320px', backgroundColor: 'var(--surface-container-highest)' }}
       >
-        <h3 className="text-xl font-black italic tracking-tighter mb-6 text-center">
+        <h3 className="font-headline text-xl font-bold tracking-tight mb-6 text-center">
           SELECT <span className="text-primary">TIME</span>
         </h3>
 

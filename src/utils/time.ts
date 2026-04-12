@@ -65,6 +65,7 @@ export function computeSlotAvailability(
   reservations: Reservation[],
   editingId: string | null,
   selectedStart: string,
+  now: Date = new Date(),
 ): SlotAvailability {
   const activeRes = reservations.filter(
     (r) => r.id !== editingId && r.date === date,
@@ -77,6 +78,8 @@ export function computeSlotAvailability(
 
   const allSlots = getTimeSlots();
   const disabledStarts = new Set<string>();
+  const todayStr = formatDate(now);
+  const nowTs = now.getTime();
 
   // 24:00은 시작 시간으로 항상 비활성화
   disabledStarts.add('24:00');
@@ -84,6 +87,13 @@ export function computeSlotAvailability(
   for (const time of allSlots) {
     if (time === '24:00') continue;
     const optTs = getReservationTimestamp(date, time, false);
+
+    // Edge case: 오늘 날짜에서 이미 시작된 슬롯은 원천 차단
+    if (date === todayStr && optTs <= nowTs) {
+      disabledStarts.add(time);
+      continue;
+    }
+
     const overlap = scheduled.some((r) => optTs >= r.startTs && optTs < r.endTs);
     if (overlap) disabledStarts.add(time);
   }

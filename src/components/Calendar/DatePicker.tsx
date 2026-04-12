@@ -38,7 +38,7 @@ export default function DatePicker({ isOpen, onClose, selectedDate, onSelect }: 
         style={{ maxWidth: '340px', backgroundColor: 'var(--surface-container-highest)' }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-black italic tracking-tighter">
+          <h3 className="font-headline text-lg font-bold tracking-tight">
             {year}년 <span className="text-primary">{month + 1}월</span>
           </h3>
           <div className="flex gap-2">

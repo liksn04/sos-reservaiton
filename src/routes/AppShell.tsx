@@ -53,28 +53,38 @@ export default function AppShell() {
   }
 
   return (
-    <div className="min-h-screen pb-24 max-w-2xl mx-auto relative" style={{ backgroundColor: 'var(--bg-dark)', color: 'var(--text-main)' }}>
+    <div className="min-h-screen pb-24 max-w-2xl mx-auto relative" style={{ color: 'var(--text-main)' }}>
 
       {/* ── Top App Bar ── */}
       <header className="top-app-bar">
-        <div className="logo-area"></div>
+        <div className="logo-area">
+          <div className="logo-icon">빛</div>
+          <span className="logo-title">빛소리</span>
+        </div>
         <div className="flex items-center gap-3">
           {profile?.is_admin && (
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full border border-orange-500/30 bg-orange-500/5 text-orange-500 text-[10px] font-black uppercase tracking-wider">
-              <span className="material-symbols-outlined text-[12px]">verified_user</span>
-              ADMIN
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full bg-primary/10 text-primary text-[11px] font-bold border border-primary/10">
+              <span className="material-symbols-outlined text-[14px]">verified_user</span>
+              관리자
             </div>
           )}
-          <div className="flex flex-col items-end justify-center">
-            <div className="flex items-center gap-1.5 leading-none mb-0.5">
+          <div className="flex flex-col items-end justify-center min-w-0">
+            <div className="flex items-center gap-1.5 leading-none mb-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-              <span className="text-[10px] text-tertiary-container font-black tracking-widest uppercase">ONLINE</span>
+              <span className="text-[10px] text-primary font-bold tracking-[0.18em] uppercase">ONLINE</span>
             </div>
-            <span className="text-sm text-on-surface font-bold leading-tight line-clamp-1">
+            <span className="text-sm text-on-surface font-semibold leading-tight line-clamp-1">
               {profile?.display_name || '게스트'}
             </span>
           </div>
-          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg" style={{ backgroundColor: 'var(--surface-highest)', border: '1px solid var(--outline-border)' }}>
+          <div
+            className="w-11 h-11 rounded-full overflow-hidden flex-shrink-0"
+            style={{
+              backgroundColor: 'rgb(var(--color-surface-container-lowest))',
+              border: '2px solid rgba(var(--color-primary) / 0.08)',
+              boxShadow: '0 10px 24px rgba(0, 78, 203, 0.08)',
+            }}
+          >
             {profile?.avatar_url ? (
               <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
             ) : (

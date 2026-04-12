@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useBudgetCategories } from '../hooks/useBudgetCategories';
 import { useBudgetMutations, uploadReceipt } from '../hooks/mutations/useBudgetMutations';
-import { useToast } from '../contexts/ToastContext';
+import { useToast } from '../contexts/useToast';
 import type { BudgetTransaction, BudgetTransactionInput, BudgetCategory } from '../types';
 
 interface Props {
@@ -212,7 +212,7 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
 
         {/* ── 헤더 ── */}
         <div className="modal-header" style={{ paddingTop: '2.5rem' }}>
-          <h2 className="text-2xl font-black italic tracking-tighter">
+          <h2 className="font-headline text-2xl font-bold tracking-tight">
             {editing ? '거래 내역' : '새 거래'}{' '}
             <span className={txType === 'income' ? 'text-emerald-500' : 'text-rose-500'}>
               {editing ? '수정' : '등록'}
@@ -235,7 +235,7 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
                 key={t}
                 type="button"
                 onClick={() => setTxType(t)}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black italic uppercase tracking-widest transition-all ${
+                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
                   txType === t
                     ? t === 'income'
                       ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
