@@ -1,4 +1,8 @@
+// @ts-ignore: Deno runtime module imports are not recognized by standard Node TypeScript settings
 import { createClient } from 'npm:@supabase/supabase-js@2';
+
+// Deno is implicitly provided in Edge Functions.
+declare const Deno: any;
 
 const SUPABASE_URL      = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
@@ -9,7 +13,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   // CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -50,27 +54,40 @@ Deno.serve(async (req) => {
     });
 
     // ── 4. 탈퇴 로그 적재 ────────────────────────────────────────
-    const { data: profile } = await admin
+    const { data: profile, error: profileError } = await admin
       .from('profiles')
       .select('display_name')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
-    await admin.from('account_deletion_log').insert({
+    if (profileError) {
+      console.warn('Profile fetch error during deletion:', profileError);
+    }
+
+    const { error: logError } = await admin.from('account_deletion_log').insert({
       user_email:   user.email ?? null,
       display_name: profile?.display_name ?? null,
       reason,
     });
+    
+    if (logError) {
+      console.warn('Account deletion log insert error:', logError);
+    }
 
     // ── 5. 스토리지 아바타 정리 ──────────────────────────────────
     // avatars 버킷에 업로드된 파일 목록을 가져와 전부 삭제
-    const { data: files } = await admin.storage
+    const { data: files, error: filesError } = await admin.storage
       .from('avatars')
       .list(user.id, { limit: 100 });
 
-    if (files && files.length > 0) {
-      const paths = files.map((f) => `${user.id}/${f.name}`);
-      await admin.storage.from('avatars').remove(paths);
+    if (filesError) {
+      console.warn('Avatar list fetch error:', filesError);
+    } else if (files && files.length > 0) {
+      const paths = files.map((f: { name: string }) => `${user.id}/${f.name}`);
+      const { error: removeError } = await admin.storage.from('avatars').remove(paths);
+      if (removeError) {
+        console.warn('Avatar remove error:', removeError);
+      }
     }
 
     // ── 6. auth.users 삭제 ────────────────────────────────────────
@@ -79,7 +96,7 @@ Deno.serve(async (req) => {
     if (deleteError) {
       console.error('deleteUser error:', deleteError);
       return new Response(
-        JSON.stringify({ error: '계정 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.' }),
+        JSON.stringify({ error: `계정 삭제 실패: ${deleteError.message}` }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
@@ -92,7 +109,7 @@ Deno.serve(async (req) => {
   } catch (err) {
     console.error('Unexpected error:', err);
     return new Response(
-      JSON.stringify({ error: '서버 오류가 발생했습니다.' }),
+      JSON.stringify({ error: `서버 내부 오류: ${err instanceof Error ? err.message : String(err)}` }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   }

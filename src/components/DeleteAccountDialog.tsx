@@ -44,10 +44,14 @@ function DeleteAccountDialogContent({ onClose }: Pick<Props, 'onClose'>) {
     try {
       // 탈퇴 사유(reason) 필드를 삭제했으므로 undefined 전달
       await deleteAccount.mutateAsync(undefined);
-      await signOut();
-    } catch (err) {
+      try {
+        await signOut();
+      } catch (signOutErr) {
+        console.warn('Sign out generated an error, but account was logically deleted.', signOutErr);
+      }
+    } catch (err: any) {
       console.error(err);
-      setError('탈퇴 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      setError(`탈퇴 실패: ${err?.message || '알 수 없는 오류'}`);
     }
   }
 
