@@ -14,7 +14,6 @@ function withCachedLoader<TModule>(loader: ModuleLoader<TModule>): ModuleLoader<
 
 export const routeModuleLoaders = {
   login: withCachedLoader(() => import('../routes/Login')),
-  pendingApproval: withCachedLoader(() => import('../routes/PendingApproval')),
   profileSetup: withCachedLoader(() => import('../routes/ProfileSetup')),
   appShell: withCachedLoader(() => import('../routes/AppShell')),
   home: withCachedLoader(() => import('../routes/HomeRoute')),
@@ -30,7 +29,6 @@ export const routeModuleLoaders = {
 } as const
 
 export const adminTabModuleLoaders = {
-  pending: withCachedLoader(() => import('../components/admin/PendingTab')),
   members: withCachedLoader(() => import('../components/admin/MembersTab')),
   policy: withCachedLoader(() => import('../components/admin/ReservationPolicyTab')),
   banned: withCachedLoader(() => import('../components/admin/BannedTab')),
@@ -45,7 +43,6 @@ const routePathToLoader = {
   '/admin': routeModuleLoaders.admin,
   '/budget': routeModuleLoaders.budget,
   '/login': routeModuleLoaders.login,
-  '/pending-approval': routeModuleLoaders.pendingApproval,
   '/profile/setup': routeModuleLoaders.profileSetup,
   '/banned': routeModuleLoaders.banned,
 } as const

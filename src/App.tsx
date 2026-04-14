@@ -10,7 +10,6 @@ import { RealtimeProvider } from './lib/RealtimeProvider';
 import { routeModuleLoaders } from './lib/moduleLoaders';
 
 const Login = lazy(routeModuleLoaders.login);
-const PendingApproval = lazy(routeModuleLoaders.pendingApproval);
 const ProfileSetup = lazy(routeModuleLoaders.profileSetup);
 const AppShell = lazy(routeModuleLoaders.appShell);
 const HomeRoute = lazy(routeModuleLoaders.home);
@@ -92,7 +91,6 @@ export default function App() {
                     <Route path="/login" element={<Login />} />
                     <Route element={<RequireAuth />}>
                       <Route path="/profile/setup" element={<ProfileSetup />} />
-                      <Route path="/pending-approval" element={<PendingApproval />} />
                       <Route path="/banned" element={<BannedPage />} />
 
                       <Route element={<RequireApproved />}>

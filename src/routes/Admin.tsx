@@ -5,29 +5,25 @@ import { supabase } from '../lib/supabase';
 import { queryKeys } from '../lib/queryKeys';
 import { adminTabModuleLoaders, prefetchAdminTabModule, prefetchRouteModule, scheduleIdlePrefetch } from '../lib/moduleLoaders';
 
-type AdminTab = 'pending' | 'members' | 'policy' | 'banned' | 'logs';
+type AdminTab = 'members' | 'policy' | 'banned' | 'logs';
 
 interface TabCount {
-  pending: number;
   banned: number;
 }
 
 const ADMIN_TABS: { key: AdminTab; icon: string; label: string; badgeKey?: keyof TabCount }[] = [
-  { key: 'pending', icon: 'how_to_reg', label: '대기중', badgeKey: 'pending' },
   { key: 'members', icon: 'groups', label: '전체 회원' },
   { key: 'policy', icon: 'event_upcoming', label: '예약 정책' },
   { key: 'banned', icon: 'block', label: '차단됨', badgeKey: 'banned' },
   { key: 'logs', icon: 'history', label: '관리 로그' },
 ];
 
-const PendingTab = lazy(adminTabModuleLoaders.pending);
 const MembersTab = lazy(adminTabModuleLoaders.members);
 const ReservationPolicyTab = lazy(adminTabModuleLoaders.policy);
 const BannedTab = lazy(adminTabModuleLoaders.banned);
 const LogsTab = lazy(adminTabModuleLoaders.logs);
 
 const ADMIN_TAB_COMPONENTS = {
-  pending: PendingTab,
   members: MembersTab,
   policy: ReservationPolicyTab,
   banned: BannedTab,
@@ -45,17 +41,16 @@ function AdminTabFallback() {
 
 export default function Admin() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<AdminTab>('pending');
+  const [activeTab, setActiveTab] = useState<AdminTab>('members');
 
   // 배지 카운트용 쿼리
   const { data: counts } = useQuery<TabCount>({
     queryKey: queryKeys.admin.counts,
     queryFn: async () => {
-      const [p, b] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      const [b] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'banned'),
       ]);
-      return { pending: p.count ?? 0, banned: b.count ?? 0 };
+      return { banned: b.count ?? 0 };
     },
     refetchInterval: 30_000,
   });
