@@ -128,23 +128,23 @@ export default function ProfileRoute() {
                   )}
                 </div>
 
-                <div className="flex flex-wrap justify-center gap-2">
+                <div className="flex w-full max-w-md flex-wrap justify-center gap-2">
                   <button
                     onClick={() => setIsEditingProfile(true)}
-                    className="secondary-btn !h-11 !px-4 !text-xs"
+                    className="secondary-btn !h-11 !min-w-[112px] !px-4 !text-xs"
                   >
                     프로필 편집
                   </button>
                   <button
                     onClick={signOut}
-                    className="px-4 py-2 rounded-full text-xs font-bold transition-colors bg-surface-container-high text-error border border-outline-border"
+                    className="inline-flex min-w-[112px] items-center justify-center rounded-full border border-outline-border bg-surface-container-high px-4 py-2 text-xs font-bold text-error transition-colors"
                   >
                     로그아웃
                   </button>
                   {profile?.is_admin && (
                     <Link
                       to="/admin"
-                      className="px-4 py-2 rounded-full text-xs font-bold transition-colors"
+                      className="inline-flex min-w-[112px] items-center justify-center rounded-full border px-4 py-2 text-xs font-bold transition-colors"
                       style={{ backgroundColor: 'var(--club-tag-bg)', color: 'var(--primary)', border: '1px solid var(--primary-border)' }}
                     >
                       관리자

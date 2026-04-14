@@ -53,6 +53,26 @@ export interface MyReservation extends ReservationWithDetails {
   role: 'host' | 'invitee';
 }
 
+export interface ReservationPolicySeason {
+  id: string;
+  name: string;
+  start_date: string;
+  end_date: string;
+  note: string | null;
+  is_active: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReservationPolicySeasonInput {
+  name: string;
+  start_date: string;
+  end_date: string;
+  note?: string | null;
+  is_active: boolean;
+}
+
 // ── Events Hub ────────────────────────────────────────────
 export interface EventCategory {
   id: string;
@@ -168,4 +188,3 @@ export interface BudgetTransactionInput {
   fiscal_year: number;
   fiscal_half: 1 | 2;
 }
-

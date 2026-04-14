@@ -32,6 +32,7 @@ export const routeModuleLoaders = {
 export const adminTabModuleLoaders = {
   pending: withCachedLoader(() => import('../components/admin/PendingTab')),
   members: withCachedLoader(() => import('../components/admin/MembersTab')),
+  policy: withCachedLoader(() => import('../components/admin/ReservationPolicyTab')),
   banned: withCachedLoader(() => import('../components/admin/BannedTab')),
   logs: withCachedLoader(() => import('../components/admin/LogsTab')),
 } as const
