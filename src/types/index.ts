@@ -103,7 +103,7 @@ export interface ClubEvent {
 export interface ClubEventWithDetails extends ClubEvent {
   category: EventCategory | null;
   creator: Pick<Profile, 'id' | 'display_name' | 'avatar_url'> | null;
-  participants?: EventParticipant[];
+  participantSummary?: EventParticipantSummary;
 }
 
 export interface ClubEventInput {
@@ -126,6 +126,12 @@ export interface EventParticipant {
   attended: boolean;
   joined_at: string;
   profile?: Pick<Profile, 'id' | 'display_name' | 'avatar_url' | 'part'> | null;
+}
+
+export interface EventParticipantSummary {
+  eventId: string;
+  participantCount: number;
+  viewerJoined: boolean;
 }
 
 // ── Budget Hub ────────────────────────────────────────────
@@ -166,6 +172,12 @@ export interface MembershipFeePolicy {
   created_at: string;
 }
 
+export interface MembershipFeePolicyInput {
+  amount: number;
+  due_date: string | null;
+  note: string | null;
+}
+
 export interface MembershipFeeRecord {
   id: string;
   policy_id: string;
@@ -175,6 +187,17 @@ export interface MembershipFeeRecord {
   is_paid: boolean;
   note: string | null;
   profile?: Pick<Profile, 'id' | 'display_name' | 'avatar_url'> | null;
+}
+
+export interface MembershipFeeMemberStatus {
+  userId: string;
+  displayName: string;
+  policyId: string | null;
+  recordId: string | null;
+  isPaid: boolean;
+  paidAt: string | null;
+  amountPaid: number | null;
+  note: string | null;
 }
 
 export interface BudgetTransactionInput {

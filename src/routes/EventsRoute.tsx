@@ -4,7 +4,7 @@ import { useEvents } from '../hooks/useEvents';
 import { useEventCategories } from '../hooks/useEventCategories';
 import { useDeleteEvent } from '../hooks/mutations/useEventMutations';
 import { useJoinEvent, useLeaveEvent } from '../hooks/mutations/useEventParticipantMutations';
-import { useEventParticipants } from '../hooks/useEventParticipants';
+import { useEventParticipantSummaries } from '../hooks/useEventParticipantSummaries';
 import EventModal from '../components/EventModal';
 import EventParticipantsModal from '../components/EventParticipantsModal';
 import EventTimeline from '../components/EventTimeline';
@@ -28,6 +28,9 @@ export default function EventsRoute() {
   const { profile } = useAuth();
   const { data: events = [], isLoading } = useEvents();
   const { data: categories = [] } = useEventCategories();
+  const { data: participantSummaryMap = {}, isLoading: isSummaryLoading } = useEventParticipantSummaries(
+    events.map((event) => event.id),
+  );
   const deleteEvent = useDeleteEvent();
 
   const [tab, setTab] = useState<Tab>('upcoming');
@@ -41,15 +44,26 @@ export default function EventsRoute() {
   const today = new Date().toISOString().slice(0, 10);
   const isAdmin = !!profile?.is_admin;
 
+  const eventsWithSummaries = useMemo(() => (
+    events.map((event) => ({
+      ...event,
+      participantSummary: participantSummaryMap[event.id] ?? {
+        eventId: event.id,
+        participantCount: 0,
+        viewerJoined: false,
+      },
+    }))
+  ), [events, participantSummaryMap]);
+
   const filtered = useMemo(() => {
-    return events
+    return eventsWithSummaries
       .filter((e) => (filterCategory ? e.category_id === filterCategory : true))
       .filter((e) => {
         const lastDay = e.end_date ?? e.start_date;
         if (tab === 'timeline') return true; // 타임라인은 전체 표시
         return tab === 'upcoming' ? lastDay >= today : lastDay < today;
       });
-  }, [events, filterCategory, tab, today]);
+  }, [eventsWithSummaries, filterCategory, tab, today]);
 
 
   const sorted = useMemo(() => {
@@ -154,6 +168,10 @@ export default function EventsRoute() {
           <div className="glass-card rounded-[2rem] p-10 flex justify-center">
             <div className="spinner" />
           </div>
+        ) : isSummaryLoading ? (
+          <div className="glass-card rounded-[2rem] p-10 flex justify-center">
+            <div className="spinner" />
+          </div>
         ) : tab === 'timeline' ? (
           <EventTimeline events={sorted} />
         ) : sorted.length === 0 ? (
@@ -171,7 +189,6 @@ export default function EventsRoute() {
               today={today}
               tab={tab}
               isAdmin={isAdmin}
-              currentUserId={profile?.id}
               onEdit={() => openEdit(ev)}
               onDelete={() => handleDelete(ev)}
               onViewParticipants={() => {
@@ -215,23 +232,26 @@ export default function EventsRoute() {
  * 개별 일정 카드 컴포넌트 (가독성을 위한 분리)
  */
 function EventCard({ 
-  ev, today, tab, isAdmin, currentUserId, 
+  ev, today, tab, isAdmin,
   onEdit, onDelete, onViewParticipants 
 }: { 
   ev: ClubEventWithDetails, 
   today: string, 
   tab: Tab, 
   isAdmin: boolean,
-  currentUserId?: string,
   onEdit: () => void,
   onDelete: () => void,
   onViewParticipants: () => void
 }) {
-  const { data: participants = [] } = useEventParticipants(ev.id);
   const joinEvent = useJoinEvent();
   const leaveEvent = useLeaveEvent();
 
-  const isJoined = participants.some(p => p.user_id === currentUserId);
+  const participantSummary = ev.participantSummary ?? {
+    eventId: ev.id,
+    participantCount: 0,
+    viewerJoined: false,
+  };
+  const isJoined = participantSummary.viewerJoined;
   const dDays = diffDays(ev.start_date, today);
   const isDday = tab === 'upcoming' && dDays === 0;
   const cat = ev.category;
@@ -349,34 +369,11 @@ function EventCard({
         {/* 참가자 정보 및 버튼 */}
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-2 cursor-pointer group min-w-0" onClick={onViewParticipants}>
-            <div className="flex -space-x-2 flex-shrink-0">
-              {participants.slice(0, 3).map((p) => (
-                p.profile?.avatar_url ? (
-                  <img
-                    key={p.id}
-                    src={p.profile.avatar_url}
-                    className="w-6 h-6 rounded-full border-2 border-surface object-cover"
-                    title={p.profile?.display_name}
-                  />
-                ) : (
-                  <div
-                    key={p.id}
-                    className="w-6 h-6 rounded-full border-2 border-surface bg-surface-container flex items-center justify-center text-[8px] font-black"
-                    title={p.profile?.display_name}
-                  >
-                    {p.profile?.display_name?.charAt(0) ?? '?'}
-                  </div>
-                )
-              ))}
-
-              {participants.length > 3 && (
-                <div className="w-6 h-6 rounded-full border-2 border-surface bg-surface-container flex items-center justify-center text-[8px] font-black">
-                  +{participants.length - 3}
-                </div>
-              )}
+            <div className="flex h-8 min-w-[44px] items-center justify-center rounded-full border border-card-border bg-surface-container px-3">
+              <span className="material-symbols-outlined text-[15px] text-primary">group</span>
             </div>
             <span className="text-[10px] font-black text-muted group-hover:text-primary transition-colors whitespace-nowrap">
-              {participants.length}명 참여 중
+              {participantSummary.participantCount}명 참여 중
             </span>
           </div>
 

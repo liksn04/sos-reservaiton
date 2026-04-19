@@ -25,13 +25,7 @@ export function useEvents() {
           created_at,
           updated_at,
           category:event_categories(*),
-          creator:profiles!created_by(id, display_name, avatar_url),
-          participants:event_participants(
-            id,
-            user_id,
-            attended,
-            profile:profiles(id, display_name, avatar_url)
-          )
+          creator:profiles!created_by(id, display_name, avatar_url)
         `)
         .order('start_date', { ascending: true })
         .order('start_time', { ascending: true, nullsFirst: true });

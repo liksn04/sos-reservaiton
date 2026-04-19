@@ -2,14 +2,15 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { resolveAuthenticatedRoute } from '../utils/authRedirect';
 
 export default function Login() {
-  const { session, profile } = useAuth();
+  const { session, profile, loading } = useAuth();
   const navigate = useNavigate();
 
   // 이미 로그인된 경우 적절한 경로로 리다이렉트
   useEffect(() => {
-    if (!session) return;
+    if (loading || !session) return;
 
     // 로컬 개발 환경 + 익명 로그인인 경우 즉시 메인으로 이동
     const isLocalAnonymous = import.meta.env.DEV && (session?.user?.is_anonymous || session?.user?.app_metadata.provider === 'anonymous');
@@ -18,14 +19,8 @@ export default function Login() {
       return;
     }
 
-    if (!profile || profile.display_name === '') {
-      navigate('/profile/setup', { replace: true });
-    } else if (profile.status === 'approved') {
-      navigate('/', { replace: true });
-    } else {
-      navigate('/pending-approval', { replace: true });
-    }
-  }, [session, profile, navigate]);
+    navigate(resolveAuthenticatedRoute(profile), { replace: true });
+  }, [loading, navigate, profile, session]);
 
   async function handleKakaoLogin() {
     await supabase.auth.signInWithOAuth({

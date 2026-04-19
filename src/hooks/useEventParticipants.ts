@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import { queryKeys } from '../lib/queryKeys';
 import type { EventParticipant } from '../types';
 
-export function useEventParticipants(eventId: string) {
+export function useEventParticipants(eventId: string, enabled = true) {
   return useQuery({
     queryKey: queryKeys.events.participants.byEvent(eventId),
     queryFn: async () => {
@@ -25,6 +25,6 @@ export function useEventParticipants(eventId: string) {
       if (error) throw error;
       return (data ?? []) as unknown as EventParticipant[];
     },
-    enabled: !!eventId,
+    enabled: enabled && !!eventId,
   });
 }

@@ -36,6 +36,8 @@ export function useJoinEvent() {
     onSuccess: (_, eventId) => {
       // 해당 일정의 참가자 목록 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: queryKeys.events.participants.byEvent(eventId) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.summaries.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.all })
     },
   })
 }
@@ -61,6 +63,8 @@ export function useLeaveEvent() {
     },
     onSuccess: (_, eventId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.events.participants.byEvent(eventId) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.summaries.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.all })
     },
   })
 }
@@ -92,8 +96,8 @@ export function useMarkAttended() {
     onSuccess: () => {
       // 모든 참가자 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: queryKeys.events.participants.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.events.summaries.all })
     },
 
   })
 }
-
