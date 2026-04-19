@@ -13,6 +13,21 @@ export default function DeleteAccountDialog({ isOpen, onClose }: Props) {
   return <DeleteAccountDialogContent onClose={onClose} />;
 }
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message.trim().length > 0) {
+    return error.message;
+  }
+
+  if (typeof error === 'object' && error !== null) {
+    const message = Reflect.get(error, 'message');
+    if (typeof message === 'string' && message.trim().length > 0) {
+      return message;
+    }
+  }
+
+  return '알 수 없는 오류';
+}
+
 function DeleteAccountDialogContent({ onClose }: Pick<Props, 'onClose'>) {
   const { profile, signOut } = useAuth();
   const deleteAccount = useDeleteAccount();
@@ -44,10 +59,14 @@ function DeleteAccountDialogContent({ onClose }: Pick<Props, 'onClose'>) {
     try {
       // 탈퇴 사유(reason) 필드를 삭제했으므로 undefined 전달
       await deleteAccount.mutateAsync(undefined);
-      await signOut();
-    } catch (err) {
-      console.error(err);
-      setError('탈퇴 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      try {
+        await signOut();
+      } catch (signOutErr) {
+        console.warn('Sign out generated an error, but account was logically deleted.', signOutErr);
+      }
+    } catch (error: unknown) {
+      console.error(error);
+      setError(`탈퇴 실패: ${getErrorMessage(error)}`);
     }
   }
 

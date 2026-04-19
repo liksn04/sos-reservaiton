@@ -162,28 +162,10 @@ export default function EventTimeline({ events }: Props) {
                                 {format(date, 'eee', { locale: ko })}
                               </span>
                             </div>
-                            {ev.participants && ev.participants.length > 0 && (
-                              <div className="flex -space-x-2 mt-2">
-                                {ev.participants.slice(0, 3).map((p, idx) => (
-                                  <div 
-                                    key={idx}
-                                    className="w-6 h-6 rounded-full border-2 border-surface bg-gray-200 overflow-hidden flex items-center justify-center text-[8px] font-black"
-                                    title={p.profile?.display_name}
-                                  >
-                                    {p.profile?.avatar_url ? (
-                                      <img src={p.profile.avatar_url} alt="" className="w-full h-full object-cover" />
-                                    ) : (
-                                      p.profile?.display_name?.charAt(0)
-                                    )}
-                                  </div>
-                                ))}
-                                {ev.participants.length > 3 && (
-                                  <div className="w-6 h-6 rounded-full border-2 border-surface bg-surface-container-high flex items-center justify-center text-[8px] font-black">
-                                    +{ev.participants.length - 3}
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-card-border bg-surface-container-low px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
+                              <span className="material-symbols-outlined text-[15px] text-primary">group</span>
+                              {(ev.participantSummary?.participantCount ?? 0)}명 참여
+                            </div>
                           </div>
                         </div>
                       </div>

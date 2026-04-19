@@ -2,8 +2,9 @@ import { useMemo } from 'react';
 import TimeSlotPicker from './TimeSlotPicker';
 import InviteePicker from './InviteePicker';
 import { validateSameDayPolicy } from '../../utils/validation';
+import { findActiveReservationPolicySeason, getReservationMinimumDate } from '../../utils/reservationPolicy';
 import { PURPOSES } from '../../lib/constants';
-import type { ReservationWithDetails, Purpose, Profile } from '../../types';
+import type { ReservationPolicySeason, ReservationWithDetails, Purpose, Profile } from '../../types';
 
 interface Props {
   // 날짜 & 시간
@@ -27,6 +28,7 @@ interface Props {
   onInviteesChange: (v: string[]) => void;
   members: Profile[];
   currentUserId: string;
+  policySeasons: ReservationPolicySeason[];
 }
 
 export default function ReservationFormFields({
@@ -38,22 +40,23 @@ export default function ReservationFormFields({
   purpose, onPurposeChange,
   invitees, onInviteesChange,
   members, currentUserId,
+  policySeasons,
 }: Props) {
+  const activeSameDaySeason = useMemo(
+    () => findActiveReservationPolicySeason(policySeasons),
+    [policySeasons],
+  );
+
   // [규칙 1] 합주 당일 예약 경고 메시지 — 실시간 UX 피드백
   const sameDayWarning = useMemo(
-    () => validateSameDayPolicy(date, purpose),
-    [date, purpose],
+    () => validateSameDayPolicy(date, purpose, policySeasons),
+    [date, policySeasons, purpose],
   );
 
   // 날짜 input의 최솟값: 합주인 경우 내일, 그 외는 오늘
   const minDate = useMemo(() => {
-    const base = new Date();
-    if (purpose === '합주') base.setDate(base.getDate() + 1);
-    const y = base.getFullYear();
-    const m = String(base.getMonth() + 1).padStart(2, '0');
-    const d = String(base.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  }, [purpose]);
+    return getReservationMinimumDate(purpose, policySeasons);
+  }, [policySeasons, purpose]);
 
   return (
     <>
@@ -67,6 +70,12 @@ export default function ReservationFormFields({
           onChange={(e) => onDateChange(e.target.value)}
           required
         />
+        {purpose === '합주' && activeSameDaySeason && (
+          <p className="mt-1.5 flex items-center gap-1 text-[11px] font-bold tracking-tight text-primary">
+            <span className="material-symbols-outlined text-sm shrink-0">event_available</span>
+            현재 [{activeSameDaySeason.name}] 시즌으로 오늘 합주 예약도 가능합니다.
+          </p>
+        )}
         {/* [규칙 1] 합주 당일 선택 시 경고 */}
         {sameDayWarning && (
           <p className="text-error mt-1.5 flex items-center gap-1 text-[11px] font-bold tracking-tight animate-in fade-in slide-in-from-top-1 duration-300">
@@ -152,7 +161,11 @@ export default function ReservationFormFields({
           {PURPOSES.map((p) => (
             <option key={p} value={p}>
               {p === '합주' ? '🎸 ' : p === '강습' ? '📚 ' : '💬 '}{p}
-              {p === '합주' ? ' (당일 예약 불가 · 최대 1시간)' : ''}
+              {p === '합주'
+                ? activeSameDaySeason
+                  ? ' (현재 시즌: 오늘 예약 허용 · 최대 1시간)'
+                  : ' (당일 예약 불가 · 최대 1시간)'
+                : ''}
             </option>
           ))}
         </select>

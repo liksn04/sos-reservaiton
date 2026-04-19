@@ -17,7 +17,7 @@ export default function ProfileSetup() {
 
         <ProfileForm
           mode="setup"
-          onSuccess={() => navigate('/pending-approval', { replace: true })}
+          onSuccess={() => navigate('/', { replace: true })}
         />
       </div>
     </div>

@@ -67,7 +67,7 @@ export default function ProfileForm({ mode, profile, onSuccess, onCancel }: Prof
           />
           {/* [규칙 3] 실명 안내 */}
           <p style={{ fontSize: '11px', color: 'var(--color-on-surface-variant, #9ca3af)', marginTop: '4px' }}>
-            실명으로 등록하면 동아리원이 쉽게 알아볼 수 있습니다.
+            동아리 활동에서는 반드시 실명을 사용해주세요. 동아리원이 서로를 쉽게 알아볼 수 있습니다.
           </p>
 
           {/* [규칙 4] 동명이인 토글 */}
@@ -218,7 +218,7 @@ export default function ProfileForm({ mode, profile, onSuccess, onCancel }: Prof
           />
           {/* [규칙 3] 실명 안내 */}
           <p className="text-[11px] text-on-surface-variant mt-1">
-            실명으로 등록하면 동아리원이 쉽게 알아볼 수 있습니다.
+            동아리 활동에서는 반드시 실명을 사용해주세요. 동아리원이 서로를 쉽게 알아볼 수 있습니다.
           </p>
 
           {/* [규칙 4] 동명이인 토글 */}
@@ -299,7 +299,7 @@ export default function ProfileForm({ mode, profile, onSuccess, onCancel }: Prof
           className="primary-btn w-full mt-4 py-4"
           disabled={isPending || (showDuplicateToggle && !allowDuplicateName)}
         >
-          {isPending ? 'SAVING...' : 'SAVE CHANGES'}
+          {isPending ? '저장 중...' : '변경사항 저장'}
         </button>
       </form>
     </div>

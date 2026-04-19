@@ -26,10 +26,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
       if (profileError) {
-        if (profileError.code === 'PGRST116' && import.meta.env.DEV) {
+        console.error('Critical Profile Fetch Error:', profileError);
+        return;
+      }
+
+      // 프로필이 없는 경우 (주로 DB에서 profiles 행만 삭제된 테스트 데이터 꼬임 상황)
+      if (!data) {
+        if (import.meta.env.DEV) {
           setProfile({
             id: userId,
             kakao_id: null,
@@ -44,6 +50,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             banned_by: null,
             created_at: new Date().toISOString(),
           });
+        } else {
+          console.warn('Profile not found for user:', userId);
+          setProfile(null);
         }
         return;
       }

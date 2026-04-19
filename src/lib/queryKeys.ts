@@ -5,11 +5,19 @@
 export const queryKeys = {
   reservations: {
     all: ['reservations'] as const,
+    policySeasons: {
+      all: ['reservation_policy_seasons'] as const,
+      list: (scope: 'all' | 'active') => ['reservation_policy_seasons', scope] as const,
+    },
   },
 
   events: {
     all: ['club_events'] as const,
     categories: ['event_categories'] as const,
+    summaries: {
+      all: ['event_participant_summaries'] as const,
+      list: (eventIds: readonly string[]) => ['event_participant_summaries', ...eventIds] as const,
+    },
     participants: {
       all: ['event_participants'] as const,
       byEvent: (eventId: string) => ['event_participants', eventId] as const,
@@ -23,18 +31,19 @@ export const queryKeys = {
     stats: (year: number) => ['budget_stats', year] as const,
     availableYears: ['budget_available_years'] as const,
     fees: {
-      policy: (year: number, half: 1 | 2) => ['membership_fee_policy', year, half] as const,
-      records: (year: number, half: 1 | 2) => ['membership_fee_records', year, half] as const,
+      all: ['membership_fees'] as const,
+      policy: (year: number, half: 1 | 2) => ['membership_fees', 'policy', year, half] as const,
+      records: (year: number, half: 1 | 2) => ['membership_fees', 'records', year, half] as const,
     },
   },
 
   admin: {
     all: ['admin'] as const,
     counts: ['admin', 'counts'] as const,
-    pending: ['admin', 'pending'] as const,
     approved: ['admin', 'approved'] as const,
     banned: ['admin', 'banned'] as const,
     logs: ['admin', 'logs'] as const,
+    reservationPolicySeasons: ['admin', 'reservation_policy_seasons'] as const,
   },
 
   members: ['members'] as const,

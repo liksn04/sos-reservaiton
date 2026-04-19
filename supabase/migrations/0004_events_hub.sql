@@ -63,59 +63,46 @@ alter table public.event_categories enable row level security;
 alter table public.club_events       enable row level security;
 
 -- event_categories
-create policy "event_categories: approved can read"
+create policy "event_categories_select"
   on public.event_categories for select
   using (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and status = 'approved')
+    (select public.is_approved()) or (select public.is_admin_user())
   );
 
-create policy "event_categories: admin can write"
-  on public.event_categories for all
-  using (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  )
-  with check (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  );
+create policy "event_categories_insert"
+  on public.event_categories for insert
+  with check (select public.is_admin_user());
+
+create policy "event_categories_update"
+  on public.event_categories for update
+  using (select public.is_admin_user())
+  with check (select public.is_admin_user());
+
+create policy "event_categories_delete"
+  on public.event_categories for delete
+  using (select public.is_admin_user());
 
 -- club_events
 create policy "club_events: approved can read public"
   on public.club_events for select
   using (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and status = 'approved')
-    and (is_public = true or created_by = auth.uid()
-         or exists (select 1 from public.profiles
-                    where id = auth.uid() and is_admin = true))
+    (select public.is_approved())
+    and (is_public = true or created_by = (select auth.uid())
+         or (select public.is_admin_user()))
   );
 
 create policy "club_events: admin can insert"
   on public.club_events for insert
-  with check (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  );
+  with check (select public.is_admin_user());
 
 create policy "club_events: admin can update"
   on public.club_events for update
-  using (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  )
-  with check (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  );
+  using (select public.is_admin_user())
+  with check (select public.is_admin_user());
 
 create policy "club_events: admin can delete"
   on public.club_events for delete
-  using (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  );
+  using (select public.is_admin_user());
 
 -- ── Realtime ────────────────────────────────────────────────
 alter publication supabase_realtime add table public.club_events;

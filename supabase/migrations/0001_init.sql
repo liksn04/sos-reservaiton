@@ -11,7 +11,7 @@ create table public.profiles (
   avatar_url    text,
   part          text check (part in ('vocal', 'guitar', 'drum', 'bass', 'keyboard', 'other')),
   bio           text,
-  status        text not null default 'pending'
+  status        text not null default 'approved'
                   check (status in ('pending', 'approved', 'rejected')),
   is_admin      boolean not null default false,
   created_at    timestamptz default now()

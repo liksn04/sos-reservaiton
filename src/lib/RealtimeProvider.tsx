@@ -33,6 +33,8 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'event_participants' }, () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.events.participants.all });
+        queryClient.invalidateQueries({ queryKey: queryKeys.events.summaries.all });
+        queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       })
       // 예산
       .on('postgres_changes', { event: '*', schema: 'public', table: 'budget_transactions' }, () => {
@@ -40,6 +42,12 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'budget_categories' }, () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.budget.categories });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'membership_fee_policies' }, () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.budget.fees.all });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'membership_fee_records' }, () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.budget.fees.all });
       })
       .subscribe();
 

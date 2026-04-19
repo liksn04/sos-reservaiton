@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
 import { queryKeys } from '../../lib/queryKeys';
-import { computeIsNextDay, validatePastDatePolicy, validatePastStartTimePolicy } from '../../utils/validation';
+import { fetchReservationPolicySeasons } from '../useReservationPolicySeasons';
+import { computeIsNextDay, validatePastDatePolicy, validatePastStartTimePolicy, validateSameDayPolicy } from '../../utils/validation';
 import type { Purpose } from '../../types';
 
 // ── 신규 예약 ────────────────────────────────────────────────────────────
@@ -23,6 +24,10 @@ export function useCreateReservation() {
     mutationFn: async (payload: CreatePayload) => {
       const pastDateError = validatePastDatePolicy(payload.date);
       if (pastDateError) throw new Error(pastDateError.message);
+
+      const policySeasons = await fetchReservationPolicySeasons(false);
+      const sameDayError = validateSameDayPolicy(payload.date, payload.purpose, policySeasons);
+      if (sameDayError) throw new Error(sameDayError.message);
 
       // Edge case: min date/time UI를 우회해 과거 시간을 제출한 경우 차단
       // Edge case: 모달을 오래 열어 둔 뒤 선택한 슬롯이 이미 시작된 경우 차단
@@ -87,6 +92,10 @@ export function useUpdateReservation() {
     mutationFn: async (payload: UpdatePayload) => {
       const pastDateError = validatePastDatePolicy(payload.date);
       if (pastDateError) throw new Error(pastDateError.message);
+
+      const policySeasons = await fetchReservationPolicySeasons(false);
+      const sameDayError = validateSameDayPolicy(payload.date, payload.purpose, policySeasons);
+      if (sameDayError) throw new Error(sameDayError.message);
 
       // Edge case: 수정 흐름에서도 과거 시작 시간으로 바꾸는 우회를 차단
       const pastStartError = validatePastStartTimePolicy(payload.date, payload.startTime);

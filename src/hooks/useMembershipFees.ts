@@ -1,59 +1,66 @@
-import { useQuery } from '@tanstack/react-query'
-import { supabase } from '../lib/supabase'
-import { queryKeys } from '../lib/queryKeys'
-import type { MembershipFeePolicy } from '../types'
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '../lib/supabase';
+import { queryKeys } from '../lib/queryKeys';
+import type {
+  MembershipFeePolicy,
+  MembershipFeeRecord,
+} from '../types';
+import { buildMembershipFeeMemberStatuses } from '../utils/membershipFees';
 
 export function useMembershipFees(year: number, half: number) {
-  const { data: policy, isLoading: isLoadingPolicy } = useQuery({
-    queryKey: queryKeys.budget.fees.policy(year, half as 1 | 2),
+  const query = useQuery({
+    queryKey: [...queryKeys.budget.fees.all, year, half],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: policy, error: policyError } = await supabase
         .from('membership_fee_policies')
         .select('*')
         .eq('fiscal_year', year)
         .eq('fiscal_half', half)
-        .maybeSingle()
+        .maybeSingle();
 
-      if (error) throw error
-      return data as MembershipFeePolicy | null
-    },
-  })
+      if (policyError) throw policyError;
 
-  const { data: records, isLoading: isLoadingRecords } = useQuery({
-    queryKey: queryKeys.budget.fees.records(year, half as 1 | 2),
-    queryFn: async () => {
-      // 모든 활성 회원(또는 정회원)을 가져오고, 해당 기간의 납부 기록을 결합
       const { data: profiles, error: pError } = await supabase
         .from('profiles')
-        .select('id, full_name, session, role')
-        .eq('is_approved', true)
-        .order('full_name')
+        .select('id, display_name')
+        .eq('status', 'approved')
+        .order('display_name');
 
-      if (pError) throw pError
+      if (pError) throw pError;
+
+      // Edge case: 정책이 아직 없으면 레코드 조회를 생략하고 기본 상태 목록만 구성
+      if (!policy) {
+        return {
+          policy: null,
+          records: buildMembershipFeeMemberStatuses({
+            policyId: null,
+            profiles: profiles ?? [],
+            records: [],
+          }),
+        };
+      }
 
       const { data: fees, error: fError } = await supabase
         .from('membership_fee_records')
-        .select('*')
-        .eq('fiscal_year', year)
-        .eq('fiscal_half', half)
+        .select('id, policy_id, user_id, paid_at, amount_paid, is_paid, note')
+        .eq('policy_id', policy.id);
 
-      if (fError) throw fError
+      if (fError) throw fError;
 
-      return profiles.map((p) => {
-        const record = fees.find((f) => f.user_id === p.id)
-        return {
-          ...p,
-          is_paid: record?.is_paid ?? false,
-          paid_at: record?.paid_at,
-          record_id: record?.id,
-        }
-      })
+      return {
+        policy: policy as MembershipFeePolicy,
+        records: buildMembershipFeeMemberStatuses({
+          policyId: policy.id,
+          profiles: profiles ?? [],
+          records: (fees ?? []) as MembershipFeeRecord[],
+        }),
+      };
     },
-  })
+  });
 
   return {
-    policy,
-    records,
-    isLoading: isLoadingPolicy || isLoadingRecords,
-  }
+    policy: query.data?.policy ?? null,
+    records: query.data?.records ?? [],
+    isLoading: query.isLoading,
+  };
 }

@@ -1,5 +1,6 @@
 import { normalizeTime, hasOverlap, getReservationTimestamp } from './time';
-import type { Reservation, Purpose } from '../types';
+import { isSameDayHanjuBookingAllowed } from './reservationPolicy';
+import type { Reservation, Purpose, ReservationPolicySeason } from '../types';
 
 export interface OverlapError {
   type: 'same_time' | 'overlap' | 'same_day_hanju' | 'max_duration_hanju' | 'past_start_time' | 'past_date';
@@ -26,6 +27,8 @@ function toMinutes(time: string): number {
 export function validateSameDayPolicy(
   date: string,
   purpose: Purpose,
+  policySeasons: ReservationPolicySeason[] = [],
+  now: Date = new Date(),
 ): OverlapError | null {
   // Edge case: 합주 카테고리에서만 검사
   if (purpose !== '합주') return null;
@@ -33,14 +36,13 @@ export function validateSameDayPolicy(
   // Edge case: date가 비어있거나 잘못된 형식
   if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
 
-  const today = new Date();
   const todayStr = [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, '0'),
-    String(today.getDate()).padStart(2, '0'),
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
   ].join('-');
 
-  if (date === todayStr) {
+  if (date === todayStr && !isSameDayHanjuBookingAllowed(date, purpose, policySeasons, now)) {
     return {
       type: 'same_day_hanju',
       message: '합주는 당일 예약이 불가합니다. 최소 하루 전에 예약해주세요.',
@@ -165,19 +167,21 @@ export function validateReservationTime(
   reservations: Reservation[],
   editingId: string | null,
   purpose: Purpose = '합주',
+  policySeasons: ReservationPolicySeason[] = [],
+  now: Date = new Date(),
 ): OverlapError | null {
-  const pastDateErr = validatePastDatePolicy(date);
+  const pastDateErr = validatePastDatePolicy(date, now);
   if (pastDateErr) return pastDateErr;
 
   // [규칙 1] 합주 당일 예약 불가
-  const sameDayErr = validateSameDayPolicy(date, purpose);
+  const sameDayErr = validateSameDayPolicy(date, purpose, policySeasons, now);
   if (sameDayErr) return sameDayErr;
 
   // [규칙 2] 합주 최대 1시간
   const durationErr = validateMaxDurationPolicy(startTime, endTime, purpose);
   if (durationErr) return durationErr;
 
-  const pastStartErr = validatePastStartTimePolicy(date, startTime);
+  const pastStartErr = validatePastStartTimePolicy(date, startTime, now);
   if (pastStartErr) return pastStartErr;
 
   const start = normalizeTime(startTime);

@@ -1,0 +1,34 @@
+# Styles
+**/*.css
+**/*.scss
+**/*.sass
+**/*.less
+
+# Assets/Images/Media
+**/assets/**
+public/**
+**/*.svg
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.ico
+**/*.webp
+**/*.woff*
+**/*.ttf
+**/*.eot
+**/*.mp4
+**/*.mov
+
+# Configs (Design related)
+tailwind.config.*
+postcss.config.js
+
+# Build/Misc
+dist/
+node_modules/
+.vercel/
+.git/
+package-lock.json
+repomix-output.xml
+.DS_Store

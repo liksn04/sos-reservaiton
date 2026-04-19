@@ -75,67 +75,57 @@ alter table public.membership_fee_policies enable row level security;
 alter table public.membership_fee_records enable row level security;
 
 -- budget_categories: approved 읽기, admin 쓰기
-create policy "budget_categories: approved can read"
+create policy "budget_categories_select"
   on public.budget_categories for select
   using (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and status = 'approved')
+    (select public.is_approved()) or (select public.is_admin_user())
   );
 
-create policy "budget_categories: admin can write"
-  on public.budget_categories for all
-  using (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  )
-  with check (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  );
+create policy "budget_categories_insert"
+  on public.budget_categories for insert
+  with check (select public.is_admin_user());
+
+create policy "budget_categories_update"
+  on public.budget_categories for update
+  using (select public.is_admin_user())
+  with check (select public.is_admin_user());
+
+create policy "budget_categories_delete"
+  on public.budget_categories for delete
+  using (select public.is_admin_user());
 
 -- budget_transactions: admin만
 create policy "budget_transactions: admin only"
   on public.budget_transactions for all
-  using (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  )
-  with check (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  );
+  using (select public.is_admin_user())
+  with check (select public.is_admin_user());
 
 -- membership_fee_policies: admin만
 create policy "membership_fee_policies: admin only"
   on public.membership_fee_policies for all
-  using (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  )
-  with check (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  );
+  using (select public.is_admin_user())
+  with check (select public.is_admin_user());
 
 -- membership_fee_records: 본인 읽기, admin 쓰기
-create policy "membership_fee_records: can read own or admin"
+create policy "membership_fee_records_select"
   on public.membership_fee_records for select
   using (
-    user_id = auth.uid()
-    or exists (select 1 from public.profiles
-               where id = auth.uid() and is_admin = true)
+    user_id = (select auth.uid())
+    or (select public.is_admin_user())
   );
 
-create policy "membership_fee_records: admin can write"
-  on public.membership_fee_records for all
-  using (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  )
-  with check (
-    exists (select 1 from public.profiles
-            where id = auth.uid() and is_admin = true)
-  );
+create policy "membership_fee_records_insert"
+  on public.membership_fee_records for insert
+  with check (select public.is_admin_user());
+
+create policy "membership_fee_records_update"
+  on public.membership_fee_records for update
+  using (select public.is_admin_user())
+  with check (select public.is_admin_user());
+
+create policy "membership_fee_records_delete"
+  on public.membership_fee_records for delete
+  using (select public.is_admin_user());
 
 -- Realtime
 alter publication supabase_realtime add table public.budget_transactions;

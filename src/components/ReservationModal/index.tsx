@@ -1,7 +1,7 @@
 import { useMembers } from '../../hooks/useMembers';
 import { useReservationForm } from './useReservationForm';
 import ReservationFormFields from './ReservationFormFields';
-import type { Profile, ReservationWithDetails } from '../../types';
+import type { Profile, ReservationPolicySeason, ReservationWithDetails } from '../../types';
 
 interface Props {
   isOpen: boolean;
@@ -10,6 +10,8 @@ interface Props {
   editing: ReservationWithDetails | null;
   reservations: ReservationWithDetails[];
   currentUserId: string;
+  policySeasons: ReservationPolicySeason[];
+  isPolicySeasonsLoading: boolean;
 }
 
 export default function ReservationModal({
@@ -19,6 +21,8 @@ export default function ReservationModal({
   editing,
   reservations,
   currentUserId,
+  policySeasons,
+  isPolicySeasonsLoading,
 }: Props) {
   const { data: members = [] } = useMembers();
 
@@ -35,6 +39,8 @@ export default function ReservationModal({
       reservations={reservations}
       currentUserId={currentUserId}
       members={members}
+      policySeasons={policySeasons}
+      isPolicySeasonsLoading={isPolicySeasonsLoading}
     />
   );
 }
@@ -46,6 +52,8 @@ function ReservationModalContent({
   reservations,
   currentUserId,
   members,
+  policySeasons,
+  isPolicySeasonsLoading,
 }: Omit<Props, 'isOpen'> & { members: Profile[] }) {
   const {
     date, setDate,
@@ -58,7 +66,15 @@ function ReservationModalContent({
     error,
     submitting,
     handleSubmit,
-  } = useReservationForm({ editing, initialDate, reservations, currentUserId, onClose });
+  } = useReservationForm({
+    editing,
+    initialDate,
+    reservations,
+    currentUserId,
+    onClose,
+    policySeasons,
+    isPolicySeasonsLoading,
+  });
 
   const isEditing = !!editing;
 
@@ -93,6 +109,7 @@ function ReservationModalContent({
               purpose={purpose}             onPurposeChange={setPurpose}
               invitees={invitees}           onInviteesChange={setInvitees}
               members={members}             currentUserId={currentUserId}
+              policySeasons={policySeasons}
             />
 
             {error && (
