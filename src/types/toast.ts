@@ -6,8 +6,3 @@ export interface Toast {
   type: ToastType;
   duration?: number;
 }
-
-export interface ToastContextType {
-  addToast: (message: string, type: ToastType, duration?: number) => void;
-  removeToast: (id: string) => void;
-}
