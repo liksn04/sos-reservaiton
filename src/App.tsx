@@ -82,8 +82,8 @@ export default function App() {
       <ThemeProvider>
         <ToastProvider>
           <QueryClientProvider client={queryClient}>
-            <RealtimeProvider>
             <AuthProvider>
+              <RealtimeProvider>
               <BrowserRouter>
                 <Suspense fallback={<AppRouteFallback />}>
                   <Routes>
@@ -111,8 +111,8 @@ export default function App() {
                   </Routes>
                 </Suspense>
               </BrowserRouter>
+              </RealtimeProvider>
             </AuthProvider>
-            </RealtimeProvider>
           </QueryClientProvider>
           <ToastContainer />
         </ToastProvider>

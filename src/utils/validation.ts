@@ -1,9 +1,9 @@
-import { normalizeTime, hasOverlap, getReservationTimestamp } from './time';
+import { canReservationsShareTime, normalizeTime, hasOverlap, getReservationTimestamp } from './time';
 import { isSameDayHanjuBookingAllowed } from './reservationPolicy';
 import type { Reservation, Purpose, ReservationPolicySeason } from '../types';
 
 export interface OverlapError {
-  type: 'same_time' | 'overlap' | 'same_day_hanju' | 'max_duration_hanju' | 'past_start_time' | 'past_date';
+  type: 'same_time' | 'overlap' | 'same_day_hanju' | 'max_duration_hanju' | 'past_start_time' | 'past_date' | 'admin_only_purpose';
   message: string;
 }
 
@@ -14,6 +14,26 @@ export interface OverlapError {
 function toMinutes(time: string): number {
   const [h, m] = time.split(':').map(Number);
   return h * 60 + m;
+}
+
+/**
+ * 관리자 전용 예약 목적 접근을 검증합니다.
+ *
+ * 처리하는 예외:
+ * 1. 비관리자가 DOM 조작으로 숨겨진 목적값을 강제로 제출한 경우를 차단합니다.
+ * 2. 모달을 열어 둔 사이 권한이 바뀌어 관리자 권한이 사라진 경우를 차단합니다.
+ * 3. UI를 거치지 않고 mutation 함수를 직접 호출한 경우에도 동일 정책을 적용합니다.
+ */
+export function validatePurposeAccessPolicy(
+  purpose: Purpose,
+  isAdmin: boolean,
+): OverlapError | null {
+  if (purpose !== '오디션' || isAdmin) return null;
+
+  return {
+    type: 'admin_only_purpose',
+    message: '오디션 예약은 관리자만 추가하거나 수정할 수 있습니다.',
+  };
 }
 
 /**
@@ -169,6 +189,7 @@ export function validateReservationTime(
   purpose: Purpose = '합주',
   policySeasons: ReservationPolicySeason[] = [],
   now: Date = new Date(),
+  teamName = '',
 ): OverlapError | null {
   const pastDateErr = validatePastDatePolicy(date, now);
   if (pastDateErr) return pastDateErr;
@@ -195,10 +216,15 @@ export function validateReservationTime(
   const isNextDay = end < start && end !== '00:00';
 
   const activeRes = reservations.filter((r) => r.id !== editingId);
+  const currentReservation = {
+    purpose,
+    team_name: teamName,
+  } satisfies Pick<Reservation, 'purpose' | 'team_name'>;
 
   // Edge case: 기존 예약과 시간 겹침
   const overlap = activeRes.some((res) =>
-    hasOverlap(
+    !canReservationsShareTime(currentReservation, res)
+    && hasOverlap(
       date,
       start,
       end,

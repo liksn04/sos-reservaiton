@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  canReservationsShareTime,
   computeSlotAvailability,
   formatDate,
   getReservationTimestamp,
@@ -51,7 +52,7 @@ describe('time utilities', () => {
       },
     ];
 
-    const availability = computeSlotAvailability(today, reservations, null, '10:00', now);
+    const availability = computeSlotAvailability(today, reservations, null, '10:00', '강습', '', now);
 
     expect(availability.disabledStarts.has('10:00')).toBe(true);
     expect(availability.disabledStarts.has('11:00')).toBe(true);
@@ -62,10 +63,44 @@ describe('time utilities', () => {
   });
 
   it('뒤에 예약이 없으면 24:00까지 종료 슬롯을 열어둔다', () => {
-    const availability = computeSlotAvailability(today, [], null, '23:30', now);
+    const availability = computeSlotAvailability(today, [], null, '23:30', '강습', '', now);
 
     expect(availability.effectiveStart).toBe('23:30');
     expect(availability.disabledEnds.has('24:00')).toBe(false);
+  });
+
+  it('오디션은 서로 다른 팀이면 같은 시간대를 공유할 수 있다', () => {
+    const reservations: Reservation[] = [
+      {
+        id: 'reservation-1',
+        host_id: 'host-1',
+        date: today,
+        start_time: '11:00',
+        end_time: '12:30',
+        is_next_day: false,
+        team_name: '기존 팀',
+        people_count: 4,
+        purpose: '오디션',
+        created_at: '2026-04-01T00:00:00.000Z',
+      },
+    ];
+
+    const availability = computeSlotAvailability(today, reservations, null, '11:00', '오디션', '새 팀', now);
+
+    expect(availability.disabledStarts.has('11:00')).toBe(false);
+    expect(availability.disabledEnds.has('12:30')).toBe(false);
+  });
+
+  it('오디션이어도 같은 팀이면 기존처럼 겹침을 차단한다', () => {
+    expect(canReservationsShareTime(
+      { purpose: '오디션', team_name: 'Alpha Team' } as Reservation,
+      { purpose: '오디션', team_name: ' alpha   team ' } as Reservation,
+    )).toBe(false);
+
+    expect(canReservationsShareTime(
+      { purpose: '오디션', team_name: 'Alpha Team' } as Reservation,
+      { purpose: '오디션', team_name: 'Beta Team' } as Reservation,
+    )).toBe(true);
   });
 
   it('예약 시간 겹침을 정확히 판별한다', () => {

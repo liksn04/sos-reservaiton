@@ -10,6 +10,7 @@ import {
   validateMaxDurationPolicy,
   validatePastDatePolicy,
   validatePastStartTimePolicy,
+  validatePurposeAccessPolicy,
   validateReservationTime,
   validateSameDayPolicy,
 } from './validation';
@@ -146,6 +147,12 @@ describe('reservationPolicy', () => {
     expect(validateMaxDurationPolicy('10:00', '11:30', '강습')).toBeNull();
   });
 
+  it('오디션 예약은 관리자만 추가하거나 수정할 수 있다', () => {
+    expect(validatePurposeAccessPolicy('오디션', false)?.type).toBe('admin_only_purpose');
+    expect(validatePurposeAccessPolicy('오디션', true)).toBeNull();
+    expect(validatePurposeAccessPolicy('강습', false)).toBeNull();
+  });
+
   it('기존 예약과 겹치면 전체 예약 검증에서 차단한다', () => {
     const reservations: Reservation[] = [
       {
@@ -171,6 +178,69 @@ describe('reservationPolicy', () => {
       '강습',
       [],
       mockNow,
+      '새 팀',
+    );
+
+    expect(error?.type).toBe('overlap');
+  });
+
+  it('오디션은 다른 팀이면 같은 시간에도 예약 검증을 통과한다', () => {
+    const reservations: Reservation[] = [
+      {
+        id: 'reservation-1',
+        host_id: 'host-1',
+        date: tomorrow,
+        start_time: '13:00',
+        end_time: '14:00',
+        is_next_day: false,
+        team_name: '기존 팀',
+        people_count: 4,
+        purpose: '오디션',
+        created_at: '2026-04-01T00:00:00.000Z',
+      },
+    ];
+
+    const error = validateReservationTime(
+      tomorrow,
+      '13:30',
+      '14:30',
+      reservations,
+      null,
+      '오디션',
+      [],
+      mockNow,
+      '새 팀',
+    );
+
+    expect(error).toBeNull();
+  });
+
+  it('오디션이어도 같은 팀이면 같은 시간 중복 예약을 차단한다', () => {
+    const reservations: Reservation[] = [
+      {
+        id: 'reservation-1',
+        host_id: 'host-1',
+        date: tomorrow,
+        start_time: '13:00',
+        end_time: '14:00',
+        is_next_day: false,
+        team_name: 'Alpha Team',
+        people_count: 4,
+        purpose: '오디션',
+        created_at: '2026-04-01T00:00:00.000Z',
+      },
+    ];
+
+    const error = validateReservationTime(
+      tomorrow,
+      '13:30',
+      '14:30',
+      reservations,
+      null,
+      '오디션',
+      [],
+      mockNow,
+      ' alpha   team ',
     );
 
     expect(error?.type).toBe('overlap');

@@ -12,6 +12,7 @@ interface Props {
   onEndChange: (t: string) => void;
   /** [규칙 2] 합주일 때 종료 시간을 시작+1시간으로 제한 */
   purpose: Purpose;
+  teamName: string;
 }
 
 const ALL_SLOTS = getTimeSlots();
@@ -66,6 +67,7 @@ export default function TimeSlotPicker({
   onStartChange,
   onEndChange,
   purpose,
+  teamName,
 }: Props) {
   // 날짜, 시작 시간, 카테고리가 바뀔 때마다 가용 슬롯 재계산
   useEffect(() => {
@@ -75,6 +77,8 @@ export default function TimeSlotPicker({
       reservations,
       editingId,
       startTime,
+      purpose,
+      teamName,
     );
 
     // 합주 규칙 적용
@@ -94,13 +98,15 @@ export default function TimeSlotPicker({
       if (firstValid) onEndChange(firstValid);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date, startTime, purpose, reservations.length, editingId]);
+  }, [date, startTime, purpose, teamName, reservations.length, editingId]);
 
   const { disabledStarts, disabledEnds } = computeSlotAvailability(
     date,
     reservations,
     editingId,
     startTime,
+    purpose,
+    teamName,
   );
 
   // 합주일 때 종료 슬롯 추가 제한

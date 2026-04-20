@@ -92,6 +92,7 @@ npm install
 ```bash
 VITE_SUPABASE_URL=...
 VITE_SUPABASE_ANON_KEY=...
+VITE_ENABLE_SUPABASE_REALTIME=true
 ```
 
 ### 3. 개발 서버 실행
@@ -115,6 +116,7 @@ npm run build
 ## Supabase 메모
 
 - 프론트는 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`를 사용합니다.
+- 로컬 개발에서 Realtime WebSocket 오류를 피하려면 기본적으로 Realtime이 꺼집니다. 필요할 때만 `VITE_ENABLE_SUPABASE_REALTIME=true`를 추가해 활성화하세요.
 - Edge Function은 Supabase 프로젝트 환경 변수의 `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`를 사용합니다.
 - 주요 보안은 Supabase RLS와 helper function(`is_approved`, `is_admin_user`)에 의존합니다.
 - 당일 합주 예약 예외는 `reservation_policy_seasons`와 DB trigger로 함께 제어합니다.

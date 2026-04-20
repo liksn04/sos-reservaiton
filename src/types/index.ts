@@ -1,6 +1,6 @@
 export type ProfileStatus = 'pending' | 'approved' | 'rejected' | 'banned';
 export type Part = 'vocal' | 'guitar' | 'drum' | 'bass' | 'keyboard';
-export type Purpose = '합주' | '강습' | '정기회의';
+export type Purpose = '합주' | '강습' | '정기회의' | '오디션';
 
 export interface Profile {
   id: string;

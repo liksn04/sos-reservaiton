@@ -115,6 +115,7 @@ export default function AppShell() {
         currentUserId={profile.id}
         policySeasons={policySeasons}
         isPolicySeasonsLoading={isPolicySeasonsLoading}
+        isAdmin={profile.is_admin}
       />
     </div>
   );

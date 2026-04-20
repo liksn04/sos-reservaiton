@@ -3,7 +3,7 @@ import TimeSlotPicker from './TimeSlotPicker';
 import InviteePicker from './InviteePicker';
 import { validateSameDayPolicy } from '../../utils/validation';
 import { findActiveReservationPolicySeason, getReservationMinimumDate } from '../../utils/reservationPolicy';
-import { PURPOSES } from '../../lib/constants';
+import { getAvailableReservationPurposes } from '../../lib/constants';
 import type { ReservationPolicySeason, ReservationWithDetails, Purpose, Profile } from '../../types';
 
 interface Props {
@@ -29,6 +29,7 @@ interface Props {
   members: Profile[];
   currentUserId: string;
   policySeasons: ReservationPolicySeason[];
+  isAdmin: boolean;
 }
 
 export default function ReservationFormFields({
@@ -41,10 +42,15 @@ export default function ReservationFormFields({
   invitees, onInviteesChange,
   members, currentUserId,
   policySeasons,
+  isAdmin,
 }: Props) {
   const activeSameDaySeason = useMemo(
     () => findActiveReservationPolicySeason(policySeasons),
     [policySeasons],
+  );
+  const availablePurposes = useMemo(
+    () => getAvailableReservationPurposes(isAdmin, purpose),
+    [isAdmin, purpose],
   );
 
   // [규칙 1] 합주 당일 예약 경고 메시지 — 실시간 UX 피드백
@@ -97,6 +103,7 @@ export default function ReservationFormFields({
         onStartChange={onStartChange}
         onEndChange={onEndChange}
         purpose={purpose}
+        teamName={teamName}
       />
 
       {/* 팀명 / 인원 */}
@@ -158,14 +165,16 @@ export default function ReservationFormFields({
       <div className="form-group">
         <label>이용 목적</label>
         <select value={purpose} onChange={(e) => onPurposeChange(e.target.value as Purpose)}>
-          {PURPOSES.map((p) => (
+          {availablePurposes.map((p) => (
             <option key={p} value={p}>
-              {p === '합주' ? '🎸 ' : p === '강습' ? '📚 ' : '💬 '}{p}
+              {p === '합주' ? '🎸 ' : p === '강습' ? '📚 ' : p === '정기회의' ? '💬 ' : '🎤 '}{p}
               {p === '합주'
                 ? activeSameDaySeason
                   ? ' (현재 시즌: 오늘 예약 허용 · 최대 1시간)'
                   : ' (당일 예약 불가 · 최대 1시간)'
-                : ''}
+                : p === '오디션'
+                  ? ' (관리자 전용)'
+                  : ''}
             </option>
           ))}
         </select>

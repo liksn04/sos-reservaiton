@@ -1,8 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { queryKeys } from '../../lib/queryKeys';
 import { fetchReservationPolicySeasons } from '../useReservationPolicySeasons';
-import { computeIsNextDay, validatePastDatePolicy, validatePastStartTimePolicy, validateSameDayPolicy } from '../../utils/validation';
+import {
+  computeIsNextDay,
+  validatePastDatePolicy,
+  validatePastStartTimePolicy,
+  validatePurposeAccessPolicy,
+  validateSameDayPolicy,
+} from '../../utils/validation';
+import { isPastReservation } from '../../utils/time';
 import type { Purpose } from '../../types';
 
 // ── 신규 예약 ────────────────────────────────────────────────────────────
@@ -19,9 +27,13 @@ interface CreatePayload {
 
 export function useCreateReservation() {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
 
   return useMutation({
     mutationFn: async (payload: CreatePayload) => {
+      const purposeAccessError = validatePurposeAccessPolicy(payload.purpose, Boolean(profile?.is_admin));
+      if (purposeAccessError) throw new Error(purposeAccessError.message);
+
       const pastDateError = validatePastDatePolicy(payload.date);
       if (pastDateError) throw new Error(pastDateError.message);
 
@@ -81,15 +93,15 @@ interface UpdatePayload {
   invitees: string[];
 }
 
-import { useAuth } from '../../context/AuthContext';
-import { isPastReservation } from '../../utils/time';
-
 export function useUpdateReservation() {
   const queryClient = useQueryClient();
   const { profile } = useAuth();
 
   return useMutation({
     mutationFn: async (payload: UpdatePayload) => {
+      const purposeAccessError = validatePurposeAccessPolicy(payload.purpose, Boolean(profile?.is_admin));
+      if (purposeAccessError) throw new Error(purposeAccessError.message);
+
       const pastDateError = validatePastDatePolicy(payload.date);
       if (pastDateError) throw new Error(pastDateError.message);
 

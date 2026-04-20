@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCreateReservation, useUpdateReservation } from '../../hooks/mutations/useReservationMutations';
 import { useToast } from '../../contexts/useToast';
-import { validateReservationTime } from '../../utils/validation';
+import { validatePurposeAccessPolicy, validateReservationTime } from '../../utils/validation';
 import { getReservationMinimumDate } from '../../utils/reservationPolicy';
 import { formatDate, normalizeTime } from '../../utils/time';
 import type { ReservationPolicySeason, ReservationWithDetails, Purpose } from '../../types';
@@ -17,6 +17,7 @@ interface UseReservationFormOptions {
   onClose: () => void;
   policySeasons: ReservationPolicySeason[];
   isPolicySeasonsLoading: boolean;
+  isAdmin: boolean;
 }
 
 export function useReservationForm({
@@ -27,6 +28,7 @@ export function useReservationForm({
   onClose,
   policySeasons,
   isPolicySeasonsLoading,
+  isAdmin,
 }: UseReservationFormOptions) {
   const createReservation = useCreateReservation();
   const updateReservation = useUpdateReservation();
@@ -69,8 +71,22 @@ export function useReservationForm({
     e.preventDefault();
     setError('');
 
+    const purposeAccessError = validatePurposeAccessPolicy(purpose, isAdmin);
+    if (purposeAccessError) {
+      setError(purposeAccessError.message);
+      return;
+    }
+
     const validationError = validateReservationTime(
-      effectiveDate, startTime, endTime, reservations, editing?.id ?? null, purpose, policySeasons,
+      effectiveDate,
+      startTime,
+      endTime,
+      reservations,
+      editing?.id ?? null,
+      purpose,
+      policySeasons,
+      undefined,
+      teamName,
     );
     if (validationError) {
       setError(validationError.message);
@@ -96,7 +112,12 @@ export function useReservationForm({
       onClose();
     } catch (err) {
       console.error(err);
-      const msg = '저장에 실패했습니다. 네트워크 연결을 확인해주세요.';
+      const msg =
+        err instanceof Error
+          ? err.message
+          : typeof err === 'object' && err !== null && 'message' in err
+            ? String(err.message)
+            : '저장에 실패했습니다. 네트워크 연결을 확인해주세요.';
       setError(msg);
       addToast(msg, 'error');
     }

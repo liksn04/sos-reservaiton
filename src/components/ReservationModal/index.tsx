@@ -12,6 +12,7 @@ interface Props {
   currentUserId: string;
   policySeasons: ReservationPolicySeason[];
   isPolicySeasonsLoading: boolean;
+  isAdmin: boolean;
 }
 
 export default function ReservationModal({
@@ -23,6 +24,7 @@ export default function ReservationModal({
   currentUserId,
   policySeasons,
   isPolicySeasonsLoading,
+  isAdmin,
 }: Props) {
   const { data: members = [] } = useMembers();
 
@@ -41,6 +43,7 @@ export default function ReservationModal({
       members={members}
       policySeasons={policySeasons}
       isPolicySeasonsLoading={isPolicySeasonsLoading}
+      isAdmin={isAdmin}
     />
   );
 }
@@ -54,6 +57,7 @@ function ReservationModalContent({
   members,
   policySeasons,
   isPolicySeasonsLoading,
+  isAdmin,
 }: Omit<Props, 'isOpen'> & { members: Profile[] }) {
   const {
     date, setDate,
@@ -74,6 +78,7 @@ function ReservationModalContent({
     onClose,
     policySeasons,
     isPolicySeasonsLoading,
+    isAdmin,
   });
 
   const isEditing = !!editing;
@@ -110,6 +115,7 @@ function ReservationModalContent({
               invitees={invitees}           onInviteesChange={setInvitees}
               members={members}             currentUserId={currentUserId}
               policySeasons={policySeasons}
+              isAdmin={isAdmin}
             />
 
             {error && (

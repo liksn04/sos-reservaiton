@@ -1,4 +1,4 @@
-import type { Reservation } from '../types';
+import type { Purpose, Reservation } from '../types';
 
 /** YYYY-MM-DD */
 export function formatDate(date: Date): string {
@@ -53,6 +53,32 @@ export interface SlotAvailability {
   effectiveStart: string;
 }
 
+export function normalizeReservationTeamName(teamName: string): string {
+  return teamName.trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+/**
+ * 오디션 예약은 서로 다른 팀명일 때만 시간대를 공유할 수 있습니다.
+ *
+ * 처리하는 예외:
+ * 1. 둘 중 하나라도 오디션이 아니면 기존 단일 점유 규칙을 유지합니다.
+ * 2. 팀명이 비어 있으면 안전하게 중복 불가로 처리합니다.
+ * 3. 대소문자/연속 공백 차이만 있는 동일 팀명은 같은 팀으로 간주합니다.
+ */
+export function canReservationsShareTime(
+  a: Pick<Reservation, 'purpose' | 'team_name'>,
+  b: Pick<Reservation, 'purpose' | 'team_name'>,
+): boolean {
+  if (a.purpose !== '오디션' || b.purpose !== '오디션') return false;
+
+  const teamA = normalizeReservationTeamName(a.team_name);
+  const teamB = normalizeReservationTeamName(b.team_name);
+
+  if (!teamA || !teamB) return false;
+
+  return teamA !== teamB;
+}
+
 /**
  * 기존 app.js의 updateAvailableTimeOptions() 로직을 TypeScript로 포팅.
  *
@@ -65,11 +91,19 @@ export function computeSlotAvailability(
   reservations: Reservation[],
   editingId: string | null,
   selectedStart: string,
+  purpose: Purpose = '합주',
+  teamName = '',
   now: Date = new Date(),
 ): SlotAvailability {
-  const activeRes = reservations.filter(
-    (r) => r.id !== editingId && r.date === date,
-  );
+  const currentReservation = {
+    purpose,
+    team_name: teamName,
+  } satisfies Pick<Reservation, 'purpose' | 'team_name'>;
+
+  const activeRes = reservations.filter((r) => {
+    if (r.id === editingId || r.date !== date) return false;
+    return !canReservationsShareTime(currentReservation, r);
+  });
 
   const scheduled = activeRes.map((r) => ({
     startTs: getReservationTimestamp(r.date, normalizeTime(r.start_time), false),
