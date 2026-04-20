@@ -132,6 +132,7 @@ export interface EventParticipantSummary {
   eventId: string;
   participantCount: number;
   viewerJoined: boolean;
+  hasExactParticipantCount: boolean;
 }
 
 // ── Budget Hub ────────────────────────────────────────────

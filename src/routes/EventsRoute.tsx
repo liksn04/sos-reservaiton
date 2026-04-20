@@ -51,6 +51,7 @@ export default function EventsRoute() {
         eventId: event.id,
         participantCount: 0,
         viewerJoined: false,
+        hasExactParticipantCount: false,
       },
     }))
   ), [events, participantSummaryMap]);
@@ -250,6 +251,7 @@ function EventCard({
     eventId: ev.id,
     participantCount: 0,
     viewerJoined: false,
+    hasExactParticipantCount: false,
   };
   const isJoined = participantSummary.viewerJoined;
   const dDays = diffDays(ev.start_date, today);
@@ -373,7 +375,11 @@ function EventCard({
               <span className="material-symbols-outlined text-[15px] text-primary">group</span>
             </div>
             <span className="text-[10px] font-black text-muted group-hover:text-primary transition-colors whitespace-nowrap">
-              {participantSummary.participantCount}명 참여 중
+              {participantSummary.hasExactParticipantCount
+                ? `${participantSummary.participantCount}명 참여 중`
+                : participantSummary.viewerJoined
+                  ? '내 참여 상태: 참여 중'
+                  : '참여 상태 보기'}
             </span>
           </div>
 

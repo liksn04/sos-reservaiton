@@ -22,8 +22,12 @@ export default function EventParticipantsModal({ isOpen, onClose, event }: Props
     eventId: event.id,
     participantCount: 0,
     viewerJoined: false,
+    hasExactParticipantCount: false,
   }
   const attendedCount = participants.filter((participant) => participant.attended).length
+  const participantCountLabel = participantSummary.hasExactParticipantCount
+    ? String(participantSummary.participantCount)
+    : '-'
 
   return (
     <div
@@ -52,7 +56,7 @@ export default function EventParticipantsModal({ isOpen, onClose, event }: Props
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="font-headline text-2xl font-bold tracking-tight">
-            PARTICIPANTS <span className="text-primary">{participantSummary.participantCount}</span>
+            PARTICIPANTS <span className="text-primary">{participantCountLabel}</span>
           </h2>
           <button
             className="material-symbols-outlined text-muted hover:text-white transition-colors"
@@ -67,8 +71,10 @@ export default function EventParticipantsModal({ isOpen, onClose, event }: Props
             className="rounded-xl p-3 text-center border border-white/5"
             style={{ backgroundColor: 'var(--surface-container)' }}
           >
-            <p className="text-[10px] text-muted font-bold uppercase tracking-widest">RSVP</p>
-            <p className="font-headline text-2xl font-bold mt-1">{participantSummary.participantCount}</p>
+            <p className="text-[10px] text-muted font-bold uppercase tracking-widest">
+              {participantSummary.hasExactParticipantCount ? 'RSVP' : 'STATUS'}
+            </p>
+            <p className="font-headline text-2xl font-bold mt-1">{participantCountLabel}</p>
           </div>
           <div
             className="rounded-xl p-3 text-center border border-white/5"
@@ -87,10 +93,10 @@ export default function EventParticipantsModal({ isOpen, onClose, event }: Props
           {!isAdmin ? (
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-5">
               <p className="text-sm font-bold text-on-surface">
-                현재 공개 범위에서는 참가자 총원과 내 참여 여부만 제공됩니다.
+                현재 공개 범위에서는 내 참여 여부만 제공됩니다.
               </p>
               <p className="mt-2 text-xs text-muted">
-                상세 명단과 출석 상태는 관리자 화면에서만 확인할 수 있습니다.
+                참가자 총원, 상세 명단, 출석 상태는 관리자 화면에서만 확인할 수 있습니다.
               </p>
             </div>
           ) : isLoading ? (

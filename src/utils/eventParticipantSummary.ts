@@ -2,7 +2,6 @@ import type { EventParticipantSummary } from '../types';
 
 interface EventParticipantCountRow {
   event_id: string;
-  participant_count: number | null;
 }
 
 interface ViewerParticipationRow {
@@ -13,10 +12,12 @@ export function buildEventParticipantSummaryMap(params: {
   eventIds: readonly string[];
   countRows: EventParticipantCountRow[];
   viewerRows: ViewerParticipationRow[];
+  hasExactParticipantCount: boolean;
 }) {
-  const countsByEventId = new Map(
-    params.countRows.map((row) => [row.event_id, Math.max(0, Number(row.participant_count ?? 0))]),
-  );
+  const countsByEventId = params.countRows.reduce<Map<string, number>>((accumulator, row) => {
+    accumulator.set(row.event_id, (accumulator.get(row.event_id) ?? 0) + 1);
+    return accumulator;
+  }, new Map());
   const joinedEventIds = new Set(params.viewerRows.map((row) => row.event_id));
 
   return params.eventIds.reduce<Record<string, EventParticipantSummary>>((accumulator, eventId) => {
@@ -24,6 +25,7 @@ export function buildEventParticipantSummaryMap(params: {
       eventId,
       participantCount: countsByEventId.get(eventId) ?? 0,
       viewerJoined: joinedEventIds.has(eventId),
+      hasExactParticipantCount: params.hasExactParticipantCount,
     };
 
     return accumulator;

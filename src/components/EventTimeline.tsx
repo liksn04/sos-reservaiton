@@ -164,7 +164,11 @@ export default function EventTimeline({ events }: Props) {
                             </div>
                             <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-card-border bg-surface-container-low px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
                               <span className="material-symbols-outlined text-[15px] text-primary">group</span>
-                              {(ev.participantSummary?.participantCount ?? 0)}명 참여
+                              {ev.participantSummary?.hasExactParticipantCount
+                                ? `${ev.participantSummary.participantCount}명 참여`
+                                : ev.participantSummary?.viewerJoined
+                                  ? '참여 중'
+                                  : '참여 상태'}
                             </div>
                           </div>
                         </div>
