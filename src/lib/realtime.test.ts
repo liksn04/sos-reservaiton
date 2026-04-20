@@ -6,17 +6,13 @@ import {
 } from './realtime';
 
 describe('realtime feature flags', () => {
-  it('개발 환경에서는 명시적 설정이 없으면 Realtime을 끈다', () => {
-    expect(resolveRealtimeFeatureEnabled({ isDev: true })).toBe(false);
+  it('명시적 설정이 없으면 모든 환경에서 Realtime을 끈다', () => {
+    expect(resolveRealtimeFeatureEnabled({})).toBe(false);
   });
 
-  it('프로덕션에서는 명시적 설정이 없으면 Realtime을 켠다', () => {
-    expect(resolveRealtimeFeatureEnabled({ isDev: false })).toBe(true);
-  });
-
-  it('환경 변수 override가 있으면 개발/프로덕션 기본값보다 우선한다', () => {
-    expect(resolveRealtimeFeatureEnabled({ isDev: true, override: 'true' })).toBe(true);
-    expect(resolveRealtimeFeatureEnabled({ isDev: false, override: 'false' })).toBe(false);
+  it('환경 변수 override가 있으면 기본값보다 우선한다', () => {
+    expect(resolveRealtimeFeatureEnabled({ override: 'true' })).toBe(true);
+    expect(resolveRealtimeFeatureEnabled({ override: 'false' })).toBe(false);
   });
 });
 

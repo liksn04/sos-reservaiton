@@ -1,5 +1,4 @@
 interface RealtimeFeatureFlagOptions {
-  isDev: boolean;
   override?: string;
 }
 
@@ -12,17 +11,14 @@ interface RealtimeConnectionOptions {
 }
 
 /**
- * 개발 환경에서는 외부 WebSocket 실패가 콘솔을 오염시키기 쉬워 기본 비활성화합니다.
- * 필요하면 `VITE_ENABLE_SUPABASE_REALTIME=true`로 로컬에서도 명시적으로 활성화할 수 있습니다.
+ * Realtime은 환경 변수로 명시적으로 켠 경우에만 활성화합니다.
+ * Supabase Realtime이 불안정하거나 비활성화된 프로젝트에서도 프로덕션 콘솔 에러를 피하기 위한 보수적 기본값입니다.
  */
 export function resolveRealtimeFeatureEnabled({
-  isDev,
   override,
 }: RealtimeFeatureFlagOptions): boolean {
   if (override === 'true') return true;
-  if (override === 'false') return false;
-
-  return !isDev;
+  return false;
 }
 
 /**

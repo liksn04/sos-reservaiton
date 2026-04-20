@@ -22,7 +22,6 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
   const [isOnline, setIsOnline] = useState(getInitialOnlineStatus);
   const isRealtimeFeatureEnabled = useMemo(() => {
     return resolveRealtimeFeatureEnabled({
-      isDev: import.meta.env.DEV,
       override: import.meta.env.VITE_ENABLE_SUPABASE_REALTIME,
     });
   }, []);
