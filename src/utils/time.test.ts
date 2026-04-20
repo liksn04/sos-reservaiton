@@ -69,7 +69,7 @@ describe('time utilities', () => {
     expect(availability.disabledEnds.has('24:00')).toBe(false);
   });
 
-  it('오디션은 서로 다른 팀이면 같은 시간대를 공유할 수 있다', () => {
+  it('오디션은 기존 예약 카테고리와 무관하게 서로 다른 팀이면 같은 시간대를 공유할 수 있다', () => {
     const reservations: Reservation[] = [
       {
         id: 'reservation-1',
@@ -80,7 +80,7 @@ describe('time utilities', () => {
         is_next_day: false,
         team_name: '기존 팀',
         people_count: 4,
-        purpose: '오디션',
+        purpose: '강습',
         created_at: '2026-04-01T00:00:00.000Z',
       },
     ];
@@ -91,16 +91,21 @@ describe('time utilities', () => {
     expect(availability.disabledEnds.has('12:30')).toBe(false);
   });
 
-  it('오디션이어도 같은 팀이면 기존처럼 겹침을 차단한다', () => {
+  it('오디션이어도 같은 팀이면 기존 카테고리와 무관하게 겹침을 차단한다', () => {
     expect(canReservationsShareTime(
       { purpose: '오디션', team_name: 'Alpha Team' } as Reservation,
-      { purpose: '오디션', team_name: ' alpha   team ' } as Reservation,
+      { purpose: '강습', team_name: ' alpha   team ' } as Reservation,
     )).toBe(false);
 
     expect(canReservationsShareTime(
       { purpose: '오디션', team_name: 'Alpha Team' } as Reservation,
-      { purpose: '오디션', team_name: 'Beta Team' } as Reservation,
+      { purpose: '합주', team_name: 'Beta Team' } as Reservation,
     )).toBe(true);
+
+    expect(canReservationsShareTime(
+      { purpose: '강습', team_name: 'Alpha Team' } as Reservation,
+      { purpose: '오디션', team_name: 'Beta Team' } as Reservation,
+    )).toBe(false);
   });
 
   it('예약 시간 겹침을 정확히 판별한다', () => {

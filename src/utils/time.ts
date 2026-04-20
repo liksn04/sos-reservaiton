@@ -58,25 +58,25 @@ export function normalizeReservationTeamName(teamName: string): string {
 }
 
 /**
- * 오디션 예약은 서로 다른 팀명일 때만 시간대를 공유할 수 있습니다.
+ * 현재 만들고 있는 예약이 오디션이면, 서로 다른 팀명에 한해 기존 예약과 시간대를 공유할 수 있습니다.
  *
  * 처리하는 예외:
- * 1. 둘 중 하나라도 오디션이 아니면 기존 단일 점유 규칙을 유지합니다.
+ * 1. 현재 예약이 오디션이 아니면 기존 단일 점유 규칙을 유지합니다.
  * 2. 팀명이 비어 있으면 안전하게 중복 불가로 처리합니다.
  * 3. 대소문자/연속 공백 차이만 있는 동일 팀명은 같은 팀으로 간주합니다.
  */
 export function canReservationsShareTime(
-  a: Pick<Reservation, 'purpose' | 'team_name'>,
-  b: Pick<Reservation, 'purpose' | 'team_name'>,
+  current: Pick<Reservation, 'purpose' | 'team_name'>,
+  existing: Pick<Reservation, 'purpose' | 'team_name'>,
 ): boolean {
-  if (a.purpose !== '오디션' || b.purpose !== '오디션') return false;
+  if (current.purpose !== '오디션') return false;
 
-  const teamA = normalizeReservationTeamName(a.team_name);
-  const teamB = normalizeReservationTeamName(b.team_name);
+  const currentTeam = normalizeReservationTeamName(current.team_name);
+  const existingTeam = normalizeReservationTeamName(existing.team_name);
 
-  if (!teamA || !teamB) return false;
+  if (!currentTeam || !existingTeam) return false;
 
-  return teamA !== teamB;
+  return currentTeam !== existingTeam;
 }
 
 /**

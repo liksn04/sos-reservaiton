@@ -184,7 +184,7 @@ describe('reservationPolicy', () => {
     expect(error?.type).toBe('overlap');
   });
 
-  it('오디션은 다른 팀이면 같은 시간에도 예약 검증을 통과한다', () => {
+  it('오디션은 기존 예약 카테고리와 무관하게 다른 팀이면 같은 시간에도 예약 검증을 통과한다', () => {
     const reservations: Reservation[] = [
       {
         id: 'reservation-1',
@@ -195,7 +195,7 @@ describe('reservationPolicy', () => {
         is_next_day: false,
         team_name: '기존 팀',
         people_count: 4,
-        purpose: '오디션',
+        purpose: '정기회의',
         created_at: '2026-04-01T00:00:00.000Z',
       },
     ];
@@ -215,7 +215,7 @@ describe('reservationPolicy', () => {
     expect(error).toBeNull();
   });
 
-  it('오디션이어도 같은 팀이면 같은 시간 중복 예약을 차단한다', () => {
+  it('오디션이어도 같은 팀이면 기존 예약 카테고리와 무관하게 같은 시간 중복 예약을 차단한다', () => {
     const reservations: Reservation[] = [
       {
         id: 'reservation-1',
@@ -226,7 +226,7 @@ describe('reservationPolicy', () => {
         is_next_day: false,
         team_name: 'Alpha Team',
         people_count: 4,
-        purpose: '오디션',
+        purpose: '강습',
         created_at: '2026-04-01T00:00:00.000Z',
       },
     ];
