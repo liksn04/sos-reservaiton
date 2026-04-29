@@ -35,6 +35,53 @@ export function getReservationTimestamp(
   return d.getTime();
 }
 
+type ReservationTimeLike = Pick<Reservation, 'id' | 'date' | 'start_time' | 'end_time' | 'is_next_day'>;
+
+export function getReservationStartTimestamp(reservation: ReservationTimeLike): number {
+  return getReservationTimestamp(reservation.date, reservation.start_time, false);
+}
+
+export function getReservationEndTimestamp(reservation: ReservationTimeLike): number {
+  return getReservationTimestamp(reservation.date, reservation.end_time, reservation.is_next_day);
+}
+
+export function isReservationOngoingAt(
+  reservation: ReservationTimeLike,
+  now: Date = new Date(),
+): boolean {
+  const startTs = getReservationStartTimestamp(reservation);
+  const endTs = getReservationEndTimestamp(reservation);
+  const nowTs = now.getTime();
+
+  return startTs <= nowTs && nowTs < endTs;
+}
+
+export function getOngoingReservation<T extends ReservationTimeLike>(
+  reservations: T[],
+  now: Date = new Date(),
+): T | undefined {
+  return reservations.find((reservation) => isReservationOngoingAt(reservation, now));
+}
+
+export function getNextReservation<T extends ReservationTimeLike>(
+  reservations: T[],
+  now: Date = new Date(),
+  excludedId?: string | null,
+): T | undefined {
+  const nowTs = now.getTime();
+
+  return reservations
+    .filter((reservation) => reservation.id !== excludedId)
+    .filter((reservation) => getReservationStartTimestamp(reservation) > nowTs)
+    .sort((a, b) => {
+      const startDiff = getReservationStartTimestamp(a) - getReservationStartTimestamp(b);
+      if (startDiff !== 0) return startDiff;
+
+      return getReservationEndTimestamp(a) - getReservationEndTimestamp(b);
+    })
+    .at(0);
+}
+
 /** 30분 단위 시간 슬롯 배열: ["00:00", "00:30", ..., "23:30", "24:00"] */
 export function getTimeSlots(): string[] {
   const times: string[] = [];

@@ -9,6 +9,7 @@ import EventModal from '../components/EventModal';
 import EventParticipantsModal from '../components/EventParticipantsModal';
 import EventTimeline from '../components/EventTimeline';
 import type { ClubEventWithDetails } from '../types';
+import { formatDate } from '../utils/time';
 
 
 type Tab = 'upcoming' | 'past' | 'timeline';
@@ -41,7 +42,7 @@ export default function EventsRoute() {
   const [viewingParticipants, setViewingParticipants] = useState<ClubEventWithDetails | null>(null);
 
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = formatDate(new Date());
   const isAdmin = !!profile?.is_admin;
 
   const eventsWithSummaries = useMemo(() => (

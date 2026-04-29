@@ -5,7 +5,10 @@ import {
   formatDate,
   getReservationTimestamp,
   getTimeSlots,
+  getNextReservation,
+  getOngoingReservation,
   hasOverlap,
+  isReservationOngoingAt,
   isOldReservation,
   isPastReservation,
   normalizeTime,
@@ -116,6 +119,88 @@ describe('time utilities', () => {
     expect(
       hasOverlap(today, '10:00', '11:00', false, today, '11:00', '12:00', false),
     ).toBe(false);
+  });
+
+  it('자정 이후에도 같은 시각의 전날 예약을 진행중으로 오인하지 않는다', () => {
+    const previousDayReservation: Reservation = {
+      id: 'previous-day',
+      host_id: 'host-1',
+      date: '2026-04-29',
+      start_time: '01:00',
+      end_time: '02:00',
+      is_next_day: false,
+      team_name: '우리의 밤 중간점검',
+      people_count: 5,
+      purpose: '오디션',
+      created_at: '2026-04-20T00:00:00.000Z',
+    };
+    const currentDayReservation: Reservation = {
+      id: 'annie',
+      host_id: 'host-2',
+      date: '2026-04-30',
+      start_time: '01:00',
+      end_time: '02:00',
+      is_next_day: false,
+      team_name: 'Annie. 중간점검',
+      people_count: 5,
+      purpose: '오디션',
+      created_at: '2026-04-20T00:00:00.000Z',
+    };
+    const nowAfterMidnight = new Date(2026, 3, 30, 1, 54, 0);
+
+    expect(isReservationOngoingAt(previousDayReservation, nowAfterMidnight)).toBe(false);
+    expect(getOngoingReservation(
+      [previousDayReservation, currentDayReservation],
+      nowAfterMidnight,
+    )?.id).toBe('annie');
+  });
+
+  it('익일 종료 예약은 자정을 넘긴 뒤에도 진행중으로 계산한다', () => {
+    const overnightReservation: Reservation = {
+      id: 'overnight',
+      host_id: 'host-1',
+      date: '2026-04-29',
+      start_time: '23:30',
+      end_time: '00:30',
+      is_next_day: true,
+      team_name: '심야 합주',
+      people_count: 4,
+      purpose: '합주',
+      created_at: '2026-04-20T00:00:00.000Z',
+    };
+
+    expect(isReservationOngoingAt(overnightReservation, new Date(2026, 3, 30, 0, 15, 0))).toBe(true);
+  });
+
+  it('다음 일정은 이미 지난 전날 예약을 제외하고 시작 타임스탬프 기준으로 고른다', () => {
+    const reservations: Reservation[] = [
+      {
+        id: 'previous-day',
+        host_id: 'host-1',
+        date: '2026-04-29',
+        start_time: '01:00',
+        end_time: '02:00',
+        is_next_day: false,
+        team_name: '전날 일정',
+        people_count: 5,
+        purpose: '오디션',
+        created_at: '2026-04-20T00:00:00.000Z',
+      },
+      {
+        id: 'later-today',
+        host_id: 'host-2',
+        date: '2026-04-30',
+        start_time: '03:00',
+        end_time: '04:00',
+        is_next_day: false,
+        team_name: '다음 일정',
+        people_count: 5,
+        purpose: '오디션',
+        created_at: '2026-04-20T00:00:00.000Z',
+      },
+    ];
+
+    expect(getNextReservation(reservations, new Date(2026, 3, 30, 1, 54, 0))?.id).toBe('later-today');
   });
 
   it('지난 예약과 오래된 예약 여부를 판별한다', () => {

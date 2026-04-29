@@ -4,7 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import { useReservations } from '../hooks/useReservations';
 import { useDeleteReservation } from '../hooks/mutations/useDeleteReservation';
 import { useLeaveReservation } from '../hooks/mutations/useLeaveReservation';
-import { normalizeTime } from '../utils/time';
+import {
+  formatDate,
+  getReservationEndTimestamp,
+  getReservationStartTimestamp,
+  normalizeTime,
+} from '../utils/time';
 import ProfileForm from '../components/ProfileForm';
 import DeleteAccountDialog from '../components/DeleteAccountDialog';
 import ThemeToggle from '../components/ThemeToggle';
@@ -42,7 +47,9 @@ export default function ProfileRoute() {
   }
 
   // ── 나의 예약 계산 ───────────────────────────────────
-  const today = new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const nowTs = now.getTime();
+  const today = formatDate(now);
 
   const allMyRes = reservations
     .filter((r) => {
@@ -55,32 +62,16 @@ export default function ProfileRoute() {
       role: (r.host_id === profile?.id ? 'host' : 'invitee') as 'host' | 'invitee',
     }))
     .sort((a, b) => {
-      const dc = a.date.localeCompare(b.date);
-      if (dc !== 0) return dc;
-      return normalizeTime(a.start_time).localeCompare(normalizeTime(b.start_time));
+      const startDiff = getReservationStartTimestamp(a) - getReservationStartTimestamp(b);
+      if (startDiff !== 0) return startDiff;
+      return getReservationEndTimestamp(a) - getReservationEndTimestamp(b);
     });
 
-  const currentTime = new Date().toTimeString().slice(0, 5); // "HH:mm"
+  const myReservations = allMyRes.filter((r) => getReservationEndTimestamp(r) > nowTs);
 
-  const myReservations = allMyRes.filter((r) => {
-    // 1. 미래 날짜인 경우
-    if (r.date > today) return true;
-    // 2. 오늘인 경우: 아직 종료되지 않은 것만 포함 (전체 시간 기준)
-    if (r.date === today) {
-      return normalizeTime(r.end_time) > currentTime;
-    }
-    return false;
-  });
-
-  const myHistory = allMyRes.filter((r) => {
-    // 1. 과거 날짜인 경우
-    if (r.date < today) return true;
-    // 2. 오늘인 경우: 이미 종료된 것만 포함
-    if (r.date === today) {
-      return normalizeTime(r.end_time) <= currentTime;
-    }
-    return false;
-  }).reverse();
+  const myHistory = allMyRes
+    .filter((r) => getReservationEndTimestamp(r) <= nowTs)
+    .reverse();
 
   return (
     <div className="tab-content animate-slide-up">
@@ -225,10 +216,11 @@ export default function ProfileRoute() {
             ) : (
               (scheduleTab === 'upcoming' ? myReservations : myHistory).map((res) => {
                 const d = new Date(res.date + 'T00:00:00');
+                const todayDate = new Date(today + 'T00:00:00');
                 const diffDays =
                   scheduleTab === 'upcoming'
-                    ? Math.ceil((d.getTime() - new Date(today).getTime()) / (1000 * 3600 * 24))
-                    : Math.floor((new Date(today).getTime() - d.getTime()) / (1000 * 3600 * 24));
+                    ? Math.ceil((d.getTime() - todayDate.getTime()) / (1000 * 3600 * 24))
+                    : Math.floor((todayDate.getTime() - d.getTime()) / (1000 * 3600 * 24));
                 const isDday = scheduleTab === 'upcoming' && diffDays === 0;
 
                 return (

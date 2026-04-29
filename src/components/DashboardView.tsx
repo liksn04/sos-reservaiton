@@ -1,6 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import type { ReservationWithDetails } from '../types';
-import { normalizeTime } from '../utils/time';
+import {
+  getNextReservation,
+  getOngoingReservation,
+  normalizeTime,
+} from '../utils/time';
 import { useTheme } from '../contexts/ThemeContext';
 
 interface DashboardViewProps {
@@ -12,8 +16,6 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
   const navigate = useNavigate();
   const { resolvedTheme } = useTheme();
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
-  const currentTimeStr = now.toTimeString().slice(0, 5); // "HH:mm"
 
   // ── 이번 주 예약 건수 ─────────────────────────────
   const startOfWeek = new Date(now);
@@ -25,36 +27,15 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
   endOfWeek.setHours(23, 59, 59, 999);
 
   const thisWeekReservations = reservations.filter((r) => {
-    const d = new Date(r.date);
+    const d = new Date(`${r.date}T00:00:00`);
     return d >= startOfWeek && d <= endOfWeek;
   });
 
   // ── 현재 진행 중인 세션 ───────────────────────────
-  const ongoing = reservations.find((r) => {
-    const start = r.start_time.slice(0, 5); // "HH:mm"
-    const end = r.end_time.slice(0, 5);
-    return r.date === todayStr && currentTimeStr >= start && currentTimeStr < end;
-  });
+  const ongoing = getOngoingReservation(reservations, now);
 
   // ── 다음 일정 (진행 중인 것 제외) ─────────────────
-  const nextRes = reservations
-    .filter((r) => {
-      // 1. 현재 진행 중인 세션은 제외 (primaryRes에서 따로 세밀히 처리됨)
-      if (r.id === ongoing?.id) return false;
-      
-      // 2. 미래의 날짜인 경우 포함
-      if (r.date > todayStr) return true;
-      
-      // 3. 오늘인 경우: 현재 시간 이후에 시작하는 것만 포함
-      if (r.date === todayStr) {
-        const startTime = r.start_time.slice(0, 5);
-        return startTime > currentTimeStr;
-      }
-      
-      return false;
-    })
-    .sort((a, b) => a.date.localeCompare(b.date) || a.start_time.localeCompare(b.start_time))
-    .at(0);
+  const nextRes = getNextReservation(reservations, now, ongoing?.id);
 
   // ── 메인 표시 가공 ──────────────────────────────
   const primaryRes = ongoing || nextRes;
@@ -62,7 +43,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
   const openReservePage = () => navigate('/reserve');
 
   const formatHeroDateLabel = (dateStr: string) => {
-    const date = new Date(dateStr);
+    const date = new Date(`${dateStr}T00:00:00`);
     const weekDays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
     return `${date.getMonth() + 1}월${date.getDate()}일 ${weekDays[date.getDay()]}`;
   };
