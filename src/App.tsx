@@ -1,6 +1,7 @@
 import { Suspense, lazy, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider } from './context/AuthContext';
 import { RequireAuth, RequireApproved, RequireAdmin } from './components/RouteGuards';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -117,6 +118,7 @@ export default function App() {
           <ToastContainer />
         </ToastProvider>
       </ThemeProvider>
+      <Analytics />
     </AppErrorBoundary>
   );
 }
