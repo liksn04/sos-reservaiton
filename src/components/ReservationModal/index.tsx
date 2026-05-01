@@ -7,11 +7,11 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   initialDate: Date;
+  initialStartTime?: string;
   editing: ReservationWithDetails | null;
   reservations: ReservationWithDetails[];
   currentUserId: string;
   policySeasons: ReservationPolicySeason[];
-  isPolicySeasonsLoading: boolean;
   isAdmin: boolean;
 }
 
@@ -19,30 +19,30 @@ export default function ReservationModal({
   isOpen,
   onClose,
   initialDate,
+  initialStartTime,
   editing,
   reservations,
   currentUserId,
   policySeasons,
-  isPolicySeasonsLoading,
   isAdmin,
 }: Props) {
   const { data: members = [] } = useMembers();
 
   if (!isOpen) return null;
 
-  const formKey = editing?.id ?? `new-${initialDate.toISOString()}`;
+  const formKey = editing?.id ?? `new-${initialDate.toISOString()}-${initialStartTime ?? 'default'}`;
 
   return (
     <ReservationModalContent
       key={formKey}
       onClose={onClose}
       initialDate={initialDate}
+      initialStartTime={initialStartTime}
       editing={editing}
       reservations={reservations}
       currentUserId={currentUserId}
       members={members}
       policySeasons={policySeasons}
-      isPolicySeasonsLoading={isPolicySeasonsLoading}
       isAdmin={isAdmin}
     />
   );
@@ -51,12 +51,12 @@ export default function ReservationModal({
 function ReservationModalContent({
   onClose,
   initialDate,
+  initialStartTime,
   editing,
   reservations,
   currentUserId,
   members,
   policySeasons,
-  isPolicySeasonsLoading,
   isAdmin,
 }: Omit<Props, 'isOpen'> & { members: Profile[] }) {
   const {
@@ -73,11 +73,11 @@ function ReservationModalContent({
   } = useReservationForm({
     editing,
     initialDate,
+    initialStartTime,
     reservations,
     currentUserId,
     onClose,
     policySeasons,
-    isPolicySeasonsLoading,
     isAdmin,
   });
 

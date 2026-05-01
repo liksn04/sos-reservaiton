@@ -6,7 +6,8 @@ import { useDeleteReservation } from '../hooks/mutations/useDeleteReservation';
 import Calendar from '../components/Calendar';
 import DailySchedule from '../components/DailySchedule';
 import ReservationDetailModal from '../components/ReservationDetailModal';
-import { formatDate, normalizeTime } from '../utils/time';
+import { useToast } from '../contexts/useToast';
+import { computeSlotAvailability, formatDate, getTimeSlots, normalizeTime } from '../utils/time';
 import type { Purpose, ReservationWithDetails } from '../types';
 import type { AppShellContext } from './AppShell';
 
@@ -14,12 +15,14 @@ type CalendarView = 'month' | 'week' | 'day';
 type ReservationScope = 'all' | 'mine';
 type PurposeFilter = 'all' | Purpose;
 
-const QUICK_START_TIMES = ['10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
+const DAY_START_TIMES = getTimeSlots().filter((time) => time !== '24:00');
+const DAY_HOURS = Array.from({ length: 24 }, (_, hour) => String(hour).padStart(2, '0'));
 
 export default function Reserve() {
   const { profile } = useAuth();
   const { data: reservations = [] } = useReservations();
   const { openNew, openEdit } = useOutletContext<AppShellContext>();
+  const { addToast } = useToast();
   const deleteReservation = useDeleteReservation();
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -66,6 +69,10 @@ export default function Reserve() {
       .sort((a, b) => normalizeTime(a.start_time).localeCompare(normalizeTime(b.start_time))),
     [filteredReservations, selectedDateStr],
   );
+  const daySlotAvailability = useMemo(
+    () => computeSlotAvailability(selectedDateStr, filteredReservations, null, DAY_START_TIMES[0], '합주'),
+    [filteredReservations, selectedDateStr],
+  );
 
   function handleMonthChange(delta: 1 | -1) {
     setCurrentMonth((prev) => {
@@ -73,6 +80,17 @@ export default function Reserve() {
       d.setMonth(d.getMonth() + delta);
       return d;
     });
+  }
+
+  function handleVisibleRangeChange(delta: 1 | -1) {
+    if (calendarView === 'month') {
+      handleMonthChange(delta);
+      return;
+    }
+
+    const nextDate = new Date(selectedDate);
+    nextDate.setDate(selectedDate.getDate() + (calendarView === 'week' ? delta * 7 : delta));
+    handleSelectDate(nextDate);
   }
 
   function handleSelectDate(date: Date) {
@@ -113,12 +131,12 @@ export default function Reserve() {
                 onClick={() => setCalendarView(view)}
                 className={`segmented-option flex-1 whitespace-nowrap ${calendarView === view ? 'active' : ''}`}
               >
-                {view === 'month' ? '월' : view === 'week' ? '주' : '일'} 보기
+                {view === 'month' ? '월' : view === 'week' ? '주' : '일'}
               </button>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_auto]">
+          <div className="space-y-3">
             <div className="relative">
               <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">
                 search
@@ -130,24 +148,26 @@ export default function Reserve() {
                 className="w-full bg-surface-container-low border border-card-border rounded-2xl py-3.5 pl-11 pr-4 text-sm font-bold focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
               />
             </div>
-            <select
-              value={purposeFilter}
-              onChange={(event) => setPurposeFilter(event.target.value as PurposeFilter)}
-              className="bg-surface-container-low border border-card-border rounded-2xl px-4 py-3.5 text-sm font-bold text-on-surface"
-            >
-              <option value="all">전체 목적</option>
-              <option value="합주">합주</option>
-              <option value="강습">강습</option>
-              <option value="정기회의">정기회의</option>
-              <option value="오디션">오디션</option>
-            </select>
-            <button
-              type="button"
-              onClick={() => setScope((current) => current === 'all' ? 'mine' : 'all')}
-              className={`secondary-btn !h-auto !min-w-[120px] !px-4 ${scope === 'mine' ? '!border-primary/50 !text-primary' : ''}`}
-            >
-              {scope === 'mine' ? '내 예약' : '전체 예약'}
-            </button>
+            <div className="grid grid-cols-2 gap-3">
+              <select
+                value={purposeFilter}
+                onChange={(event) => setPurposeFilter(event.target.value as PurposeFilter)}
+                className="min-h-[52px] w-full min-w-0 rounded-2xl border border-card-border bg-surface-container-low px-4 text-sm font-bold text-on-surface"
+              >
+                <option value="all">전체 목적</option>
+                <option value="합주">합주</option>
+                <option value="강습">강습</option>
+                <option value="정기회의">정기회의</option>
+                <option value="오디션">오디션</option>
+              </select>
+              <button
+                type="button"
+                onClick={() => setScope((current) => current === 'all' ? 'mine' : 'all')}
+                className={`min-h-[52px] rounded-2xl border border-card-border bg-surface-container-low px-4 text-sm font-black text-on-surface transition-all ${scope === 'mine' ? '!border-primary/50 !text-primary bg-primary/10' : ''}`}
+              >
+                {scope === 'mine' ? '내 예약' : '전체 예약'}
+              </button>
+            </div>
           </div>
         </section>
 
@@ -161,14 +181,14 @@ export default function Reserve() {
             </h3>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button
-                onClick={() => handleMonthChange(-1)}
+                onClick={() => handleVisibleRangeChange(-1)}
                 className="material-symbols-outlined w-11 h-11 rounded-full flex items-center justify-center bg-surface-container-lowest border border-card-border"
                 style={{ color: 'var(--text-muted)' }}
               >
                 chevron_left
               </button>
               <button
-                onClick={() => handleMonthChange(1)}
+                onClick={() => handleVisibleRangeChange(1)}
                 className="material-symbols-outlined w-11 h-11 rounded-full flex items-center justify-center bg-surface-container-lowest border border-card-border"
                 style={{ color: 'var(--text-muted)' }}
               >
@@ -212,30 +232,56 @@ export default function Reserve() {
               })}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {QUICK_START_TIMES.map((time) => {
-                const occupied = selectedDayReservations.some((reservation) =>
-                  normalizeTime(reservation.start_time) <= time &&
-                  normalizeTime(reservation.end_time) > time,
-                );
-                return (
-                  <button
-                    key={time}
-                    type="button"
-                    onClick={() => openNew(selectedDate)}
-                    className={`rounded-[1.25rem] border px-4 py-3 text-left transition-all ${
-                      occupied
-                        ? 'border-card-border bg-surface-container-low text-on-surface-variant'
-                        : 'border-primary/30 bg-primary/5 text-primary hover:bg-primary/10'
-                    }`}
-                  >
-                    <p className="text-sm font-black">{time}</p>
-                    <p className="mt-1 text-[11px] font-bold opacity-70">
-                      {occupied ? '예약 있음' : '빈 슬롯'}
-                    </p>
-                  </button>
-                );
-              })}
+            <div className="max-h-[52vh] space-y-2 overflow-y-auto pr-1">
+              {DAY_HOURS.map((hour) => (
+                <div
+                  key={hour}
+                  className="grid grid-cols-[3.25rem_1fr] items-center gap-2 rounded-[1.25rem] border border-card-border bg-surface-container-low/60 px-3 py-2"
+                >
+                  <div className="text-sm font-black tabular-nums text-on-surface">
+                    {hour}:00
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {([`${hour}:00`, `${hour}:30`] as const).map((time) => {
+                      const occupied = selectedDayReservations.some((reservation) =>
+                        normalizeTime(reservation.start_time) <= time &&
+                        normalizeTime(reservation.end_time) > time,
+                      );
+                      const unavailable = daySlotAvailability.disabledStarts.has(time);
+                      const blocked = occupied || unavailable;
+                      const slotLabel = occupied ? '예약 있음' : unavailable ? '예약 불가' : '빈 슬롯';
+
+                      return (
+                        <button
+                          key={time}
+                          type="button"
+                          aria-label={`${time} ${slotLabel}`}
+                          aria-disabled={blocked}
+                          onClick={() => {
+                            if (occupied) {
+                              addToast('이미 예약된 시간입니다. 다른 빈 슬롯을 선택해주세요.', 'warning');
+                              return;
+                            }
+                            if (unavailable) {
+                              addToast('현재 선택할 수 없는 시간입니다. 다른 빈 슬롯을 선택해주세요.', 'warning');
+                              return;
+                            }
+                            openNew(selectedDate, time);
+                          }}
+                          className={`min-h-10 rounded-2xl border px-2 text-center text-[11px] font-black transition-all ${
+                            blocked
+                              ? 'cursor-not-allowed border-transparent bg-surface-container text-on-surface-variant opacity-55'
+                              : 'border-primary/30 bg-primary/5 text-primary hover:bg-primary/10'
+                          }`}
+                        >
+                          <span className="block tabular-nums">{time.slice(3)}</span>
+                          <span className="block text-[10px] opacity-70">{slotLabel}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>

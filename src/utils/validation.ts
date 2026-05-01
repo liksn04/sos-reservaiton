@@ -7,7 +7,7 @@ export interface OverlapError {
   message: string;
 }
 
-const OPERATING_START_MINUTES = 10 * 60;
+const OPERATING_START_MINUTES = 0;
 const OPERATING_END_MINUTES = 24 * 60;
 
 /**
@@ -162,7 +162,7 @@ export function validateOperatingHoursPolicy(
   ) {
     return {
       type: 'outside_operating_hours',
-      message: '운영 시간은 10:00부터 24:00까지입니다. 운영 시간 안에서 시작/종료 시간을 선택해주세요.',
+      message: '운영 시간은 00:00부터 24:00까지입니다. 운영 시간 안에서 시작/종료 시간을 선택해주세요.',
     };
   }
 

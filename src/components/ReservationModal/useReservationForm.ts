@@ -2,47 +2,52 @@ import { useState, useEffect } from 'react';
 import { useCreateReservation, useUpdateReservation } from '../../hooks/mutations/useReservationMutations';
 import { useToast } from '../../contexts/useToast';
 import { validatePurposeAccessPolicy, validateReservationTime } from '../../utils/validation';
-import { getReservationMinimumDate } from '../../utils/reservationPolicy';
 import { formatDate, normalizeTime } from '../../utils/time';
 import type { ReservationPolicySeason, ReservationWithDetails, Purpose } from '../../types';
 
 const DEFAULT_START = '10:00';
-const DEFAULT_END = '11:00';
+
+function getDefaultEndTime(startTime: string): string {
+  const [hours, minutes] = normalizeTime(startTime).split(':').map(Number);
+  const endHours = Math.min(hours + 1, 24);
+  return `${String(endHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
 
 interface UseReservationFormOptions {
   editing: ReservationWithDetails | null;
   initialDate: Date;
+  initialStartTime?: string;
   reservations: ReservationWithDetails[];
   currentUserId: string;
   onClose: () => void;
   policySeasons: ReservationPolicySeason[];
-  isPolicySeasonsLoading: boolean;
   isAdmin: boolean;
 }
 
 export function useReservationForm({
   editing,
   initialDate,
+  initialStartTime,
   reservations,
   currentUserId,
   onClose,
   policySeasons,
-  isPolicySeasonsLoading,
   isAdmin,
 }: UseReservationFormOptions) {
   const createReservation = useCreateReservation();
   const updateReservation = useUpdateReservation();
   const initialDateValue = editing?.date ?? formatDate(initialDate);
-  const initialStartTime = editing ? normalizeTime(editing.start_time) : DEFAULT_START;
-  const initialEndTime = editing ? normalizeTime(editing.end_time) : DEFAULT_END;
+  const normalizedInitialStart = normalizeTime(initialStartTime ?? DEFAULT_START);
+  const initialStartValue = editing ? normalizeTime(editing.start_time) : normalizedInitialStart;
+  const initialEndValue = editing ? normalizeTime(editing.end_time) : getDefaultEndTime(normalizedInitialStart);
   const initialTeamName = editing?.team_name ?? '';
   const initialPeopleCount = editing?.people_count ?? 1;
   const initialPurpose = editing?.purpose ?? '합주';
   const initialInvitees = editing?.reservation_invitees?.map((invitee) => invitee.user_id) ?? [];
 
   const [date, setDate]               = useState(initialDateValue);
-  const [startTime, setStartTime]     = useState(initialStartTime);
-  const [endTime, setEndTime]         = useState(initialEndTime);
+  const [startTime, setStartTime]     = useState(initialStartValue);
+  const [endTime, setEndTime]         = useState(initialEndValue);
   const [teamName, setTeamName]       = useState(initialTeamName);
   const [peopleCount, setPeopleCount] = useState(initialPeopleCount);
   const [purpose, setPurpose]         = useState<Purpose>(initialPurpose);
@@ -51,14 +56,6 @@ export function useReservationForm({
   const { addToast }                  = useToast();
 
   const submitting = createReservation.isPending || updateReservation.isPending;
-  const minimumDate =
-    editing || isPolicySeasonsLoading
-      ? date
-      : getReservationMinimumDate(purpose, policySeasons);
-  const effectiveDate =
-    editing || isPolicySeasonsLoading || date >= minimumDate
-      ? date
-      : minimumDate;
 
   // Escape 키로 닫기
   useEffect(() => {
@@ -74,11 +71,12 @@ export function useReservationForm({
     const purposeAccessError = validatePurposeAccessPolicy(purpose, isAdmin);
     if (purposeAccessError) {
       setError(purposeAccessError.message);
+      addToast(purposeAccessError.message, 'error');
       return;
     }
 
     const validationError = validateReservationTime(
-      effectiveDate,
+      date,
       startTime,
       endTime,
       reservations,
@@ -90,6 +88,7 @@ export function useReservationForm({
     );
     if (validationError) {
       setError(validationError.message);
+      addToast(validationError.message, 'error');
       return;
     }
 
@@ -97,14 +96,14 @@ export function useReservationForm({
       if (editing) {
         await updateReservation.mutateAsync({
           id: editing.id,
-          date: effectiveDate, startTime, endTime,
+          date, startTime, endTime,
           teamName, peopleCount, purpose, invitees,
         });
         addToast('예약이 성공적으로 수정되었습니다.', 'success');
       } else {
         await createReservation.mutateAsync({
           hostId: currentUserId,
-          date: effectiveDate, startTime, endTime,
+          date, startTime, endTime,
           teamName, peopleCount, purpose, invitees,
         });
         addToast('성공적으로 예약되었습니다!', 'success');
@@ -125,7 +124,7 @@ export function useReservationForm({
 
   return {
     // 필드 값
-    date: effectiveDate, setDate,
+    date, setDate,
     startTime, setStartTime,
     endTime, setEndTime,
     teamName, setTeamName,

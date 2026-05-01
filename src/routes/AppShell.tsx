@@ -9,7 +9,7 @@ import type { ReservationWithDetails } from '../types';
 
 /** Passed to child routes via <Outlet context={...}> */
 export interface AppShellContext {
-  openNew: (date?: Date) => void;
+  openNew: (date?: Date, startTime?: string) => void;
   openEdit: (res: ReservationWithDetails) => void;
 }
 
@@ -18,21 +18,23 @@ export default function AppShell() {
   const { data: reservations = [] } = useReservations();
   const {
     data: policySeasons = [],
-    isLoading: isPolicySeasonsLoading,
   } = useReservationPolicySeasons();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingReservation, setEditingReservation] = useState<ReservationWithDetails | null>(null);
   const [modalDate, setModalDate] = useState<Date>(new Date());
+  const [modalStartTime, setModalStartTime] = useState<string | undefined>(undefined);
 
-  const openNew = useCallback((date?: Date) => {
+  const openNew = useCallback((date?: Date, startTime?: string) => {
     setEditingReservation(null);
     setModalDate(date || new Date());
+    setModalStartTime(startTime);
     setModalOpen(true);
   }, []);
 
   const openEdit = useCallback((res: ReservationWithDetails) => {
     setEditingReservation(res);
+    setModalStartTime(undefined);
     setModalOpen(true);
   }, []);
 
@@ -110,11 +112,11 @@ export default function AppShell() {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         initialDate={modalDate}
+        initialStartTime={modalStartTime}
         editing={editingReservation}
         reservations={reservations}
         currentUserId={profile.id}
         policySeasons={policySeasons}
-        isPolicySeasonsLoading={isPolicySeasonsLoading}
         isAdmin={profile.is_admin}
       />
     </div>
