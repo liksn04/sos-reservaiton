@@ -45,7 +45,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             bio: 'Anonymous developer account',
             status: 'approved',
             is_admin: false,
-            member_role: 'member',
             banned_at: null,
             banned_reason: null,
             banned_by: null,

@@ -5,7 +5,6 @@ import { useReservations } from '../hooks/useReservations';
 import { useReservationPolicySeasons } from '../hooks/useReservationPolicySeasons';
 import BottomNav from '../components/BottomNav';
 import ReservationModal from '../components/ReservationModal';
-import { MEMBER_ROLE_LABELS, canManageReservations } from '../utils/roles';
 import type { ReservationWithDetails } from '../types';
 
 /** Passed to child routes via <Outlet context={...}> */
@@ -70,12 +69,6 @@ export default function AppShell() {
               관리자
             </div>
           )}
-          {profile?.member_role && profile.member_role !== 'member' && (
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full bg-surface-container-low text-on-surface-variant text-[11px] font-bold border border-card-border">
-              <span className="material-symbols-outlined text-[14px]">badge</span>
-              {MEMBER_ROLE_LABELS[profile.member_role]}
-            </div>
-          )}
           <div className="flex flex-col items-end justify-center min-w-0">
             <div className="flex items-center gap-1.5 leading-none mb-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
@@ -122,7 +115,7 @@ export default function AppShell() {
         currentUserId={profile.id}
         policySeasons={policySeasons}
         isPolicySeasonsLoading={isPolicySeasonsLoading}
-        isAdmin={canManageReservations(profile)}
+        isAdmin={profile.is_admin}
       />
     </div>
   );

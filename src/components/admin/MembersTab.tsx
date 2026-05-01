@@ -4,18 +4,16 @@ import { supabase } from '../../lib/supabase';
 import { queryKeys } from '../../lib/queryKeys';
 import { useAuth } from '../../context/AuthContext';
 import { useBanUser } from '../../hooks/mutations/useBanUser';
-import { useSetAdminRole, useSetMemberRole } from '../../hooks/mutations/useSetAdminRole';
+import { useSetAdminRole } from '../../hooks/mutations/useSetAdminRole';
 import { useAdminDeleteUser } from '../../hooks/mutations/useAdminDeleteUser';
 import AdminUserCard from './AdminUserCard';
 import BanDialog from './BanDialog';
-import { MEMBER_ROLE_LABELS } from '../../utils/roles';
-import type { MemberRole, Profile } from '../../types';
+import type { Profile } from '../../types';
 
 export default function MembersTab() {
   const { profile: me } = useAuth();
   const banUser       = useBanUser();
   const setAdminRole  = useSetAdminRole();
-  const setMemberRole = useSetMemberRole();
   const deleteUser    = useAdminDeleteUser();
 
   const [banTarget, setBanTarget]   = useState<Profile | null>(null);
@@ -45,20 +43,6 @@ export default function MembersTab() {
         userId: user.id, userName: user.display_name, isAdmin: !user.is_admin,
       });
     } catch { alert('처리에 실패했습니다.'); }
-  }
-
-  async function handleChangeMemberRole(user: Profile, memberRole: MemberRole) {
-    if (user.member_role === memberRole) return;
-    if (!confirm(`[${user.display_name}] 님의 역할을 [${MEMBER_ROLE_LABELS[memberRole]}](으)로 변경하시겠습니까?`)) return;
-    try {
-      await setMemberRole.mutateAsync({
-        userId: user.id,
-        userName: user.display_name,
-        memberRole,
-      });
-    } catch {
-      alert('역할 변경에 실패했습니다.');
-    }
   }
 
   async function handleDelete(user: Profile) {
@@ -102,20 +86,6 @@ export default function MembersTab() {
               user={user}
               actions={
                   <div className="flex items-center gap-2">
-                    <select
-                      title="운영 역할"
-                      value={user.member_role ?? 'member'}
-                      onChange={(event) => handleChangeMemberRole(user, event.target.value as MemberRole)}
-                      disabled={setMemberRole.isPending || user.id === me?.id}
-                      className="h-10 max-w-[104px] rounded-2xl border border-card-border bg-surface-container-highest px-2 text-[11px] font-bold text-on-surface-variant"
-                    >
-                      {(Object.keys(MEMBER_ROLE_LABELS) as MemberRole[]).map((role) => (
-                        <option key={role} value={role}>
-                          {MEMBER_ROLE_LABELS[role]}
-                        </option>
-                      ))}
-                    </select>
-
                     {/* 어드민 토글 */}
                     <button
                       title={user.is_admin ? '어드민 해제' : '어드민 지정'}

@@ -7,7 +7,6 @@ import Calendar from '../components/Calendar';
 import DailySchedule from '../components/DailySchedule';
 import ReservationDetailModal from '../components/ReservationDetailModal';
 import { formatDate, normalizeTime } from '../utils/time';
-import { canManageReservations } from '../utils/roles';
 import type { Purpose, ReservationWithDetails } from '../types';
 import type { AppShellContext } from './AppShell';
 
@@ -31,7 +30,6 @@ export default function Reserve() {
   const [search, setSearch] = useState('');
   const [purposeFilter, setPurposeFilter] = useState<PurposeFilter>('all');
 
-  const canManage = canManageReservations(profile);
   const selectedDateStr = formatDate(selectedDate);
   const normalizedSearch = search.trim().toLowerCase();
 
@@ -257,7 +255,7 @@ export default function Reserve() {
             reservations={filteredReservations}
             selectedDate={selectedDate}
             currentUserId={profile?.id ?? ''}
-            isAdmin={canManage}
+            isAdmin={profile?.is_admin}
             onView={setSelectedReservation}
             onEdit={openEdit}
             onDelete={handleDelete}
@@ -278,7 +276,7 @@ export default function Reserve() {
         onClose={() => setSelectedReservation(null)}
         reservation={selectedReservation}
         currentUserId={profile?.id ?? ''}
-        isAdmin={canManage}
+        isAdmin={profile?.is_admin}
       />
     </>
   );

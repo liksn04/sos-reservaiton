@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider } from './context/AuthContext';
-import { RequireAuth, RequireApproved, RequireAdmin, RequireBudgetManager } from './components/RouteGuards';
+import { RequireAuth, RequireApproved, RequireAdmin } from './components/RouteGuards';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { ToastContainer } from './components/Toast';
@@ -104,9 +104,6 @@ export default function App() {
 
                         <Route element={<RequireAdmin />}>
                           <Route path="admin" element={<Admin />} />
-                        </Route>
-
-                        <Route element={<RequireBudgetManager />}>
                           <Route path="budget" element={<BudgetRoute />} />
                         </Route>
                       </Route>

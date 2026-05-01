@@ -1,5 +1,4 @@
 export type ProfileStatus = 'pending' | 'approved' | 'rejected' | 'banned';
-export type MemberRole = 'member' | 'operations' | 'treasurer' | 'president';
 export type Part = 'vocal' | 'guitar' | 'drum' | 'bass' | 'keyboard';
 export type Purpose = '합주' | '강습' | '정기회의' | '오디션';
 
@@ -12,7 +11,6 @@ export interface Profile {
   bio: string | null;
   status: ProfileStatus;
   is_admin: boolean;
-  member_role: MemberRole;
   banned_at: string | null;
   banned_reason: string | null;
   banned_by: string | null;

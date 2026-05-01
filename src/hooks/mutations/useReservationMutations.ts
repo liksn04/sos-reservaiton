@@ -12,7 +12,6 @@ import {
   validateSameDayPolicy,
 } from '../../utils/validation';
 import { isPastReservation } from '../../utils/time';
-import { canManageReservations } from '../../utils/roles';
 import type { Purpose } from '../../types';
 
 // ── 신규 예약 ────────────────────────────────────────────────────────────
@@ -33,8 +32,7 @@ export function useCreateReservation() {
 
   return useMutation({
     mutationFn: async (payload: CreatePayload) => {
-      const canManageReservation = canManageReservations(profile);
-      const purposeAccessError = validatePurposeAccessPolicy(payload.purpose, canManageReservation);
+      const purposeAccessError = validatePurposeAccessPolicy(payload.purpose, Boolean(profile?.is_admin));
       if (purposeAccessError) throw new Error(purposeAccessError.message);
 
       const pastDateError = validatePastDatePolicy(payload.date);
@@ -121,8 +119,7 @@ export function useUpdateReservation() {
 
   return useMutation({
     mutationFn: async (payload: UpdatePayload) => {
-      const canManageReservation = canManageReservations(profile);
-      const purposeAccessError = validatePurposeAccessPolicy(payload.purpose, canManageReservation);
+      const purposeAccessError = validatePurposeAccessPolicy(payload.purpose, Boolean(profile?.is_admin));
       if (purposeAccessError) throw new Error(purposeAccessError.message);
 
       const pastDateError = validatePastDatePolicy(payload.date);
@@ -156,7 +153,7 @@ export function useUpdateReservation() {
 
       const isNextDay = computeIsNextDay(payload.startTime, payload.endTime);
 
-      if (isPastReservation(payload.date, payload.endTime, isNextDay) && !canManageReservation) {
+      if (isPastReservation(payload.date, payload.endTime, isNextDay) && !profile?.is_admin) {
         throw new Error('지난 일정은 수정할 수 없습니다.');
       }
 

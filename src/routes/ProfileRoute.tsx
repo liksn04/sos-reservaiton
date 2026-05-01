@@ -15,7 +15,6 @@ import DeleteAccountDialog from '../components/DeleteAccountDialog';
 import ThemeToggle from '../components/ThemeToggle';
 import type { AppShellContext } from './AppShell';
 import { PART_INFO } from '../lib/constants';
-import { MEMBER_ROLE_LABELS, canManageReservations } from '../utils/roles';
 
 export default function ProfileRoute() {
   const { profile, signOut } = useAuth();
@@ -27,7 +26,6 @@ export default function ProfileRoute() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [scheduleTab, setScheduleTab] = useState<'upcoming' | 'history'>('upcoming');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const canManage = canManageReservations(profile);
 
   async function handleDelete(id: string, teamName: string) {
     if (!confirm(`[${teamName}] 팀의 예약을 취소하시겠습니까?`)) return;
@@ -117,11 +115,6 @@ export default function ProfileRoute() {
                   {(!profile?.part || profile.part.length === 0) && (
                     <span className="px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant text-[9px] font-black tracking-tighter">
                       NO SESSION
-                    </span>
-                  )}
-                  {profile?.member_role && profile.member_role !== 'member' && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[9px] font-black tracking-tighter">
-                      {MEMBER_ROLE_LABELS[profile.member_role]}
                     </span>
                   )}
                 </div>
@@ -277,7 +270,7 @@ export default function ProfileRoute() {
 
                     {/* 액션 버튼 */}
                     <div className="flex flex-col gap-1.5 flex-shrink-0 ml-auto pl-2">
-                      {(res.role === 'host' || canManage) ? (
+                      {(res.role === 'host' || profile?.is_admin) ? (
                         <>
                           <button
                             onClick={() => openEdit(res)}
