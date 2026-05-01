@@ -135,10 +135,11 @@ export function useUpdateReservation() {
       if (updateErr) throw updateErr;
 
       // 초대 목록 교체 (합주면 새 목록으로, 아니면 전부 삭제)
-      await supabase
+      const { error: deleteInviteesErr } = await supabase
         .from('reservation_invitees')
         .delete()
         .eq('reservation_id', payload.id);
+      if (deleteInviteesErr) throw deleteInviteesErr;
 
       if (payload.purpose === '합주' && payload.invitees.length > 0) {
         const { error: inviteErr } = await supabase

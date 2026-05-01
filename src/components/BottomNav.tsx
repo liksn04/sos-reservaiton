@@ -19,7 +19,7 @@ export default function BottomNav() {
 
     const cancelPrefetch = scheduleIdlePrefetch(() => {
       pathsToPrefetch.forEach((path) => {
-        void prefetchRouteModule(path);
+        void prefetchRouteModule(path, { respectHeavyRouteBudget: true });
       });
     });
 

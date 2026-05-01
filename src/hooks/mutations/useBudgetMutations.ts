@@ -185,15 +185,15 @@ export function useBudgetMutations() {
         throw new Error('회원 식별자가 올바르지 않습니다.');
       }
 
-      const { data: existing, error: existingError } = await supabase
-        .from('membership_fee_records')
+      const { data: policy, error: policyError } = await supabase
+        .from('membership_fee_policies')
         .select('amount')
         .eq('id', policyId)
         .maybeSingle();
 
-      if (existingError) throw existingError;
+      if (policyError) throw policyError;
 
-      if (!existing) {
+      if (!policy) {
         throw new Error('유효한 회비 정책을 찾을 수 없습니다.');
       }
 
@@ -204,7 +204,7 @@ export function useBudgetMutations() {
           user_id: userId,
           is_paid: isPaid,
           paid_at: isPaid ? new Date().toISOString() : null,
-          amount_paid: isPaid ? existing.amount : null,
+          amount_paid: isPaid ? policy.amount : null,
           note: null,
         }, {
           onConflict: 'policy_id,user_id',

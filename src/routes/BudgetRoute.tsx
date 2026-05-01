@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import BudgetTransactionModal from '../components/BudgetTransactionModal';
 import MembershipFeePanel from '../components/MembershipFeePanel';
 import YearArchiveSelector from '../components/YearArchiveSelector';
-import { routeModuleLoaders, scheduleIdlePrefetch } from '../lib/moduleLoaders';
+import { routeModuleLoaders, scheduleIdlePrefetch, shouldPrefetchHeavyRoute } from '../lib/moduleLoaders';
 import { format } from 'date-fns';
 import { formatCurrency } from '../utils/format';
 import { ko } from 'date-fns/locale';
@@ -54,8 +54,10 @@ export default function BudgetRoute() {
     }
 
     return scheduleIdlePrefetch(() => {
-      void routeModuleLoaders.budgetCharts();
-    }, 600);
+      if (shouldPrefetchHeavyRoute()) {
+        void routeModuleLoaders.budgetCharts();
+      }
+    }, 1200);
   }, [activeTab]);
 
   // 요약 산출

@@ -2,6 +2,14 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+function isPackage(id: string, packageName: string) {
+  return id.includes(`/node_modules/${packageName}/`)
+}
+
+function isScopedPackage(id: string, scope: string) {
+  return id.includes(`/node_modules/${scope}/`)
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   build: {
@@ -12,27 +20,55 @@ export default defineConfig({
             return undefined
           }
 
-          if (id.includes('recharts')) {
+          if (
+            isPackage(id, 'react') ||
+            isPackage(id, 'react-dom') ||
+            isPackage(id, 'react-is') ||
+            isPackage(id, 'scheduler') ||
+            isPackage(id, 'use-sync-external-store')
+          ) {
+            return 'react-core'
+          }
+
+          if (isPackage(id, 'react-router') || isPackage(id, 'react-router-dom')) {
+            return 'router'
+          }
+
+          if (
+            isPackage(id, 'recharts') ||
+            isPackage(id, 'victory-vendor') ||
+            isPackage(id, 'decimal.js-light') ||
+            id.includes('/node_modules/d3-')
+          ) {
             return 'charts-vendor'
           }
 
-          if (id.includes('framer-motion') || id.includes('lucide-react')) {
-            return 'motion-vendor'
+          if (
+            isPackage(id, 'framer-motion') ||
+            isPackage(id, 'motion-dom') ||
+            isPackage(id, 'motion-utils') ||
+            isPackage(id, 'lucide-react')
+          ) {
+            return 'motion-ui'
           }
 
-          if (id.includes('@supabase/supabase-js')) {
-            return 'supabase-vendor'
+          if (isScopedPackage(id, '@supabase')) {
+            return 'supabase'
           }
 
-          if (id.includes('@tanstack/react-query')) {
-            return 'query-vendor'
+          if (isScopedPackage(id, '@tanstack')) {
+            return 'query'
           }
 
-          if (id.includes('react-router-dom') || id.includes('react-dom') || id.includes('/react/')) {
-            return 'react-vendor'
+          if (isPackage(id, 'date-fns')) {
+            return 'date-utils'
           }
 
-          return 'vendor'
+          if (isPackage(id, 'workbox-window')) {
+            return 'pwa'
+          }
+
+          return undefined
         },
       },
     },

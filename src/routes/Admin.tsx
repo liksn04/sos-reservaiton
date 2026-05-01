@@ -64,9 +64,9 @@ export default function Admin() {
 
     const cancelPrefetch = scheduleIdlePrefetch(() => {
       tabsToPrefetch.forEach((tab) => {
-        void prefetchAdminTabModule(tab);
+        void prefetchAdminTabModule(tab, { respectHeavyRouteBudget: true });
       });
-    }, 400);
+    }, 900);
 
     return cancelPrefetch;
   }, [activeTab]);

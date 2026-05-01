@@ -50,11 +50,53 @@ const routePathToLoader = {
 export type PrefetchableRoutePath = keyof typeof routePathToLoader
 export type PrefetchableAdminTab = keyof typeof adminTabModuleLoaders
 
-export function prefetchRouteModule(path: PrefetchableRoutePath) {
+interface PrefetchOptions {
+  respectHeavyRouteBudget?: boolean
+}
+
+interface NavigatorWithConnection extends Navigator {
+  connection?: {
+    effectiveType?: string
+    saveData?: boolean
+  }
+}
+
+const HEAVY_ROUTE_PATHS = new Set<PrefetchableRoutePath>(['/admin', '/budget'])
+const SLOW_CONNECTION_TYPES = new Set(['slow-2g', '2g'])
+
+export function shouldPrefetchHeavyRoute() {
+  const globalWindow = typeof window !== 'undefined' ? window : undefined
+
+  if (!globalWindow) {
+    return false
+  }
+
+  const connection = (globalWindow.navigator as NavigatorWithConnection).connection
+
+  if (connection?.saveData) {
+    return false
+  }
+
+  if (connection?.effectiveType && SLOW_CONNECTION_TYPES.has(connection.effectiveType)) {
+    return false
+  }
+
+  return true
+}
+
+export function prefetchRouteModule(path: PrefetchableRoutePath, options?: PrefetchOptions) {
+  if (options?.respectHeavyRouteBudget && HEAVY_ROUTE_PATHS.has(path) && !shouldPrefetchHeavyRoute()) {
+    return undefined
+  }
+
   return routePathToLoader[path]?.()
 }
 
-export function prefetchAdminTabModule(tab: PrefetchableAdminTab) {
+export function prefetchAdminTabModule(tab: PrefetchableAdminTab, options?: PrefetchOptions) {
+  if (options?.respectHeavyRouteBudget && !shouldPrefetchHeavyRoute()) {
+    return undefined
+  }
+
   return adminTabModuleLoaders[tab]?.()
 }
 
