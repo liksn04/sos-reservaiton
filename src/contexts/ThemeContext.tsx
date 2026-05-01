@@ -15,6 +15,11 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 const STORAGE_KEY = 'sos-theme';
 const darkMQ = window.matchMedia('(prefers-color-scheme: dark)');
+const DEFAULT_THEME: Theme = 'system';
+
+function isTheme(value: string | null): value is Theme {
+  return value === 'dark' || value === 'light' || value === 'system';
+}
 
 function getSystemTheme(): 'dark' | 'light' {
   return darkMQ.matches ? 'dark' : 'light';
@@ -34,9 +39,10 @@ function applyTheme(resolved: 'dark' | 'light') {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(
-    () => (localStorage.getItem(STORAGE_KEY) as Theme | null) ?? 'dark',
-  );
+  const [theme, setThemeState] = useState<Theme>(() => {
+    const storedTheme = localStorage.getItem(STORAGE_KEY);
+    return isTheme(storedTheme) ? storedTheme : DEFAULT_THEME;
+  });
 
   const resolvedTheme: 'dark' | 'light' =
     theme === 'system' ? getSystemTheme() : theme;

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import type { ReservationWithDetails } from '../types';
 import {
+  formatDate,
   getNextReservation,
   getOngoingReservation,
   normalizeTime,
@@ -20,16 +21,16 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
   // ── 이번 주 예약 건수 ─────────────────────────────
   const startOfWeek = new Date(now);
   startOfWeek.setDate(now.getDate() - now.getDay());
-  startOfWeek.setHours(0, 0, 0, 0);
 
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setDate(startOfWeek.getDate() + 6);
-  endOfWeek.setHours(23, 59, 59, 999);
 
-  const thisWeekReservations = reservations.filter((r) => {
-    const d = new Date(`${r.date}T00:00:00`);
-    return d >= startOfWeek && d <= endOfWeek;
-  });
+  const startOfWeekStr = formatDate(startOfWeek);
+  const endOfWeekStr = formatDate(endOfWeek);
+
+  const thisWeekReservations = reservations.filter((reservation) => (
+    reservation.date >= startOfWeekStr && reservation.date <= endOfWeekStr
+  ));
 
   // ── 현재 진행 중인 세션 ───────────────────────────
   const ongoing = getOngoingReservation(reservations, now);
@@ -208,7 +209,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
           </div>
           <div>
             <p className="stat-value">{thisWeekReservations.length}건</p>
-            <p className="stat-label">이번 주 총 예약</p>
+            <p className="stat-label">이번 주 예약</p>
           </div>
         </div>
         <div className="stat-item">

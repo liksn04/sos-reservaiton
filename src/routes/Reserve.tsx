@@ -287,14 +287,21 @@ export default function Reserve() {
         </div>
 
         {/* 선택 날짜 일정 */}
-        <div style={{ marginTop: '2.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1rem' }}>
-            <h3 className="font-headline" style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-main)' }}>
+        <div className="mt-10">
+          <div className="sticky top-20 z-40 -mx-1 mb-4 flex items-center justify-between gap-3 rounded-[1.5rem] border border-card-border bg-background/90 px-3 py-3 backdrop-blur-xl">
+            <h3 className="font-headline text-lg font-bold leading-tight text-on-surface">
               선택된 날짜{' '}
               <span style={{ color: 'var(--primary)' }}>
                 {selectedDate.getMonth() + 1}/{selectedDate.getDate()}
               </span>
             </h3>
+            <button
+              className="reserve-now-btn !min-h-11 !w-auto shrink-0 !px-4 !py-2 text-sm"
+              onClick={() => openNew(selectedDate)}
+            >
+              <span className="material-symbols-outlined text-[18px]" style={{ fontWeight: 'bold' }}>add_circle</span>
+              예약 추가
+            </button>
           </div>
 
           <DailySchedule
@@ -307,14 +314,6 @@ export default function Reserve() {
             onDelete={handleDelete}
           />
         </div>
-
-        <button
-          className="reserve-now-btn min-w-[200px] mx-auto mt-8 block"
-          onClick={() => openNew(selectedDate)}
-        >
-          <span className="material-symbols-outlined" style={{ fontWeight: 'bold' }}>add_circle</span>
-          예약 시간 추가하기
-        </button>
       </div>
 
       <ReservationDetailModal

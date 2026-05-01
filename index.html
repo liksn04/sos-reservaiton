@@ -2,31 +2,32 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>빛소리 동아리방 예약</title>
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="빛소리" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="theme-color" content="#131316" id="theme-color-meta" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#F8F9FF" id="theme-color-meta" />
     <!-- 깜빡임 방지: JS가 실행되기 전에 저장된 테마를 미리 적용 -->
     <script>
       (function () {
         try {
-          var saved = localStorage.getItem('sos-theme') || 'dark';
-          var resolved = saved === 'system'
+          var saved = localStorage.getItem('sos-theme') || 'system';
+          var theme = saved === 'dark' || saved === 'light' || saved === 'system' ? saved : 'system';
+          var resolved = theme === 'system'
             ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-            : saved;
+            : theme;
           document.documentElement.classList.remove('dark', 'light');
           document.documentElement.classList.add(resolved);
           // theme-color 메타도 즉시 업데이트
           var meta = document.getElementById('theme-color-meta');
           if (meta) meta.setAttribute('content', resolved === 'light' ? '#F8F9FF' : '#131316');
         } catch (e) {
-          // localStorage 접근 실패 시 기본값(dark) 사용
-          document.documentElement.classList.add('dark');
+          // localStorage 또는 시스템 설정 접근 실패 시 후순위 기본값(light) 사용
+          document.documentElement.classList.add('light');
         }
       })();
     </script>
