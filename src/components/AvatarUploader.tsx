@@ -4,42 +4,13 @@ interface AvatarUploaderProps {
   currentAvatar: string | null;
   fileInputRef: RefObject<HTMLInputElement | null>;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  /** 'dark' = Material Symbols 다크 테마 (ProfileRoute 편집)
-   *  'setup' = 구형 CSS 클래스 (ProfileSetup) */
-  variant?: 'dark' | 'setup';
 }
 
 export default function AvatarUploader({
   currentAvatar,
   fileInputRef,
   onFileChange,
-  variant = 'dark',
 }: AvatarUploaderProps) {
-  if (variant === 'setup') {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-        <div className="avatar-upload-area" onClick={() => fileInputRef.current?.click()}>
-          {currentAvatar ? (
-            <img src={currentAvatar} alt="프로필 미리보기" className="avatar-preview" />
-          ) : (
-            <div className="avatar-placeholder">
-              <i className="fa-solid fa-camera" />
-              <span>사진 추가</span>
-            </div>
-          )}
-        </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          style={{ display: 'none' }}
-          onChange={onFileChange}
-        />
-      </div>
-    );
-  }
-
-  // variant === 'dark'
   return (
     <div className="flex justify-center">
       <div

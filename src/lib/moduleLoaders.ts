@@ -14,7 +14,6 @@ function withCachedLoader<TModule>(loader: ModuleLoader<TModule>): ModuleLoader<
 
 export const routeModuleLoaders = {
   login: withCachedLoader(() => import('../routes/Login')),
-  profileSetup: withCachedLoader(() => import('../routes/ProfileSetup')),
   appShell: withCachedLoader(() => import('../routes/AppShell')),
   home: withCachedLoader(() => import('../routes/HomeRoute')),
   reserve: withCachedLoader(() => import('../routes/Reserve')),
@@ -43,7 +42,6 @@ const routePathToLoader = {
   '/admin': routeModuleLoaders.admin,
   '/budget': routeModuleLoaders.budget,
   '/login': routeModuleLoaders.login,
-  '/profile/setup': routeModuleLoaders.profileSetup,
   '/banned': routeModuleLoaders.banned,
 } as const
 

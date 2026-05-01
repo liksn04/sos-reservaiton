@@ -1,9 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import {
-  isBlockedProfile,
-  shouldRequireProfileSetup,
-} from '../utils/authRedirect';
+import { isBlockedProfile } from '../utils/authRedirect';
 
 /** 로그인 필수. 미로그인 → /login */
 export function RequireAuth() {
@@ -15,7 +12,6 @@ export function RequireAuth() {
 
 /**
  * 활성 프로필 전용.
- * - 프로필 미설정 → /profile/setup
  * - banned → /banned
  * - 그 외 상태는 레거시 값이더라도 앱 진입 경로를 유지하고 운영 정리 대상으로 본다.
  */
@@ -28,8 +24,6 @@ export function RequireApproved() {
   const isLocalAnonymous = import.meta.env.DEV && (session?.user?.is_anonymous || session?.user?.app_metadata.provider === 'anonymous');
   if (isLocalAnonymous) return <Outlet />;
 
-  if (shouldRequireProfileSetup(profile))
-    return <Navigate to="/profile/setup" replace />;
   if (isBlockedProfile(profile))
     return <Navigate to="/banned" replace />;
   return <Outlet />;

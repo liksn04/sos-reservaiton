@@ -11,18 +11,14 @@ const PARTS: { value: Part; label: string }[] = [
 ];
 
 interface ProfileFormProps {
-  /** 'setup' — 최초 프로필 설정 페이지 (구형 CSS 스타일)
-   *  'edit'  — 프로필 탭 인라인 편집 (다크 테마 스타일) */
-  mode: 'setup' | 'edit';
-  /** 편집 모드일 때 기존 프로필 데이터 */
   profile?: Profile | null;
   /** 저장 완료 콜백 */
   onSuccess?: () => void;
-  /** 편집 모드 취소 버튼 콜백 (edit 모드에서만 사용) */
+  /** 편집 취소 버튼 콜백 */
   onCancel?: () => void;
 }
 
-export default function ProfileForm({ mode, profile, onSuccess, onCancel }: ProfileFormProps) {
+export default function ProfileForm({ profile, onSuccess, onCancel }: ProfileFormProps) {
   const {
     displayName, setDisplayName,
     part, togglePart,
@@ -45,144 +41,6 @@ export default function ProfileForm({ mode, profile, onSuccess, onCancel }: Prof
     onSuccess,
   });
 
-  if (mode === 'setup') {
-    return (
-      <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-        <AvatarUploader
-          variant="setup"
-          currentAvatar={currentAvatar}
-          fileInputRef={fileInputRef}
-          onFileChange={handleFileChange}
-        />
-
-        <div className="form-group">
-          <label>닉네임 *</label>
-          <input
-            type="text"
-            placeholder="실명을 입력해주세요."
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            maxLength={20}
-            required
-          />
-          {/* [규칙 3] 실명 안내 */}
-          <p style={{ fontSize: '11px', color: 'var(--color-on-surface-variant, #9ca3af)', marginTop: '4px' }}>
-            동아리 활동에서는 반드시 실명을 사용해주세요. 동아리원이 서로를 쉽게 알아볼 수 있습니다.
-          </p>
-
-          {/* [규칙 4] 동명이인 토글 */}
-          {showDuplicateToggle && (
-            <div
-              style={{
-                marginTop: '8px',
-                padding: '10px 12px',
-                borderRadius: '8px',
-                background: 'rgba(234, 179, 8, 0.1)',
-                border: '1px solid rgba(234, 179, 8, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '8px',
-              }}
-            >
-              <span style={{ fontSize: '12px', color: '#ca8a04', fontWeight: 600 }}>
-                동명이인이신가요?
-              </span>
-              <button
-                type="button"
-                onClick={() => setAllowDuplicateName(!allowDuplicateName)}
-                style={{
-                  width: '40px',
-                  height: '22px',
-                  borderRadius: '11px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  backgroundColor: allowDuplicateName ? 'var(--color-primary, #6366f1)' : '#d1d5db',
-                  position: 'relative',
-                  transition: 'background-color 0.2s ease',
-                  flexShrink: 0,
-                }}
-                aria-label={allowDuplicateName ? '동명이인 허용 해제' : '동명이인으로 등록 허용'}
-              >
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: '3px',
-                    left: allowDuplicateName ? '21px' : '3px',
-                    width: '16px',
-                    height: '16px',
-                    borderRadius: '50%',
-                    backgroundColor: '#fff',
-                    transition: 'left 0.2s ease',
-                    display: 'block',
-                  }}
-                />
-              </button>
-            </div>
-          )}
-          {/* 동명이인 허용 안내 */}
-          {showDuplicateToggle && allowDuplicateName && (
-            <p style={{ fontSize: '11px', color: 'var(--color-primary, #6366f1)', marginTop: '4px', fontWeight: 600 }}>
-              동명이인으로 등록됩니다. 저장 버튼을 다시 눌러주세요.
-            </p>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label>담당 파트 (중복 선택 가능)</label>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginTop: '8px' }}>
-            {PARTS.map((p) => {
-              const isSelected = part.includes(p.value);
-              return (
-                <button
-                  key={p.value}
-                  type="button"
-                  onClick={() => togglePart(p.value)}
-                  style={{
-                    padding: '8px 4px',
-                    borderRadius: '8px',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    border: isSelected ? '1px solid var(--color-primary, #6366f1)' : '1px solid #d1d5db',
-                    backgroundColor: isSelected ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
-                    color: isSelected ? 'var(--color-primary, #6366f1)' : '#6b7280',
-                  }}
-                >
-                  {p.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label>한줄소개</label>
-          <input
-            type="text"
-            placeholder="간단한 자기소개 (선택)"
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            maxLength={60}
-          />
-        </div>
-
-        {error && <p className="form-error">{error}</p>}
-
-        <button
-          type="submit"
-          className="primary-btn"
-          style={{ width: '100%', justifyContent: 'center' }}
-          disabled={isPending || (showDuplicateToggle && !allowDuplicateName)}
-        >
-          {isPending ? '저장 중...' : '프로필 저장'}
-        </button>
-      </form>
-    );
-  }
-
-  // mode === 'edit' — 다크 테마 인라인 편집
   return (
     <div className="glass-card p-6 rounded-xl relative overflow-hidden border border-outline-variant/10">
       {onCancel && (
@@ -199,7 +57,6 @@ export default function ProfileForm({ mode, profile, onSuccess, onCancel }: Prof
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <AvatarUploader
-          variant="dark"
           currentAvatar={currentAvatar}
           fileInputRef={fileInputRef}
           onFileChange={handleFileChange}

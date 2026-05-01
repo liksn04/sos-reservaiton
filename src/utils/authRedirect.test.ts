@@ -20,7 +20,7 @@ function createProfile(overrides: Partial<Profile> = {}): Profile {
 }
 
 describe('authRedirect', () => {
-  it('프로필이 없거나 이름이 비어 있어도 강제 설정 화면으로 보내지 않는다', () => {
+  it('프로필이 없거나 이름이 비어 있어도 홈으로 보낸다', () => {
     expect(resolveAuthenticatedRoute(null)).toBe('/');
     expect(resolveAuthenticatedRoute(createProfile({ display_name: '   ' }))).toBe('/');
   });

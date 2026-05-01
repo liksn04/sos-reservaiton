@@ -79,7 +79,6 @@ export default function ProfileRoute() {
     <div className="tab-content animate-slide-up">
       {isEditingProfile ? (
         <ProfileForm
-          mode="edit"
           profile={profile}
           onSuccess={() => setIsEditingProfile(false)}
           onCancel={() => setIsEditingProfile(false)}
