@@ -1,11 +1,8 @@
 import type { Profile } from '../types';
 
-function isBlank(value: string | null | undefined) {
-  return !value || value.trim() === '';
-}
-
 export function shouldRequireProfileSetup(profile: Profile | null) {
-  return !profile || isBlank(profile.display_name);
+  void profile;
+  return false;
 }
 
 export function isBlockedProfile(profile: Profile | null) {
@@ -13,10 +10,6 @@ export function isBlockedProfile(profile: Profile | null) {
 }
 
 export function resolveAuthenticatedRoute(profile: Profile | null) {
-  if (shouldRequireProfileSetup(profile)) {
-    return '/profile/setup';
-  }
-
   if (isBlockedProfile(profile)) {
     return '/banned';
   }
