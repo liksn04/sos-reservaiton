@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { queryKeys } from '../../lib/queryKeys';
 import { useAuth } from '../../context/AuthContext';
 import { isPastReservation } from '../../utils/time';
+import { canManageReservations } from '../../utils/roles';
 
 export function useDeleteReservation() {
   const queryClient = useQueryClient();
@@ -19,7 +20,7 @@ export function useDeleteReservation() {
 
       if (fetchErr) throw fetchErr;
 
-      if (isPastReservation(res.date, res.end_time, res.is_next_day) && !profile?.is_admin) {
+      if (isPastReservation(res.date, res.end_time, res.is_next_day) && !canManageReservations(profile)) {
         throw new Error('지난 일정은 삭제할 수 없습니다.');
       }
 
@@ -28,6 +29,7 @@ export function useDeleteReservation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.reservations.all });
+      queryClient.invalidateQueries({ queryKey: ['reservations', 'history'] });
     },
   });
 }

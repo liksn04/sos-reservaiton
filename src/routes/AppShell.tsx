@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useReservations } from '../hooks/useReservations';
 import { useReservationPolicySeasons } from '../hooks/useReservationPolicySeasons';
 import BottomNav from '../components/BottomNav';
 import ReservationModal from '../components/ReservationModal';
+import { MEMBER_ROLE_LABELS, canManageReservations } from '../utils/roles';
 import type { ReservationWithDetails } from '../types';
 
 /** Passed to child routes via <Outlet context={...}> */
@@ -25,21 +26,21 @@ export default function AppShell() {
   const [editingReservation, setEditingReservation] = useState<ReservationWithDetails | null>(null);
   const [modalDate, setModalDate] = useState<Date>(new Date());
 
-  const openNew = (date?: Date) => {
+  const openNew = useCallback((date?: Date) => {
     setEditingReservation(null);
     setModalDate(date || new Date());
     setModalOpen(true);
-  };
+  }, []);
 
-  const openEdit = (res: ReservationWithDetails) => {
+  const openEdit = useCallback((res: ReservationWithDetails) => {
     setEditingReservation(res);
     setModalOpen(true);
-  };
+  }, []);
 
   const context = useMemo<AppShellContext>(() => ({ 
     openNew, 
     openEdit 
-  }), []);
+  }), [openNew, openEdit]);
 
   if (authLoading) {
     return (
@@ -67,6 +68,12 @@ export default function AppShell() {
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full bg-primary/10 text-primary text-[11px] font-bold border border-primary/10">
               <span className="material-symbols-outlined text-[14px]">verified_user</span>
               관리자
+            </div>
+          )}
+          {profile?.member_role && profile.member_role !== 'member' && (
+            <div className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full bg-surface-container-low text-on-surface-variant text-[11px] font-bold border border-card-border">
+              <span className="material-symbols-outlined text-[14px]">badge</span>
+              {MEMBER_ROLE_LABELS[profile.member_role]}
             </div>
           )}
           <div className="flex flex-col items-end justify-center min-w-0">
@@ -115,7 +122,7 @@ export default function AppShell() {
         currentUserId={profile.id}
         policySeasons={policySeasons}
         isPolicySeasonsLoading={isPolicySeasonsLoading}
-        isAdmin={profile.is_admin}
+        isAdmin={canManageReservations(profile)}
       />
     </div>
   );

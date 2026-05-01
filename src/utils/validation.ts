@@ -3,9 +3,12 @@ import { isSameDayHanjuBookingAllowed } from './reservationPolicy';
 import type { Reservation, Purpose, ReservationPolicySeason } from '../types';
 
 export interface OverlapError {
-  type: 'same_time' | 'overlap' | 'same_day_hanju' | 'max_duration_hanju' | 'past_start_time' | 'past_date' | 'admin_only_purpose';
+  type: 'same_time' | 'overlap' | 'same_day_hanju' | 'max_duration_hanju' | 'past_start_time' | 'past_date' | 'admin_only_purpose' | 'outside_operating_hours';
   message: string;
 }
+
+const OPERATING_START_MINUTES = 10 * 60;
+const OPERATING_END_MINUTES = 24 * 60;
 
 /**
  * HH:MM 문자열을 분(minute) 단위 숫자로 변환.
@@ -141,6 +144,31 @@ export function validateMaxDurationPolicy(
   return null;
 }
 
+export function validateOperatingHoursPolicy(
+  startTime: string,
+  endTime: string,
+): OverlapError | null {
+  if (!startTime || !endTime) return null;
+
+  const startMin = toMinutes(normalizeTime(startTime));
+  const endMin = toMinutes(normalizeTime(endTime));
+
+  if (
+    startMin < OPERATING_START_MINUTES ||
+    startMin >= OPERATING_END_MINUTES ||
+    endMin <= OPERATING_START_MINUTES ||
+    endMin > OPERATING_END_MINUTES ||
+    endMin <= startMin
+  ) {
+    return {
+      type: 'outside_operating_hours',
+      message: '운영 시간은 10:00부터 24:00까지입니다. 운영 시간 안에서 시작/종료 시간을 선택해주세요.',
+    };
+  }
+
+  return null;
+}
+
 /**
  * 현재 시각 이전 또는 이미 시작된 시간으로의 예약을 차단합니다.
  *
@@ -194,6 +222,14 @@ export function validateReservationTime(
   const pastDateErr = validatePastDatePolicy(date, now);
   if (pastDateErr) return pastDateErr;
 
+  const start = normalizeTime(startTime);
+  const end = normalizeTime(endTime);
+
+  // Edge case: 시작 == 종료
+  if (start === end) {
+    return { type: 'same_time', message: '시작 시간과 종료 시간이 같을 수 없습니다.' };
+  }
+
   // [규칙 1] 합주 당일 예약 불가
   const sameDayErr = validateSameDayPolicy(date, purpose, policySeasons, now);
   if (sameDayErr) return sameDayErr;
@@ -202,16 +238,11 @@ export function validateReservationTime(
   const durationErr = validateMaxDurationPolicy(startTime, endTime, purpose);
   if (durationErr) return durationErr;
 
+  const operatingHoursErr = validateOperatingHoursPolicy(startTime, endTime);
+  if (operatingHoursErr) return operatingHoursErr;
+
   const pastStartErr = validatePastStartTimePolicy(date, startTime, now);
   if (pastStartErr) return pastStartErr;
-
-  const start = normalizeTime(startTime);
-  const end = normalizeTime(endTime);
-
-  // Edge case: 시작 == 종료
-  if (start === end) {
-    return { type: 'same_time', message: '시작 시간과 종료 시간이 같을 수 없습니다.' };
-  }
 
   const isNextDay = end < start && end !== '00:00';
 

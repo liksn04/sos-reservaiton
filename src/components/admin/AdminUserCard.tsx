@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { MEMBER_ROLE_LABELS } from '../../utils/roles';
 import type { Profile } from '../../types';
 
 interface Props {
@@ -31,6 +32,11 @@ export default function AdminUserCard({ user, badge, meta, actions }: Props) {
           {user.is_admin && (
             <span className="text-[9px] bg-primary/10 text-primary px-2 py-1 rounded-full font-black tracking-widest uppercase flex-shrink-0">
               ADMIN
+            </span>
+          )}
+          {user.member_role && user.member_role !== 'member' && (
+            <span className="text-[9px] bg-surface-container-high text-on-surface-variant px-2 py-1 rounded-full font-black tracking-widest uppercase flex-shrink-0">
+              {MEMBER_ROLE_LABELS[user.member_role]}
             </span>
           )}
           {badge}

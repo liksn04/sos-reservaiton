@@ -12,6 +12,7 @@ function createProfile(overrides: Partial<Profile> = {}): Profile {
     bio: overrides.bio ?? null,
     status: overrides.status ?? 'approved',
     is_admin: overrides.is_admin ?? false,
+    member_role: overrides.member_role ?? 'member',
     banned_at: overrides.banned_at ?? null,
     banned_reason: overrides.banned_reason ?? null,
     banned_by: overrides.banned_by ?? null,

@@ -1,4 +1,5 @@
 import type { ReservationWithDetails } from '../types';
+import { useReservationChangeLog } from '../hooks/useReservationChangeLog';
 import {
   buildReservationParticipantItems,
   formatReservationDetailDate,
@@ -21,6 +22,11 @@ export default function ReservationDetailModal({
   currentUserId,
   isAdmin = false,
 }: Props) {
+  const { data: changeLog = [], isLoading: isChangeLogLoading } = useReservationChangeLog(
+    reservation?.id,
+    isOpen && Boolean(reservation),
+  );
+
   if (!isOpen || !reservation) return null;
 
   const isHost = reservation.host_id === currentUserId;
@@ -220,6 +226,60 @@ export default function ReservationDetailModal({
               {createdAtLabel}
             </p>
           </div>
+
+          <section className="mt-6">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <h3 className="font-headline text-lg font-bold tracking-tight text-on-surface">
+                변경 이력
+              </h3>
+              <span className="text-xs font-bold text-on-surface-variant">
+                최근 {changeLog.length}건
+              </span>
+            </div>
+
+            {isChangeLogLoading ? (
+              <div className="rounded-[1.5rem] border border-card-border bg-surface-container-low px-4 py-4 text-sm font-semibold text-on-surface-variant">
+                변경 이력을 불러오는 중입니다.
+              </div>
+            ) : changeLog.length === 0 ? (
+              <div className="rounded-[1.5rem] border border-card-border bg-surface-container-low px-4 py-4 text-sm font-semibold text-on-surface-variant">
+                아직 기록된 변경 사항이 없습니다.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {changeLog.map((log) => (
+                  <div
+                    key={log.id}
+                    className="rounded-[1.25rem] border border-card-border bg-surface-container-low px-4 py-3"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-black text-on-surface">
+                          {getChangeLogLabel(log.action)}
+                        </p>
+                        <p className="mt-1 text-xs font-medium text-on-surface-variant">
+                          {formatChangeLogSummary(log.previous_data, log.next_data)}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-[11px] font-bold text-on-surface-variant">
+                          {log.actor_name ?? '시스템'}
+                        </p>
+                        <p className="mt-1 text-[10px] font-medium text-on-surface-variant/70">
+                          {new Date(log.created_at).toLocaleString('ko-KR', {
+                            month: 'numeric',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
 
         <div className="modal-footer reservation-detail-footer">
@@ -230,6 +290,47 @@ export default function ReservationDetailModal({
       </div>
     </div>
   );
+}
+
+function getChangeLogLabel(action: string) {
+  switch (action) {
+    case 'reservation_updated':
+      return '예약 정보 변경';
+    case 'reservation_deleted':
+      return '예약 삭제';
+    case 'invitee_added':
+      return '초대 멤버 추가';
+    case 'invitee_removed':
+      return '초대 멤버 제거';
+    default:
+      return '변경 사항';
+  }
+}
+
+function formatChangeLogSummary(
+  previousData: Record<string, unknown> | null,
+  nextData: Record<string, unknown> | null,
+) {
+  const previousName = typeof previousData?.display_name === 'string' ? previousData.display_name : null;
+  const nextName = typeof nextData?.display_name === 'string' ? nextData.display_name : null;
+
+  if (nextName) return `${nextName} 님이 초대되었습니다.`;
+  if (previousName) return `${previousName} 님이 제외되었습니다.`;
+
+  const fields = [
+    ['date', '날짜'],
+    ['start_time', '시작'],
+    ['end_time', '종료'],
+    ['team_name', '팀명'],
+    ['people_count', '인원'],
+    ['purpose', '목적'],
+  ] as const;
+
+  const changed = fields
+    .filter(([key]) => previousData?.[key] !== nextData?.[key])
+    .map(([, label]) => label);
+
+  return changed.length > 0 ? `${changed.join(', ')} 변경` : '세부 정보가 변경되었습니다.';
 }
 
 interface InfoCardProps {

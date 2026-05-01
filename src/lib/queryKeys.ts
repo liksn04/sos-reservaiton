@@ -5,6 +5,7 @@
 export const queryKeys = {
   reservations: {
     all: ['reservations'] as const,
+    history: (reservationId: string | null | undefined) => ['reservations', 'history', reservationId] as const,
     policySeasons: {
       all: ['reservation_policy_seasons'] as const,
       list: (scope: 'all' | 'active') => ['reservation_policy_seasons', scope] as const,

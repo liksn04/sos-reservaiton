@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import TimeSlotPicker from './TimeSlotPicker';
 import InviteePicker from './InviteePicker';
-import { validateSameDayPolicy } from '../../utils/validation';
+import { validateReservationTime, validateSameDayPolicy } from '../../utils/validation';
 import { findActiveReservationPolicySeason, getReservationMinimumDate } from '../../utils/reservationPolicy';
 import { getAvailableReservationPurposes } from '../../lib/constants';
 import type { ReservationPolicySeason, ReservationWithDetails, Purpose, Profile } from '../../types';
@@ -58,6 +58,20 @@ export default function ReservationFormFields({
     () => validateSameDayPolicy(date, purpose, policySeasons),
     [date, policySeasons, purpose],
   );
+  const policyPreview = useMemo(
+    () => validateReservationTime(
+      date,
+      startTime,
+      endTime,
+      reservations,
+      editingId,
+      purpose,
+      policySeasons,
+      undefined,
+      teamName,
+    ),
+    [date, editingId, endTime, policySeasons, purpose, reservations, startTime, teamName],
+  );
 
   // 날짜 input의 최솟값: 합주인 경우 내일, 그 외는 오늘
   const minDate = useMemo(() => {
@@ -105,6 +119,28 @@ export default function ReservationFormFields({
         purpose={purpose}
         teamName={teamName}
       />
+
+      <div className={`rounded-[1.25rem] border px-4 py-3 text-xs font-bold ${
+        policyPreview
+          ? 'border-error/20 bg-error/5 text-error'
+          : 'border-primary/20 bg-primary/5 text-primary'
+      }`}>
+        <div className="flex items-start gap-2">
+          <span className="material-symbols-outlined text-[18px] shrink-0">
+            {policyPreview ? 'error' : 'verified'}
+          </span>
+          <div>
+            <p className="font-black">
+              {policyPreview ? '예약 전 확인이 필요합니다' : '현재 선택한 조건으로 예약 가능합니다'}
+            </p>
+            <p className="mt-1 leading-relaxed opacity-80">
+              {policyPreview
+                ? policyPreview.message
+                : '충돌, 최대 예약 시간, 운영 정책, 권한 조건을 사전 확인했습니다.'}
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* 팀명 / 인원 */}
       <div className="form-row">

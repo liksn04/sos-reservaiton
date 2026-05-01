@@ -10,7 +10,7 @@ export function useMembers() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, display_name, avatar_url, part, bio')
+        .select('id, display_name, avatar_url, part, bio, status, is_admin, member_role, kakao_id, banned_at, banned_reason, banned_by, created_at')
         .eq('status', 'approved')
         .order('display_name', { ascending: true });
 

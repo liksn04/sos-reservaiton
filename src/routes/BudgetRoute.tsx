@@ -9,6 +9,7 @@ import YearArchiveSelector from '../components/YearArchiveSelector';
 import { routeModuleLoaders, scheduleIdlePrefetch, shouldPrefetchHeavyRoute } from '../lib/moduleLoaders';
 import { format } from 'date-fns';
 import { formatCurrency } from '../utils/format';
+import { canManageBudget } from '../utils/roles';
 import { ko } from 'date-fns/locale';
 import type { BudgetTransaction } from '../types';
 
@@ -46,7 +47,7 @@ export default function BudgetRoute() {
 
   const { data: transactions, isLoading } = useBudgetTransactions(fiscalYear, fiscalHalf);
 
-  const isAdmin = profile?.is_admin ?? false;
+  const isAdmin = canManageBudget(profile);
 
   useEffect(() => {
     if (activeTab === 'charts') {

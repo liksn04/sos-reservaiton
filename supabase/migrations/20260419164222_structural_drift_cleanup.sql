@@ -168,6 +168,15 @@ $$;
 
 create extension if not exists pg_cron;
 
+do $$
+begin
+  perform cron.unschedule('cleanup-expired-reservations');
+exception
+  when others then
+    null;
+end;
+$$;
+
 select cron.schedule(
   'cleanup-expired-reservations',
   '15 3 * * *',

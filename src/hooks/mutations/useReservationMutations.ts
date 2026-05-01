@@ -8,9 +8,11 @@ import {
   validatePastDatePolicy,
   validatePastStartTimePolicy,
   validatePurposeAccessPolicy,
+  validateReservationTime,
   validateSameDayPolicy,
 } from '../../utils/validation';
 import { isPastReservation } from '../../utils/time';
+import { canManageReservations } from '../../utils/roles';
 import type { Purpose } from '../../types';
 
 // ── 신규 예약 ────────────────────────────────────────────────────────────
@@ -31,7 +33,8 @@ export function useCreateReservation() {
 
   return useMutation({
     mutationFn: async (payload: CreatePayload) => {
-      const purposeAccessError = validatePurposeAccessPolicy(payload.purpose, Boolean(profile?.is_admin));
+      const canManageReservation = canManageReservations(profile);
+      const purposeAccessError = validatePurposeAccessPolicy(payload.purpose, canManageReservation);
       if (purposeAccessError) throw new Error(purposeAccessError.message);
 
       const pastDateError = validatePastDatePolicy(payload.date);
@@ -46,6 +49,24 @@ export function useCreateReservation() {
       // Edge case: 클라이언트에서 직접 mutationFn을 호출한 경우도 동일 정책 적용
       const pastStartError = validatePastStartTimePolicy(payload.date, payload.startTime);
       if (pastStartError) throw new Error(pastStartError.message);
+
+      const { data: existingReservations, error: existingReservationsErr } = await supabase
+        .from('reservations')
+        .select('id, host_id, date, start_time, end_time, is_next_day, team_name, people_count, purpose, created_at');
+      if (existingReservationsErr) throw existingReservationsErr;
+
+      const reservationTimeError = validateReservationTime(
+        payload.date,
+        payload.startTime,
+        payload.endTime,
+        existingReservations ?? [],
+        null,
+        payload.purpose,
+        policySeasons,
+        undefined,
+        payload.teamName,
+      );
+      if (reservationTimeError) throw new Error(reservationTimeError.message);
 
       const isNextDay = computeIsNextDay(payload.startTime, payload.endTime);
 
@@ -77,6 +98,7 @@ export function useCreateReservation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.reservations.all });
+      queryClient.invalidateQueries({ queryKey: ['reservations', 'history'] });
     },
   });
 }
@@ -99,7 +121,8 @@ export function useUpdateReservation() {
 
   return useMutation({
     mutationFn: async (payload: UpdatePayload) => {
-      const purposeAccessError = validatePurposeAccessPolicy(payload.purpose, Boolean(profile?.is_admin));
+      const canManageReservation = canManageReservations(profile);
+      const purposeAccessError = validatePurposeAccessPolicy(payload.purpose, canManageReservation);
       if (purposeAccessError) throw new Error(purposeAccessError.message);
 
       const pastDateError = validatePastDatePolicy(payload.date);
@@ -113,11 +136,40 @@ export function useUpdateReservation() {
       const pastStartError = validatePastStartTimePolicy(payload.date, payload.startTime);
       if (pastStartError) throw new Error(pastStartError.message);
 
+      const { data: existingReservations, error: existingReservationsErr } = await supabase
+        .from('reservations')
+        .select('id, host_id, date, start_time, end_time, is_next_day, team_name, people_count, purpose, created_at');
+      if (existingReservationsErr) throw existingReservationsErr;
+
+      const reservationTimeError = validateReservationTime(
+        payload.date,
+        payload.startTime,
+        payload.endTime,
+        existingReservations ?? [],
+        payload.id,
+        payload.purpose,
+        policySeasons,
+        undefined,
+        payload.teamName,
+      );
+      if (reservationTimeError) throw new Error(reservationTimeError.message);
+
       const isNextDay = computeIsNextDay(payload.startTime, payload.endTime);
 
-      if (isPastReservation(payload.date, payload.endTime, isNextDay) && !profile?.is_admin) {
+      if (isPastReservation(payload.date, payload.endTime, isNextDay) && !canManageReservation) {
         throw new Error('지난 일정은 수정할 수 없습니다.');
       }
+
+      const { data: currentInvitees, error: currentInviteesErr } = await supabase
+        .from('reservation_invitees')
+        .select('user_id')
+        .eq('reservation_id', payload.id);
+      if (currentInviteesErr) throw currentInviteesErr;
+
+      const nextInvitees = payload.purpose === '합주' ? new Set(payload.invitees) : new Set<string>();
+      const previousInvitees = new Set((currentInvitees ?? []).map((invitee) => invitee.user_id as string));
+      const inviteesToRemove = [...previousInvitees].filter((userId) => !nextInvitees.has(userId));
+      const inviteesToAdd = [...nextInvitees].filter((userId) => !previousInvitees.has(userId));
 
       const { error: updateErr } = await supabase
         .from('reservations')
@@ -134,22 +186,25 @@ export function useUpdateReservation() {
 
       if (updateErr) throw updateErr;
 
-      // 초대 목록 교체 (합주면 새 목록으로, 아니면 전부 삭제)
-      const { error: deleteInviteesErr } = await supabase
-        .from('reservation_invitees')
-        .delete()
-        .eq('reservation_id', payload.id);
-      if (deleteInviteesErr) throw deleteInviteesErr;
+      if (inviteesToRemove.length > 0) {
+        const { error: deleteInviteesErr } = await supabase
+          .from('reservation_invitees')
+          .delete()
+          .eq('reservation_id', payload.id)
+          .in('user_id', inviteesToRemove);
+        if (deleteInviteesErr) throw deleteInviteesErr;
+      }
 
-      if (payload.purpose === '합주' && payload.invitees.length > 0) {
+      if (inviteesToAdd.length > 0) {
         const { error: inviteErr } = await supabase
           .from('reservation_invitees')
-          .insert(payload.invitees.map((uid) => ({ reservation_id: payload.id, user_id: uid })));
+          .insert(inviteesToAdd.map((uid) => ({ reservation_id: payload.id, user_id: uid })));
         if (inviteErr) throw inviteErr;
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.reservations.all });
+      queryClient.invalidateQueries({ queryKey: ['reservations', 'history'] });
     },
   });
 }

@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { canManageBudget } from '../utils/roles';
 import {
   isBlockedProfile,
   shouldRequireProfileSetup,
@@ -40,5 +41,13 @@ export function RequireAdmin() {
   const { profile, loading } = useAuth();
   if (loading) return <div className="loading-screen"><div className="spinner" /></div>;
   if (!profile?.is_admin) return <Navigate to="/" replace />;
+  return <Outlet />;
+}
+
+/** 예산 관리자 전용: 관리자, 회장, 총무 */
+export function RequireBudgetManager() {
+  const { profile, loading } = useAuth();
+  if (loading) return <div className="loading-screen"><div className="spinner" /></div>;
+  if (!canManageBudget(profile)) return <Navigate to="/" replace />;
   return <Outlet />;
 }

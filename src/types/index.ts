@@ -1,4 +1,5 @@
 export type ProfileStatus = 'pending' | 'approved' | 'rejected' | 'banned';
+export type MemberRole = 'member' | 'operations' | 'treasurer' | 'president';
 export type Part = 'vocal' | 'guitar' | 'drum' | 'bass' | 'keyboard';
 export type Purpose = '합주' | '강습' | '정기회의' | '오디션';
 
@@ -11,6 +12,7 @@ export interface Profile {
   bio: string | null;
   status: ProfileStatus;
   is_admin: boolean;
+  member_role: MemberRole;
   banned_at: string | null;
   banned_reason: string | null;
   banned_by: string | null;
@@ -47,6 +49,17 @@ export interface ReservationWithDetails extends Reservation {
     user_id: string;
     profile: Pick<Profile, 'id' | 'display_name' | 'avatar_url'> | null;
   }[];
+}
+
+export interface ReservationChangeLog {
+  id: string;
+  reservation_id: string | null;
+  actor_id: string | null;
+  actor_name: string | null;
+  action: 'reservation_updated' | 'reservation_deleted' | 'invitee_added' | 'invitee_removed';
+  previous_data: Record<string, unknown> | null;
+  next_data: Record<string, unknown> | null;
+  created_at: string;
 }
 
 export interface MyReservation extends ReservationWithDetails {
