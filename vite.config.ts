@@ -76,9 +76,13 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       includeAssets: ['favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'],
       manifest: {
+        id: '/',
         name: '빛소리 예약',
         short_name: '빛소리',
         description: '빛소리 동아리방 예약 시스템',

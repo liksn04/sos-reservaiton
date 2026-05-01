@@ -14,6 +14,7 @@ import ProfileForm from '../components/ProfileForm';
 import DeleteAccountDialog from '../components/DeleteAccountDialog';
 import ThemeToggle from '../components/ThemeToggle';
 import PwaInstallPrompt from '../components/PwaInstallPrompt';
+import ReservationNotificationPrompt from '../components/ReservationNotificationPrompt';
 import type { AppShellContext } from './AppShell';
 import { PART_INFO } from '../lib/constants';
 
@@ -155,6 +156,7 @@ export default function ProfileRoute() {
           </section>
 
           <PwaInstallPrompt />
+          <ReservationNotificationPrompt />
 
           {/* ── 테마 설정 ── */}
           <section className="mb-8">

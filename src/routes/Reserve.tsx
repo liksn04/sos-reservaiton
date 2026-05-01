@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useReservations } from '../hooks/useReservations';
 import { useDeleteReservation } from '../hooks/mutations/useDeleteReservation';
@@ -24,6 +24,7 @@ export default function Reserve() {
   const { openNew, openEdit } = useOutletContext<AppShellContext>();
   const { addToast } = useToast();
   const deleteReservation = useDeleteReservation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -35,6 +36,12 @@ export default function Reserve() {
 
   const selectedDateStr = formatDate(selectedDate);
   const normalizedSearch = search.trim().toLowerCase();
+  const targetReservationId = searchParams.get('reservation');
+  const linkedReservation = useMemo(
+    () => reservations.find((item) => item.id === targetReservationId) ?? null,
+    [reservations, targetReservationId],
+  );
+  const detailReservation = selectedReservation ?? linkedReservation;
 
   const filteredReservations = useMemo(() => {
     return reservations.filter((reservation) => {
@@ -100,6 +107,16 @@ export default function Reserve() {
       date.getFullYear() !== currentMonth.getFullYear()
     ) {
       setCurrentMonth(new Date(date.getFullYear(), date.getMonth(), 1));
+    }
+  }
+
+  function closeReservationDetail() {
+    setSelectedReservation(null);
+
+    if (targetReservationId) {
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete('reservation');
+      setSearchParams(nextParams, { replace: true });
     }
   }
 
@@ -317,9 +334,9 @@ export default function Reserve() {
       </div>
 
       <ReservationDetailModal
-        isOpen={selectedReservation !== null}
-        onClose={() => setSelectedReservation(null)}
-        reservation={selectedReservation}
+        isOpen={detailReservation !== null}
+        onClose={closeReservationDetail}
+        reservation={detailReservation}
         currentUserId={profile?.id ?? ''}
         isAdmin={profile?.is_admin}
       />
