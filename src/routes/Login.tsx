@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { resolveAuthenticatedRoute } from '../utils/authRedirect';
@@ -125,9 +125,17 @@ export default function Login() {
         )}
       </div>
 
-      <div className="absolute bottom-6 w-full text-center">
+      <div className="absolute bottom-6 w-full text-center px-6">
         <p className="text-[9px] font-bold tracking-widest uppercase text-outline/60">
-          로그인 시 <a href="#" className="underline text-on-surface-variant hover:text-on-surface">이용약관</a>에 동의하는 것으로 간주됩니다
+          로그인 시{' '}
+          <Link to="/legal/terms" className="underline text-on-surface-variant hover:text-on-surface">
+            이용약관
+          </Link>
+          {' '}및{' '}
+          <Link to="/legal/privacy" className="underline text-on-surface-variant hover:text-on-surface">
+            개인정보 처리방침
+          </Link>
+          에 동의하는 것으로 간주됩니다
         </p>
       </div>
     </div>

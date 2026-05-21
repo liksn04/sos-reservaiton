@@ -223,3 +223,23 @@ export interface BudgetTransactionInput {
   fiscal_year: number;
   fiscal_half: 1 | 2;
 }
+
+// ── Legal Documents (Terms / Privacy) ─────────────────────
+export type LegalDocumentSlug = 'terms' | 'privacy';
+
+export interface LegalDocument {
+  slug: LegalDocumentSlug;
+  title: string;
+  intro: string;
+  body: string;
+  effective_date: string;    // YYYY-MM-DD
+  updated_at: string;
+  updated_by: string | null;
+}
+
+export interface LegalDocumentInput {
+  title: string;
+  intro: string;
+  body: string;
+  effective_date: string;
+}

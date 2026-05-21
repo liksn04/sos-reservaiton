@@ -19,6 +19,8 @@ const BudgetRoute = lazy(routeModuleLoaders.budget);
 const ProfileRoute = lazy(routeModuleLoaders.profile);
 const Admin = lazy(routeModuleLoaders.admin);
 const BannedPage = lazy(routeModuleLoaders.banned);
+const TermsRoute = lazy(routeModuleLoaders.terms);
+const PrivacyRoute = lazy(routeModuleLoaders.privacy);
 const OfflineBanner = lazy(routeModuleLoaders.offlineBanner);
 const UpdatePrompt = lazy(routeModuleLoaders.updatePrompt);
 
@@ -88,6 +90,8 @@ export default function App() {
                 <Suspense fallback={<AppRouteFallback />}>
                   <Routes>
                     {/* ... routes ... */}
+                    <Route path="/legal/terms" element={<TermsRoute />} />
+                    <Route path="/legal/privacy" element={<PrivacyRoute />} />
                     <Route path="/login" element={<Login />} />
                     <Route element={<RequireAuth />}>
                       <Route path="/banned" element={<BannedPage />} />

@@ -22,6 +22,8 @@ export const routeModuleLoaders = {
   profile: withCachedLoader(() => import('../routes/ProfileRoute')),
   admin: withCachedLoader(() => import('../routes/Admin')),
   banned: withCachedLoader(() => import('../routes/BannedPage')),
+  terms: withCachedLoader(() => import('../routes/TermsRoute')),
+  privacy: withCachedLoader(() => import('../routes/PrivacyRoute')),
   offlineBanner: withCachedLoader(() => import('../components/OfflineBanner')),
   updatePrompt: withCachedLoader(() => import('../components/UpdatePrompt')),
   budgetCharts: withCachedLoader(() => import('../components/BudgetCharts')),
@@ -32,6 +34,7 @@ export const adminTabModuleLoaders = {
   policy: withCachedLoader(() => import('../components/admin/ReservationPolicyTab')),
   banned: withCachedLoader(() => import('../components/admin/BannedTab')),
   logs: withCachedLoader(() => import('../components/admin/LogsTab')),
+  legal: withCachedLoader(() => import('../components/admin/LegalDocumentsTab')),
 } as const
 
 const routePathToLoader = {

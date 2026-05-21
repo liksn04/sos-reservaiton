@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import { queryKeys } from '../lib/queryKeys';
 import { adminTabModuleLoaders, prefetchAdminTabModule, prefetchRouteModule, scheduleIdlePrefetch } from '../lib/moduleLoaders';
 
-type AdminTab = 'members' | 'policy' | 'banned' | 'logs';
+type AdminTab = 'members' | 'policy' | 'banned' | 'logs' | 'legal';
 
 interface TabCount {
   banned: number;
@@ -16,18 +16,21 @@ const ADMIN_TABS: { key: AdminTab; icon: string; label: string; badgeKey?: keyof
   { key: 'policy', icon: 'event_upcoming', label: '예약 정책' },
   { key: 'banned', icon: 'block', label: '차단됨', badgeKey: 'banned' },
   { key: 'logs', icon: 'history', label: '관리 로그' },
+  { key: 'legal', icon: 'gavel', label: '약관/방침' },
 ];
 
 const MembersTab = lazy(adminTabModuleLoaders.members);
 const ReservationPolicyTab = lazy(adminTabModuleLoaders.policy);
 const BannedTab = lazy(adminTabModuleLoaders.banned);
 const LogsTab = lazy(adminTabModuleLoaders.logs);
+const LegalDocumentsTab = lazy(adminTabModuleLoaders.legal);
 
 const ADMIN_TAB_COMPONENTS = {
   members: MembersTab,
   policy: ReservationPolicyTab,
   banned: BannedTab,
   logs: LogsTab,
+  legal: LegalDocumentsTab,
 } as const;
 
 function AdminTabFallback() {

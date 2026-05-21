@@ -48,4 +48,9 @@ export const queryKeys = {
   },
 
   members: ['members'] as const,
+
+  legalDocuments: {
+    all: ['legal_documents'] as const,
+    bySlug: (slug: string) => ['legal_documents', slug] as const,
+  },
 } as const;

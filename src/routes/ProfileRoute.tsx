@@ -168,6 +168,19 @@ export default function ProfileRoute() {
             </div>
           </section>
 
+          {/* 약관/정책 링크 */}
+          <section className="mb-8">
+            <div className="flex justify-center gap-4 text-[11px] font-bold text-on-surface-variant/60">
+              <Link to="/legal/terms" className="hover:text-on-surface transition-colors underline underline-offset-2">
+                이용약관
+              </Link>
+              <span className="text-outline/30">|</span>
+              <Link to="/legal/privacy" className="hover:text-on-surface transition-colors underline underline-offset-2">
+                개인정보 처리방침
+              </Link>
+            </div>
+          </section>
+
           {/* 회원 탈퇴 다이얼로그 */}
           <DeleteAccountDialog
             isOpen={isDeleteDialogOpen}
