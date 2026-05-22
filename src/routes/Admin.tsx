@@ -97,12 +97,12 @@ export default function Admin() {
         <div className="animate-slide-up">
           <div className="club-tag mb-2">운영 도구</div>
           <h1 className="dashboard-title mb-8">
-            <span className="text-gradient-white-purple">빛소리 관리자</span>
+            <span className="text-gradient-white-purple">운영센터</span>
           </h1>
 
           {/* ── 관리 도구 바로가기 ── */}
           <div className="grid grid-cols-2 gap-4 mb-10">
-            {/* 예산 관리 카드 */}
+            {/* 재정 관리 카드 */}
             <div 
               onClick={() => navigate('/budget')}
               onPointerEnter={() => { void prefetchRouteModule('/budget'); }}
@@ -115,7 +115,7 @@ export default function Admin() {
                 <span className="material-symbols-outlined text-white text-2xl font-black">payments</span>
               </div>
               <div className="space-y-1 text-left">
-                <p className="text-sm font-black leading-tight">예산 관리</p>
+                <p className="text-sm font-black leading-tight">재정 관리</p>
                 <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">FINANCE HUB</p>
               </div>
             </div>

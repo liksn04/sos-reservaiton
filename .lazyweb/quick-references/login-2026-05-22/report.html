@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quick References: Mobile Login / Reservation Auth</title>
+  <style>
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#f8fafc; color:#172033; line-height:1.65; }
+    main { max-width:900px; margin:0 auto; padding:48px 20px 80px; }
+    h1 { font-size:34px; line-height:1.15; margin:0 0 20px; }
+    h2 { margin-top:42px; padding-top:28px; border-top:1px solid #d9e1ee; font-size:24px; }
+    h3 { margin-top:32px; font-size:20px; }
+    .callout { background:#eaf4ff; border:1px solid #cfe6ff; border-radius:8px; padding:18px 20px; margin:20px 0 28px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; }
+    img { max-width:100%; border-radius:8px; box-shadow:0 10px 30px rgba(22,34,51,.12); background:white; }
+    figure { margin:18px 0; }
+    figcaption { color:#637083; font-size:14px; margin-top:8px; }
+    pre { overflow:auto; background:#0f172a; color:#e5edf7; border-radius:8px; padding:16px; font-size:14px; line-height:1.45; }
+    a { color:#1463ff; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Quick References: Mobile Login / Reservation Auth</h1>
+  <div class="callout"><strong>TL;DR</strong><br>예약형 앱 로그인은 "예약 맥락 + 짧은 이점 + 즉시 인증" 패턴이 강합니다. 이 앱은 예약 가능 시간 프리뷰와 카카오 CTA를 첫 viewport에 함께 두는 편이 맞습니다.</div>
+
+  <h2>Current State</h2>
+  <figure>
+    <img src="references/current-state.png" alt="Current login">
+    <figcaption>현재 로그인 화면.</figcaption>
+  </figure>
+
+  <h2>Patterns</h2>
+  <h3>Pattern A: 서비스 맥락을 비주얼/프리뷰로 먼저 보여준다</h3>
+  <div class="grid">
+    <figure><img src="references/lazyweb-fever-login.png" alt="Fever login"><figcaption>Fever - 지역 이벤트 프리뷰와 게스트 진입. [Lazyweb]</figcaption></figure>
+    <figure><img src="references/lazyweb-spothero-account-prompt.png" alt="SpotHero account prompt"><figcaption>SpotHero - 예약 탐색 후 계정 이점. [Lazyweb]</figcaption></figure>
+  </div>
+  <pre>+--------------------------------+
+| 오늘 예약 가능 시간            |
+| 18:00  19:30  21:00            |
+| 카카오 로그인                  |
++--------------------------------+</pre>
+
+  <h3>Pattern B: 로그인 이점은 작게, CTA는 크게 둔다</h3>
+  <div class="grid">
+    <figure><img src="references/lazyweb-booking-login.png" alt="Booking login"><figcaption>Booking.com - 예약/여행 상세 접근성을 로그인 이유로 제시. [Lazyweb]</figcaption></figure>
+    <figure><img src="references/lazyweb-booksy-login.png" alt="Booksy login"><figcaption>Booksy - 예약 관리를 위한 간결한 인증 진입. [Lazyweb]</figcaption></figure>
+  </div>
+
+  <h3>Pattern C: 게스트/미리보기는 보조 행동으로 분리한다</h3>
+  <p>운영 정책상 가능하면 `예약 현황 먼저 보기`를 보조 버튼으로 둘 수 있습니다. 공개 범위는 개인정보 없는 availability로 제한합니다.</p>
+
+  <h3>Pattern D: 소셜 로그인 버튼은 제공자 가이드를 따른다</h3>
+  <p>Kakao Developers 공식 가이드는 카카오 로그인 버튼의 색상, 심볼, 라벨, radius를 지정합니다. 현재 버튼은 색상은 맞지만 pill 형태와 커스텀 아이콘은 재검토 대상입니다.</p>
+
+  <h2>Reference Index</h2>
+  <ul>
+    <li>Fever: <code>references/lazyweb-fever-login.png</code></li>
+    <li>SpotHero: <code>references/lazyweb-spothero-account-prompt.png</code></li>
+    <li>Booking.com: <code>references/lazyweb-booking-login.png</code></li>
+    <li>Booksy: <code>references/lazyweb-booksy-login.png</code></li>
+    <li><a href="https://developers.kakao.com/docs/latest/en/kakaologin/design-guide">Kakao Developers Design Guide</a></li>
+    <li><a href="https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple">Apple HIG: Sign in with Apple</a></li>
+  </ul>
+</main>
+</body>
+</html>

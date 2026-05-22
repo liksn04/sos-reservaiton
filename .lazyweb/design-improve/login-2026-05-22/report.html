@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Design Improvement: Login Screen</title>
+  <style>
+    :root { color-scheme: light; --ink:#172033; --muted:#637083; --line:#d9e1ee; --blue:#eaf4ff; --accent:#1463ff; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#f7f9fc; color:var(--ink); line-height:1.65; }
+    main { max-width:900px; margin:0 auto; padding:48px 20px 80px; }
+    h1 { font-size:34px; line-height:1.15; margin:0 0 20px; }
+    h2 { margin-top:44px; font-size:24px; border-top:1px solid var(--line); padding-top:28px; }
+    h3 { margin-top:34px; font-size:20px; }
+    p, li { font-size:16px; }
+    a { color:var(--accent); }
+    .callout { background:var(--blue); border:1px solid #cfe6ff; border-radius:8px; padding:18px 20px; margin:20px 0 28px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; align-items:start; }
+    figure { margin:18px 0; }
+    img { max-width:100%; border-radius:8px; box-shadow:0 10px 30px rgba(22,34,51,.12); background:white; }
+    figcaption { margin-top:8px; color:var(--muted); font-size:14px; }
+    pre { overflow:auto; background:#0f172a; color:#e5edf7; border-radius:8px; padding:16px; font-size:14px; line-height:1.45; }
+    ul { padding-left:22px; }
+    .meta { color:var(--muted); font-size:14px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Design Improvement: Login Screen</h1>
+  <div class="callout"><strong>TL;DR</strong><br>로그인 화면은 더 화려하게 만들기보다, 첫 화면에서 "지금 무엇을 할 수 있는지"와 "왜 로그인해야 하는지"를 바로 보여주는 쪽이 맞습니다. 히어로 카드를 줄이고, 예약 현황 미리보기와 카카오 로그인 CTA를 첫 viewport 안에 안정적으로 고정하는 개편을 권합니다.</div>
+
+  <h2>Assumptions</h2>
+  <ul>
+    <li>이 앱은 단일 동아리용 합주실/동아리방 예약 PWA입니다.</li>
+    <li>현재 인증 진입점은 카카오 로그인이 주 경로이고, 개발용 익명 로그인은 운영 화면에서 숨겨집니다.</li>
+    <li>비로그인 예약 현황 공개는 정책 결정이 필요합니다. 공개한다면 개인 이름/초대자 정보 없이 "빈 시간"만 보여주는 범위로 제한해야 합니다.</li>
+  </ul>
+
+  <h2>Current State</h2>
+  <div class="grid">
+    <figure>
+      <img src="references/current.png" alt="Current full login screen">
+      <figcaption>현재 전체 로그인 화면.</figcaption>
+    </figure>
+    <figure>
+      <img src="references/current-viewport-395x750.png" alt="Current viewport">
+      <figcaption>395x750 첫 viewport. CTA는 보이지만 법적 문구와 보조 흐름은 밀립니다.</figcaption>
+    </figure>
+  </div>
+
+  <h2>Improvement Ideas</h2>
+  <h3>1. Hero를 줄이고 예약 가능 시간 미리보기로 바꾸기</h3>
+  <p>상단을 40% 이하로 줄이고, 오늘/내일의 예약 가능 시간 칩 또는 미니 캘린더 프리뷰를 보여주면 앱의 목적이 즉시 전달됩니다.</p>
+  <div class="grid">
+    <figure><img src="references/lazyweb-fever-login.png" alt="Fever login"><figcaption>Fever - 이벤트 프리뷰 + 인증/게스트 진입. [Lazyweb]</figcaption></figure>
+    <figure><img src="references/lazyweb-spothero-account-prompt.png" alt="SpotHero account prompt"><figcaption>SpotHero - 예약 맥락 먼저, 계정 이점은 나중. [Lazyweb]</figcaption></figure>
+  </div>
+  <pre>+--------------------------------+
+| 빛소리 예약                    |
+| 오늘 합주실을 바로 확인하세요  |
+| [오늘] 18:00  19:30  21:00     |
+| 카카오 로그인                  |
++--------------------------------+</pre>
+
+  <h3>2. 3개 기능 카드를 로그인 이점 3칩으로 압축하기</h3>
+  <p>카드 3개를 "빈 시간 확인", "중복 예약 방지", "내 예약 모아보기" 같은 짧은 결과 중심 칩으로 바꾸면 CTA가 위로 올라옵니다.</p>
+  <div class="grid">
+    <figure><img src="references/lazyweb-booking-login.png" alt="Booking login"><figcaption>Booking.com - 로그인 이유와 인증 옵션을 바로 제시. [Lazyweb]</figcaption></figure>
+    <figure><img src="references/lazyweb-booksy-login.png" alt="Booksy login"><figcaption>Booksy - 예약 관리 계정 진입을 간결하게 구성. [Lazyweb]</figcaption></figure>
+  </div>
+  <pre>+--------------------------------+
+|  빈 시간 확인  |  중복 방지    |
+|  내 예약 보기  |  승인 부원용  |
++--------------------------------+</pre>
+
+  <h3>3. 카카오 로그인 버튼은 공식 가이드에 맞춰 낮고 단단하게 정리하기</h3>
+  <p>노란색은 유지하되, pill 형태와 강한 그림자를 줄이고 Kakao guide의 색상, 심볼, 라벨, 12px radius를 기준으로 맞춥니다.</p>
+
+  <h3>4. 게스트는 개발용과 운영용을 분리해서 설계하기</h3>
+  <p>운영에 미리보기가 필요하면 "예약 현황 먼저 보기"로 별도 정책을 세우고, 개인 정보 없는 availability만 노출합니다.</p>
+
+  <h3>5. Desktop에서는 split utility layout 사용하기</h3>
+  <p>데스크톱에서는 모바일 카드 확대가 아니라 좌측 예약 요약, 우측 로그인 패널로 분리합니다.</p>
+
+  <h2>What's Working</h2>
+  <ul>
+    <li>카카오 로그인 하나로 인증 경로가 명확합니다.</li>
+    <li>파란 히어로와 노란 카카오 CTA의 대비는 강합니다.</li>
+    <li>법적 문구와 약관/개인정보 링크가 이미 존재합니다.</li>
+    <li>모바일 폭에서 큰 레이아웃 깨짐은 없습니다.</li>
+  </ul>
+
+  <h2>Implementation Plan</h2>
+  <ol>
+    <li>상단 히어로를 compact header + 예약 프리뷰로 교체합니다.</li>
+    <li>기능 카드를 chip/mini benefit row로 압축합니다.</li>
+    <li>카카오 버튼을 공식 가이드 기준으로 정리합니다.</li>
+    <li>운영용 미리보기 여부를 결정하고 공개 범위를 제한합니다.</li>
+    <li>데스크톱 breakpoint에서 split layout을 적용합니다.</li>
+  </ol>
+
+  <h2>References</h2>
+  <ul>
+    <li>Fever, Booking.com, Booksy, SpotHero screenshots from Lazyweb.</li>
+    <li><a href="https://developers.kakao.com/docs/latest/en/kakaologin/design-guide">Kakao Developers Design Guide</a></li>
+    <li><a href="https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple">Apple HIG: Sign in with Apple</a></li>
+  </ul>
+  <p class="meta">Note: Lazyweb image comparison rejected the generated current screenshots, so this report uses local current captures plus Lazyweb text search results verified through vision descriptions.</p>
+</main>
+</body>
+</html>

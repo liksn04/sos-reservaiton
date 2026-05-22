@@ -83,9 +83,9 @@ export default defineConfig({
       includeAssets: ['favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'],
       manifest: {
         id: '/',
-        name: '빛소리 예약',
-        short_name: '빛소리',
-        description: '빛소리 동아리방 예약 시스템',
+        name: 'Roomin - 빛소리',
+        short_name: 'Roomin',
+        description: '작은 조직을 위한 공간 운영 앱',
         theme_color: '#cc97ff',
         background_color: '#131316',
         display: 'standalone',

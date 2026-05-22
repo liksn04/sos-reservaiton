@@ -105,7 +105,7 @@ export default function BudgetRoute() {
           >
             <span className="material-symbols-outlined text-[24px]">arrow_back</span>
           </button>
-          <span className="logo-text ml-2">예산 관리</span>
+          <span className="logo-text ml-2">재정 관리</span>
         </div>
       </header>
 
@@ -113,7 +113,7 @@ export default function BudgetRoute() {
         <div className="animate-slide-up">
           <div className="club-tag tracking-wider mb-2">재정 대시보드</div>
           <h1 className="dashboard-title mb-8">
-            <span className="text-gradient-white-purple">{`${fiscalYear}년 ${fiscalHalf}학기 예산`}</span>
+            <span className="text-gradient-white-purple">{`${fiscalYear}년 ${fiscalHalf}학기 재정`}</span>
           </h1>
 
           {/* ── 연도 아카이브 셀렉터 ── */}
@@ -177,7 +177,7 @@ export default function BudgetRoute() {
                   {formatCurrency(summary.balance)}
                 </p>
                 <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">
-                  현재 예산 잔액
+                  현재 재정 잔액
                 </p>
               </div>
             </div>

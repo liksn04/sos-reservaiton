@@ -61,7 +61,10 @@ export default function AppShell() {
       {/* ── Top App Bar ── */}
       <header className="top-app-bar">
         <div className="logo-area">
-          <div className="logo-icon">빛</div>
+          <div className="logo-icon roomin-brand-icon">
+            <img src="/roomin-logo-blue.svg" alt="" className="roomin-brand-icon-light" aria-hidden="true" />
+            <img src="/roomin-logo-purple.svg" alt="" className="roomin-brand-icon-dark" aria-hidden="true" />
+          </div>
           <span className="logo-title">빛소리</span>
         </div>
         <div className="flex items-center gap-3">

@@ -1,6 +1,6 @@
-# 빛소리 SOS Reservation
+# Roomin
 
-빛소리 동아리의 합주실 예약, 행사 관리, 예산 관리, 회원 운영을 모바일 중심으로 묶은 Supabase 기반 운영 SPA입니다.
+Roomin(루민)은 작은 조직을 위한 공간 운영 앱입니다. 첫 워크스페이스인 빛소리의 공간 예약, 일정, 회비, 운영 관리를 모바일 중심으로 묶은 Supabase 기반 운영 SPA입니다.
 
 자세한 온보딩 문서는 [docs/project-overview-report-2026-04-20.md](./docs/project-overview-report-2026-04-20.md)를 참고하세요.
 
@@ -21,11 +21,11 @@
   - 차단/차단 해제
   - 예약 정책 시즌 관리
   - 감사 로그 조회
-- 예산 허브
+- 재정 허브
   - 거래 내역 등록, 수정, 삭제
   - 카테고리 관리
   - 차트 기반 요약
-  - 회비/예산 운영 UI
+  - 회비/재정 운영 UI
 - 운영 편의
   - PWA 업데이트 프롬프트
   - PWA 예약 리마인드 푸시 알림
@@ -74,7 +74,7 @@ docs/           온보딩/분석 문서
 - `event_categories`, `club_events`, `event_participants`
   - 행사 허브와 RSVP
 - `budget_categories`, `budget_transactions`
-  - 예산/회계 거래
+  - 재정/회계 거래
 - `membership_fee_policies`, `membership_fee_records`
   - 회비 정책과 납부 기록
 

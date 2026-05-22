@@ -153,7 +153,7 @@ export default function PwaInstallPrompt() {
                 </span>
               </div>
               <h2 id="pwa-install-title" className="font-headline text-lg font-black tracking-tight text-on-surface">
-                빛소리를 앱처럼 사용하세요
+                Roomin을 앱처럼 사용하세요
               </h2>
               <p className="mt-1.5 text-sm font-semibold leading-6 text-on-surface-variant">
                 홈 화면에서 바로 열고 예약 현황을 빠르게 확인할 수 있습니다. 알림 기능을 사용하려면 앱으로 전환해 주세요.

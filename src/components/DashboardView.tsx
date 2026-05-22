@@ -67,7 +67,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
       <section className="mb-10">
         <div className="club-tag">
           <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>music_note</span>
-          빛소리 밴드 동아리
+          빛소리
         </div>
         <h2 className="dashboard-title">
           <span className="text-gradient-white-purple">
@@ -76,7 +76,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
           <span>연주해 볼까요?</span>
         </h2>
         <p className="dashboard-subtitle">
-          동아리방 예약 현황을 확인하고<br />당신의 다음 합주를 준비하세요.
+          예약 현황과 모임 일정을 확인하고<br />다음 공간 사용을 준비하세요.
         </p>
       </section>
 

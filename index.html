@@ -4,18 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>빛소리 동아리방 예약</title>
+    <title>Roomin - 빛소리</title>
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="빛소리" />
+    <meta name="apple-mobile-web-app-title" content="Roomin" />
     <link rel="apple-touch-icon" sizes="192x192" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#F8F9FF" id="theme-color-meta" />
     <!-- 깜빡임 방지: JS가 실행되기 전에 저장된 테마를 미리 적용 -->
     <script>
       (function () {
         try {
-          var saved = localStorage.getItem('sos-theme') || 'system';
+          var saved = localStorage.getItem('roomin-theme') || 'system';
           var theme = saved === 'dark' || saved === 'light' || saved === 'system' ? saved : 'system';
           var resolved = theme === 'system'
             ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')

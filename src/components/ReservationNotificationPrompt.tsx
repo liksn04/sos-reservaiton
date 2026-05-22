@@ -139,7 +139,7 @@ function getStatusCopy(status: string) {
     case 'blocked':
       return {
         title: '브라우저에서 알림이 차단되어 있습니다',
-        description: '기기 설정에서 빛소리 알림 권한을 허용한 뒤 다시 시도해주세요.',
+        description: '기기 설정에서 Roomin 알림 권한을 허용한 뒤 다시 시도해주세요.',
       };
     case 'unsupported':
       return {

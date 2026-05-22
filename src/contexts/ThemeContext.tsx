@@ -13,7 +13,7 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-const STORAGE_KEY = 'sos-theme';
+const STORAGE_KEY = 'roomin-theme';
 const darkMQ = window.matchMedia('(prefers-color-scheme: dark)');
 const DEFAULT_THEME: Theme = 'system';
 
