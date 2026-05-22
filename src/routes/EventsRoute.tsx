@@ -14,6 +14,7 @@ import EventTimeline from '../components/EventTimeline';
 import { EventCard } from '../components/events/EventCard';
 import type { ClubEventWithDetails } from '../types';
 import { formatDate } from '../utils/time';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 type Tab = 'upcoming' | 'past' | 'timeline';
 
@@ -121,18 +122,15 @@ export default function EventsRoute() {
         </p>
       </section>
 
-      <div className="flex gap-6 mb-6 border-b" style={{ borderColor: 'var(--outline-border)' }}>
+      <div className="segmented-control flex w-full overflow-x-auto no-scrollbar mb-6">
         {(Object.keys(TAB_LABELS) as Tab[]).map((t) => (
-          <button key={t} onClick={() => setTab(t)} className="relative pb-3 px-1">
-            <span
-              className="font-headline text-lg font-bold transition-colors"
-              style={{ color: tab === t ? 'var(--primary)' : 'var(--text-muted)' }}
-            >
-              {TAB_LABELS[t]}
-            </span>
-            {tab === t && (
-              <div className="absolute bottom-0 left-0 w-full h-1 rounded-t-lg bg-primary-btn shadow-primary-glow" />
-            )}
+          <button
+            key={t}
+            type="button"
+            onClick={() => setTab(t)}
+            className={`segmented-option flex-1 whitespace-nowrap ${tab === t ? 'active' : ''}`}
+          >
+            {TAB_LABELS[t]}
           </button>
         ))}
       </div>
@@ -170,9 +168,7 @@ export default function EventsRoute() {
 
       <div className="space-y-4 animate-fade-in">
         {isLoading || isSummaryLoading ? (
-          <div className="glass-card rounded-[2rem] p-10 flex justify-center">
-            <div className="spinner" />
-          </div>
+          <LoadingSpinner />
         ) : tab === 'timeline' ? (
           <EventTimeline events={sorted} />
         ) : sorted.length === 0 ? (

@@ -1,11 +1,12 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { isBlockedProfile } from '../utils/authRedirect';
+import LoadingSpinner from './LoadingSpinner';
 
 /** 로그인 필수. 미로그인 → /login */
 export function RequireAuth() {
   const { session, loading } = useAuth();
-  if (loading) return <div className="loading-screen"><div className="spinner" /></div>;
+  if (loading) return <LoadingSpinner fullScreen />;
   if (!session) return <Navigate to="/login" replace />;
   return <Outlet />;
 }
@@ -17,7 +18,7 @@ export function RequireAuth() {
  */
 export function RequireApproved() {
   const { session, profile, loading } = useAuth();
-  if (loading) return <div className="loading-screen"><div className="spinner" /></div>;
+  if (loading) return <LoadingSpinner fullScreen />;
   if (!session) return <Navigate to="/login" replace />;
 
   // 로컬 개발 환경 + 익명 로그인인 경우 승인 체크 우회
@@ -32,7 +33,7 @@ export function RequireApproved() {
 /** 관리자 전용 */
 export function RequireAdmin() {
   const { profile, loading } = useAuth();
-  if (loading) return <div className="loading-screen"><div className="spinner" /></div>;
+  if (loading) return <LoadingSpinner fullScreen />;
   if (!profile?.is_admin) return <Navigate to="/" replace />;
   return <Outlet />;
 }

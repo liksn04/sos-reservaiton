@@ -12,6 +12,7 @@ import { routeModuleLoaders, scheduleIdlePrefetch, shouldPrefetchHeavyRoute } fr
 import { useConfirm } from '../contexts/useConfirm';
 import { useToast } from '../contexts/useToast';
 import type { BudgetTransaction } from '../types';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 type Tab = 'transactions' | 'charts' | 'fees';
 type FilterHalf = 1 | 2;
@@ -27,9 +28,8 @@ const TABS: Array<{ id: Tab; label: string; icon: string }> = [
 function BudgetChartsFallback() {
   return (
     <div className="surface-card p-10 flex flex-col items-center justify-center text-center">
-      <div className="mb-4 h-10 w-10 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-      <p className="font-headline text-lg font-bold tracking-tight text-on-surface">통계 리포트를 준비하고 있습니다</p>
-      <p className="mt-2 text-sm text-on-surface-variant">차트 라이브러리를 필요할 때만 로드하도록 분리했습니다.</p>
+      <LoadingSpinner size="md" center={false} label="통계 리포트를 준비하고 있습니다" />
+      <p className="mt-4 text-sm text-on-surface-variant">차트 라이브러리를 필요할 때만 로드하도록 분리했습니다.</p>
     </div>
   );
 }
@@ -104,8 +104,8 @@ export default function BudgetRoute() {
   }, [deleteTransaction, confirm, addToast]);
 
   return (
-    <div className="app-shell pb-20">
-      <header className="top-app-bar">
+    <>
+      <header className="top-app-bar" style={{ maxWidth: '800px', margin: '0 auto', left: '50%', transform: 'translateX(-50%)' }}>
         <div className="logo-area">
           <button
             onClick={() => navigate(-1)}
@@ -117,12 +117,11 @@ export default function BudgetRoute() {
         </div>
       </header>
 
-      <main className="shell-main">
-        <div className="animate-slide-up">
-          <div className="club-tag tracking-wider mb-2">재정 대시보드</div>
-          <h1 className="dashboard-title mb-8">
-            <span className="text-gradient-white-purple">{`${fiscalYear}년 ${fiscalHalf}학기 재정`}</span>
-          </h1>
+      <div className="animate-slide-up">
+        <div className="club-tag tracking-wider mb-2">재정 대시보드</div>
+        <h1 className="dashboard-title mb-8">
+          <span className="text-gradient-white-purple">{`${fiscalYear}년 ${fiscalHalf}학기 재정`}</span>
+        </h1>
 
           <YearArchiveSelector selectedYear={fiscalYear} onYearChange={setFiscalYear} />
 
@@ -178,8 +177,7 @@ export default function BudgetRoute() {
               <MembershipFeePanel year={fiscalYear} half={fiscalHalf} />
             )}
           </div>
-        </div>
-      </main>
+      </div>
 
       <BudgetTransactionModal
         isOpen={isModalOpen}
@@ -188,6 +186,6 @@ export default function BudgetRoute() {
         fiscalYear={fiscalYear}
         fiscalHalf={fiscalHalf}
       />
-    </div>
+    </>
   );
 }

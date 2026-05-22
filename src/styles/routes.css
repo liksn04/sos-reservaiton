@@ -9,6 +9,23 @@
 .res-dot-indicator { width: 4px; height: 4px; background-color: var(--primary); border-radius: 50%; }
 .selected .res-dot-indicator { background-color: white; }
 
+@media (max-width: 640px) {
+  .day-cell-wrapper {
+    aspect-ratio: 1.15;
+    border-radius: 0.75rem;
+  }
+  .calendar-days-grid {
+    gap: 0.25rem;
+  }
+  .day-cell-content {
+    gap: 0px;
+  }
+  .day-number {
+    font-size: 0.85rem;
+  }
+}
+
+
 .schedule-card {
   display: flex; gap: 1rem; padding: 1.25rem; border-radius: 1.25rem;
   background-color: var(--surface-container); border: 1px solid var(--card-border);

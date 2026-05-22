@@ -64,13 +64,16 @@ function EventModalContent({ onClose, editing, initialDate, categories }: Conten
         style={{ padding: '70px 1rem 90px' }}
       >
         <div className="modal-container animate-slide-up" style={{ maxHeight: 'calc(100vh - 160px)' }}>
-          <div className="modal-header" style={{ paddingTop: '2.5rem' }}>
+          <div className="modal-header">
             <h2 className="font-headline text-2xl font-bold tracking-tight">
               {editing ? '일정' : '새 일정'} <span className="text-primary">{editing ? '수정' : '등록'}</span>
             </h2>
             <button
-              className="material-symbols-outlined text-[28px] text-muted hover:text-white transition-colors"
-              onClick={onClose}>
+              type="button"
+              aria-label="닫기"
+              className="material-symbols-outlined text-2xl text-on-surface-variant hover:text-on-surface transition-colors flex-shrink-0 w-11 h-11 rounded-full border border-card-border bg-surface-container-low flex items-center justify-center"
+              onClick={onClose}
+            >
               close
             </button>
           </div>

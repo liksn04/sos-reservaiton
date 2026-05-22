@@ -1,5 +1,6 @@
 import { Suspense, lazy, useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import LoadingSpinner from './components/LoadingSpinner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Analytics } from '@vercel/analytics/react';
 import { AuthProvider } from './context/AuthContext';
@@ -84,9 +85,9 @@ function AppErrorBoundary({ children }: { children: React.ReactNode }) {
 function AppRouteFallback() {
   return (
     <div className="min-h-screen bg-background text-on-surface flex items-center justify-center px-6">
-      <div className="surface-card w-full max-w-sm p-8 text-center">
-        <div className="mx-auto mb-4 h-10 w-10 rounded-full border-4 border-primary/25 border-t-primary animate-spin" />
-        <p className="font-headline text-lg font-bold tracking-tight">화면을 불러오는 중입니다</p>
+      <div className="surface-card w-full max-w-sm p-8 text-center flex flex-col items-center">
+        <LoadingSpinner size="md" center={false} />
+        <p className="font-headline text-lg font-bold tracking-tight mt-4">화면을 불러오는 중입니다</p>
         <p className="mt-2 text-sm text-on-surface-variant">필요한 화면 코드만 순차적으로 로드하고 있어요.</p>
       </div>
     </div>
@@ -124,11 +125,11 @@ export default function App() {
                           <Route path="reserve" element={<Reserve />} />
                           <Route path="events" element={<EventsRoute />} />
                           <Route path="profile" element={<ProfileRoute />} />
-                        </Route>
 
-                        <Route element={<RequireAdmin />}>
-                          <Route path="admin" element={<Admin />} />
-                          <Route path="budget" element={<BudgetRoute />} />
+                          <Route element={<RequireAdmin />}>
+                            <Route path="admin" element={<Admin />} />
+                            <Route path="budget" element={<BudgetRoute />} />
+                          </Route>
                         </Route>
                       </Route>
                     </Route>

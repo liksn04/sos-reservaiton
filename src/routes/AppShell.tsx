@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useReservations } from '../hooks/useReservations';
 import { useReservationPolicySeasons } from '../hooks/useReservationPolicySeasons';
 import BottomNav from '../components/BottomNav';
 import ReservationModal from '../components/ReservationModal';
+import LoadingSpinner from '../components/LoadingSpinner';
 import type { ReservationWithDetails } from '../types';
 
 /** Passed to child routes via <Outlet context={...}> */
@@ -14,6 +15,7 @@ export interface AppShellContext {
 }
 
 export default function AppShell() {
+  const { pathname } = useLocation();
   const { profile, loading: authLoading } = useAuth();
   const { data: reservations = [] } = useReservations();
   const {
@@ -43,12 +45,10 @@ export default function AppShell() {
     openEdit 
   }), [openNew, openEdit]);
 
+  const isSubPage = pathname.startsWith('/admin') || pathname.startsWith('/budget');
+
   if (authLoading) {
-    return (
-      <div className="loading-screen">
-        <div className="spinner" />
-      </div>
-    );
+    return <LoadingSpinner fullScreen />;
   }
 
   if (!profile) {
@@ -59,7 +59,8 @@ export default function AppShell() {
     <div className="min-h-screen pb-24 max-w-2xl mx-auto relative" style={{ color: 'var(--text-main)' }}>
 
       {/* ── Top App Bar ── */}
-      <header className="top-app-bar">
+      {!isSubPage && (
+        <header className="top-app-bar">
         <div className="logo-area">
           <div className="logo-icon roomin-brand-icon">
             <img src="/roomin-logo-blue.svg" alt="" className="roomin-brand-icon-light" aria-hidden="true" />
@@ -77,7 +78,7 @@ export default function AppShell() {
           <div className="flex flex-col items-end justify-center min-w-0">
             <div className="flex items-center gap-1.5 leading-none mb-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-              <span className="text-[10px] text-primary font-bold tracking-[0.18em] uppercase">ONLINE</span>
+              <span className="text-[10px] text-emerald-500 font-bold tracking-[0.18em] uppercase">ONLINE</span>
             </div>
             <span className="text-sm text-on-surface font-semibold leading-tight line-clamp-1">
               {profile?.display_name || '게스트'}
@@ -100,7 +101,8 @@ export default function AppShell() {
             )}
           </div>
         </div>
-      </header>
+        </header>
+      )}
 
       {/* ── Route content ── */}
       <main className="shell-main">

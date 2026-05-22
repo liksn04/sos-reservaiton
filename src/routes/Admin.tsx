@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '../lib/queryKeys';
 import { adminTabModuleLoaders, prefetchAdminTabModule, prefetchRouteModule, scheduleIdlePrefetch } from '../lib/moduleLoaders';
 import { getAdminCounts } from '../services/adminService';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 type AdminTab = 'members' | 'policy' | 'banned' | 'logs' | 'legal';
 
@@ -31,9 +32,8 @@ const ADMIN_TAB_COMPONENTS = {
 
 function AdminTabFallback() {
   return (
-    <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-4">
-      <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-      <p className="text-sm font-bold opacity-60">관리 도구를 불러오는 중...</p>
+    <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center">
+      <LoadingSpinner size="md" center={false} label="관리 도구를 불러오는 중..." />
     </div>
   );
 }
@@ -66,8 +66,8 @@ export default function Admin() {
   }, [activeTab]);
 
   return (
-    <div className="app-shell">
-      <header className="top-app-bar">
+    <>
+      <header className="top-app-bar" style={{ maxWidth: '800px', margin: '0 auto', left: '50%', transform: 'translateX(-50%)' }}>
         <div className="logo-area">
           <button
             onClick={() => navigate(-1)}
@@ -75,7 +75,7 @@ export default function Admin() {
           >
             <span className="material-symbols-outlined text-[24px]">arrow_back</span>
           </button>
-          <span className="logo-text">관리자 패널</span>
+          <span className="logo-text ml-2">관리자 패널</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="soft-chip active !px-4 !py-2">
@@ -84,12 +84,11 @@ export default function Admin() {
         </div>
       </header>
 
-      <main className="shell-main">
-        <div className="animate-slide-up">
-          <div className="club-tag mb-2">운영 도구</div>
-          <h1 className="dashboard-title mb-8">
-            <span className="text-gradient-white-purple">운영센터</span>
-          </h1>
+      <div className="animate-slide-up">
+        <div className="club-tag mb-2">운영 도구</div>
+        <h1 className="dashboard-title mb-8">
+          <span className="text-gradient-white-purple">운영센터</span>
+        </h1>
 
           {/* ── 관리 도구 바로가기 ── */}
           <div className="grid grid-cols-2 gap-4 mb-10">
@@ -169,8 +168,7 @@ export default function Admin() {
               <ActiveTabComponent />
             </Suspense>
           </div>
-        </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }

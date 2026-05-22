@@ -197,7 +197,7 @@ export default function Reserve() {
         </section>
 
         {/* 달력 카드 */}
-        <div className="page-section-card p-6">
+        <div className="page-section-card p-4 sm:p-6">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <h3 className="font-headline" style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-main)' }}>
               {calendarView === 'month'

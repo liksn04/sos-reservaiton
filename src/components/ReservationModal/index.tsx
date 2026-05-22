@@ -95,7 +95,8 @@ function ReservationModalContent({
           </h2>
           <button
             type="button"
-            className="material-symbols-outlined text-2xl text-on-surface-variant hover:text-on-surface transition-colors"
+            aria-label="닫기"
+            className="material-symbols-outlined text-2xl text-on-surface-variant hover:text-on-surface transition-colors flex-shrink-0 w-11 h-11 rounded-full border border-card-border bg-surface-container-low flex items-center justify-center"
             onClick={onClose}
           >
             close
