@@ -1,0 +1,51 @@
+/* ── Reset & Base ──────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+select, input, textarea {
+  font-family: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* html 요소에도 배경을 명시 — body 배경이 viewport로 전파되지 않는 케이스 방지 */
+html {
+  background-color: var(--bg-dark);
+  transition: background-color 0.2s;
+}
+
+body {
+  font-family: 'Inter', 'Pretendard', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 32px;
+  transition: background-color 0.2s, color 0.2s;
+}
+body:has(.roomin-login-page) {
+  overflow: hidden;
+  padding-bottom: 0;
+}
+html.light body {
+  background:
+    radial-gradient(circle at top right, rgba(0, 100, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, #ffffff 0%, #f8f9ff 20%, #f3f6ff 100%);
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4 { font-style: normal; letter-spacing: -0.03em; }
+.font-headline, .logo-title, .logo-text, .dashboard-title {
+  font-family: 'Plus Jakarta Sans', 'Inter', 'Pretendard', sans-serif;
+}
+
+/* ── Material Symbols ── */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+}

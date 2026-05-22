@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { validateImageFile } from '../utils/fileUpload';
+import { createImagePreviewUrl, revokePreviewUrl } from '../utils/fileUpload';
 import {
   isDisplayNameTaken,
   updateProfile,
@@ -41,9 +41,7 @@ export function useProfileForm({ initialValues, onSuccess }: UseProfileFormOptio
 
   useEffect(() => {
     return () => {
-      if (avatarPreview) {
-        URL.revokeObjectURL(avatarPreview);
-      }
+      revokePreviewUrl(avatarPreview);
     };
   }, [avatarPreview]);
 
@@ -53,7 +51,7 @@ export function useProfileForm({ initialValues, onSuccess }: UseProfileFormOptio
     if (!file) return;
 
     try {
-      validateImageFile(file);
+      setAvatarPreview(createImagePreviewUrl(file));
     } catch (err) {
       setError(err instanceof Error ? err.message : '이미지 업로드 파일이 올바르지 않습니다.');
       e.target.value = '';
@@ -61,7 +59,6 @@ export function useProfileForm({ initialValues, onSuccess }: UseProfileFormOptio
     }
 
     setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
     setError('');
   }
 

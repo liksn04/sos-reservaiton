@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../lib/supabase';
 import { queryKeys } from '../../lib/queryKeys';
 import { useAuth } from '../../context/AuthContext';
 import { useBanUser } from '../../hooks/mutations/useBanUser';
@@ -8,6 +7,7 @@ import { useSetAdminRole } from '../../hooks/mutations/useSetAdminRole';
 import { useAdminDeleteUser } from '../../hooks/mutations/useAdminDeleteUser';
 import { useConfirm } from '../../contexts/useConfirm';
 import { useToast } from '../../contexts/useToast';
+import { listApprovedMembers } from '../../services/adminService';
 import AdminUserCard from './AdminUserCard';
 import BanDialog from './BanDialog';
 import type { Profile } from '../../types';
@@ -25,13 +25,7 @@ export default function MembersTab() {
 
   const { data: users = [], isLoading } = useQuery<Profile[]>({
     queryKey: queryKeys.admin.approved,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles').select('*').eq('status', 'approved')
-        .order('created_at', { ascending: true });
-      if (error) throw error;
-      return (data ?? []) as Profile[];
-    },
+    queryFn: listApprovedMembers,
   });
 
   const filtered = users.filter((u) =>

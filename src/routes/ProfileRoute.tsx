@@ -93,92 +93,94 @@ export default function ProfileRoute() {
   const isAdmin = profile?.is_admin ?? false;
 
   return (
-    <div className="tab-content animate-slide-up">
-      <ProfileHeader
-        profile={profile}
-        onEdit={() => setIsEditingProfile(true)}
-        onSignOut={signOut}
-        onOpenDeleteDialog={() => setIsDeleteDialogOpen(true)}
-      />
+    <>
+      <div className="tab-content animate-slide-up">
+        <ProfileHeader
+          profile={profile}
+          onEdit={() => setIsEditingProfile(true)}
+          onSignOut={signOut}
+          onOpenDeleteDialog={() => setIsDeleteDialogOpen(true)}
+        />
 
-      <PwaInstallPrompt />
-      <ReservationNotificationPrompt />
+        <PwaInstallPrompt />
+        <ReservationNotificationPrompt />
 
-      <section className="mb-8">
-        <div className="surface-card p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="material-symbols-outlined text-[20px] text-on-surface-variant">palette</span>
-            <h4 className="font-headline text-sm font-bold text-on-surface tracking-tight">화면 테마</h4>
+        <section className="mb-8">
+          <div className="surface-card p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="material-symbols-outlined text-[20px] text-on-surface-variant">palette</span>
+              <h4 className="font-headline text-sm font-bold text-on-surface tracking-tight">화면 테마</h4>
+            </div>
+            <ThemeToggle />
           </div>
-          <ThemeToggle />
-        </div>
-      </section>
+        </section>
 
-      <section className="mb-8">
-        <div className="flex justify-center gap-4 text-[11px] font-bold text-on-surface-variant/60">
-          <Link to="/legal/terms" className="hover:text-on-surface transition-colors underline underline-offset-2">
-            이용약관
-          </Link>
-          <span className="text-outline/30">|</span>
-          <Link to="/legal/privacy" className="hover:text-on-surface transition-colors underline underline-offset-2">
-            개인정보 처리방침
-          </Link>
+        <section className="mb-8">
+          <div className="flex justify-center gap-4 text-[11px] font-bold text-on-surface-variant/60">
+            <Link to="/legal/terms" className="hover:text-on-surface transition-colors underline underline-offset-2">
+              이용약관
+            </Link>
+            <span className="text-outline/30">|</span>
+            <Link to="/legal/privacy" className="hover:text-on-surface transition-colors underline underline-offset-2">
+              개인정보 처리방침
+            </Link>
+          </div>
+        </section>
+
+        <section className="mb-6 flex justify-between items-end">
+          <div>
+            <h3 className="font-headline text-3xl font-bold tracking-tight text-on-surface">내 합주 일정</h3>
+            <p className="text-on-surface-variant text-sm mt-1">당신의 합주 일정을 확인해보세요</p>
+          </div>
+        </section>
+
+        <div className="flex gap-4 mb-8 border-b" style={{ borderColor: 'var(--outline-border)' }}>
+          {(['upcoming', 'history'] as ScheduleTab[]).map((tab) => (
+            <button key={tab} onClick={() => setScheduleTab(tab)} className="relative pb-3 px-1 group">
+              <span
+                className="font-headline text-lg font-bold transition-colors"
+                style={{ color: scheduleTab === tab ? 'var(--primary)' : 'var(--text-muted)' }}
+              >
+                {tab === 'upcoming' ? '다가오는 일정' : '지난 일정'}
+              </span>
+              {scheduleTab === tab && (
+                <div className="absolute bottom-0 left-0 w-full h-1 rounded-t-lg bg-primary-btn shadow-primary-glow"></div>
+              )}
+            </button>
+          ))}
         </div>
-      </section>
+
+        <div className="space-y-4">
+          {visibleReservations.length === 0 ? (
+            <div className="glass-card rounded-[2rem] p-10 flex flex-col items-center justify-center text-center border border-outline-variant/10">
+              <span className="material-symbols-outlined text-[48px] text-surface-variant mb-4">event_busy</span>
+              <p className="text-on-surface-variant font-bold">
+                {scheduleTab === 'upcoming' ? '예정된 일정이 없습니다.' : '지난 일정이 없습니다.'}
+              </p>
+            </div>
+          ) : (
+            visibleReservations.map((res) => (
+              <MyReservationCard
+                key={res.id}
+                reservation={res}
+                scheduleTab={scheduleTab}
+                today={today}
+                canManage={res.role === 'host' || isAdmin}
+                isHostMutating={deleteReservation.isPending}
+                isLeaveMutating={leaveReservation.isPending}
+                onEdit={handleEditFromCard}
+                onDelete={handleDelete}
+                onLeave={handleLeave}
+              />
+            ))
+          )}
+        </div>
+      </div>
 
       <DeleteAccountDialog
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
       />
-
-      <section className="mb-6 flex justify-between items-end">
-        <div>
-          <h3 className="font-headline text-3xl font-bold tracking-tight text-on-surface">내 합주 일정</h3>
-          <p className="text-on-surface-variant text-sm mt-1">당신의 합주 일정을 확인해보세요</p>
-        </div>
-      </section>
-
-      <div className="flex gap-4 mb-8 border-b" style={{ borderColor: 'var(--outline-border)' }}>
-        {(['upcoming', 'history'] as ScheduleTab[]).map((tab) => (
-          <button key={tab} onClick={() => setScheduleTab(tab)} className="relative pb-3 px-1 group">
-            <span
-              className="font-headline text-lg font-bold transition-colors"
-              style={{ color: scheduleTab === tab ? 'var(--primary)' : 'var(--text-muted)' }}
-            >
-              {tab === 'upcoming' ? '다가오는 일정' : '지난 일정'}
-            </span>
-            {scheduleTab === tab && (
-              <div className="absolute bottom-0 left-0 w-full h-1 rounded-t-lg bg-primary-btn shadow-primary-glow"></div>
-            )}
-          </button>
-        ))}
-      </div>
-
-      <div className="space-y-4">
-        {visibleReservations.length === 0 ? (
-          <div className="glass-card rounded-[2rem] p-10 flex flex-col items-center justify-center text-center border border-outline-variant/10">
-            <span className="material-symbols-outlined text-[48px] text-surface-variant mb-4">event_busy</span>
-            <p className="text-on-surface-variant font-bold">
-              {scheduleTab === 'upcoming' ? '예정된 일정이 없습니다.' : '지난 일정이 없습니다.'}
-            </p>
-          </div>
-        ) : (
-          visibleReservations.map((res) => (
-            <MyReservationCard
-              key={res.id}
-              reservation={res}
-              scheduleTab={scheduleTab}
-              today={today}
-              canManage={res.role === 'host' || isAdmin}
-              isHostMutating={deleteReservation.isPending}
-              isLeaveMutating={leaveReservation.isPending}
-              onEdit={handleEditFromCard}
-              onDelete={handleDelete}
-              onLeave={handleLeave}
-            />
-          ))
-        )}
-      </div>
-    </div>
+    </>
   );
 }

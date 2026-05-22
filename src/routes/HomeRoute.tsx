@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
 import { useReservations } from '../hooks/useReservations';
+import { getTotalUserCount } from '../services/adminService';
 import DashboardView from '../components/DashboardView';
 
 export default function HomeRoute() {
@@ -8,10 +8,19 @@ export default function HomeRoute() {
   const [totalUserCount, setTotalUserCount] = useState(0);
 
   useEffect(() => {
-    supabase
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
-      .then(({ count }) => setTotalUserCount(count ?? 0));
+    let isMounted = true;
+
+    getTotalUserCount()
+      .then((count) => {
+        if (isMounted) setTotalUserCount(count);
+      })
+      .catch(() => {
+        if (isMounted) setTotalUserCount(0);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (

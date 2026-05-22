@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../lib/supabase';
 import { queryKeys } from '../../lib/queryKeys';
+import { listAdminActionLogs } from '../../services/adminService';
 import type { AdminActionLog } from '../../types';
 
 const ACTION_META: Record<AdminActionLog['action'], { label: string; color: string; icon: string }> = {
@@ -16,15 +16,7 @@ const ACTION_META: Record<AdminActionLog['action'], { label: string; color: stri
 export default function LogsTab() {
   const { data: logs = [], isLoading } = useQuery<AdminActionLog[]>({
     queryKey: queryKeys.admin.logs,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('admin_action_log')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(100);
-      if (error) throw error;
-      return (data ?? []) as AdminActionLog[];
-    },
+    queryFn: listAdminActionLogs,
   });
 
   if (isLoading) {

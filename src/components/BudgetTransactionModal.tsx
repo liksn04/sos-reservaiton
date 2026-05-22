@@ -3,7 +3,7 @@ import { useBudgetCategories } from '../hooks/useBudgetCategories';
 import { useBudgetMutations } from '../hooks/mutations/useBudgetMutations';
 import { useToast } from '../contexts/useToast';
 import { useConfirm } from '../contexts/useConfirm';
-import { validateImageFile } from '../utils/fileUpload';
+import { createImagePreviewUrl, revokePreviewUrl } from '../utils/fileUpload';
 import { CategorySection } from './BudgetTransactionModal/CategorySection';
 import { BUDGET_CATEGORY_COLOR_PRESETS, BUDGET_CATEGORY_ICON_OPTIONS } from './BudgetTransactionModal/constants';
 import { ReceiptUploadField } from './BudgetTransactionModal/ReceiptUploadField';
@@ -86,9 +86,7 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
 
   useEffect(() => {
     return () => {
-      if (receiptPreview) {
-        URL.revokeObjectURL(receiptPreview);
-      }
+      revokePreviewUrl(receiptPreview);
     };
   }, [receiptPreview]);
 
@@ -108,7 +106,7 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
     if (!file) return;
 
     try {
-      validateImageFile(file);
+      setReceiptPreview(createImagePreviewUrl(file));
     } catch (err) {
       setError(err instanceof Error ? err.message : '이미지 업로드 파일이 올바르지 않습니다.');
       e.target.value = '';
@@ -117,7 +115,6 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
 
     setError(null);
     setReceiptFile(file);
-    setReceiptPreview(URL.createObjectURL(file));
   }
 
   // ── 카테고리 추가 ─────────────────────────────────────────────────────────

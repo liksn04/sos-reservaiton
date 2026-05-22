@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../contexts/useToast';
+import { signInAnonymously, signInWithKakao } from '../services/authService';
 import { resolveAuthenticatedRoute } from '../utils/authRedirect';
 
 function KakaoIcon() {
@@ -43,17 +43,18 @@ export default function Login() {
   }, [loading, navigate, profile, session]);
 
   async function handleKakaoLogin() {
-    await supabase.auth.signInWithOAuth({
-      provider: 'kakao',
-      options: {
-        redirectTo: `${window.location.origin}/`,
-      },
-    });
+    try {
+      await signInWithKakao(`${window.location.origin}/`);
+    } catch (error) {
+      addToast('카카오 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.', 'error');
+      console.error(error);
+    }
   }
 
   async function handleAnonymousLogin() {
-    const { error } = await supabase.auth.signInAnonymously();
-    if (error) {
+    try {
+      await signInAnonymously();
+    } catch (error) {
       addToast('게스트 입장에 실패했습니다. Supabase Anonymous 로그인 설정을 확인해주세요.', 'error');
       console.error(error);
     }

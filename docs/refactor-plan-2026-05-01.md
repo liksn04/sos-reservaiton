@@ -284,3 +284,28 @@ Validation:
 - `npm run build` passes; no PostCSS warning.
 - `npm run check:bundle` passes; route chunks within +0.4 KiB of post-Phase-2 baseline.
 - Dev preview boots clean; `/legal/terms` renders with full content; CSS tokens load through new import (verified `--primary` and `--surface-container` resolve correctly in the browser).
+
+## Clean Code / SOLID Action Log - 2026-05-22 (CSS Ownership + Admin Boundary Closeout)
+
+Applied:
+- Completed the CSS ownership split without renaming classes. `src/index.css` is now only the Tailwind entry, while `src/styles/app.css` imports `tokens`, `base`, `layout`, `routes-login`, `shell`, `modals`, `routes`, `components`, and `theme-light` in deterministic order from `src/main.tsx`.
+- Preserved the previous app-CSS cascade by importing `src/styles/app.css` after `src/index.css`. This avoids the PostCSS warning that would happen if new `@import` rules were placed after `@tailwind` directives in the same file.
+- Added `src/services/adminService.ts` for admin counts, member lists, banned-user lists, admin logs, ban/unban, role changes, and admin delete function calls.
+- Added `src/services/authService.ts` so the login route no longer imports the Supabase client directly.
+- Moved `Admin`, `HomeRoute`, `MembersTab`, `BannedTab`, and `LogsTab` read queries behind service functions. Admin mutation hooks now call service functions and retain only React Query invalidation.
+- Centralized preview URL creation/revocation in `src/utils/fileUpload.ts`; product surfaces no longer call `URL.createObjectURL` directly.
+- Removed the remaining production `console.log` from the PWA update prompt; development registration output now uses a dev-only `console.info`.
+
+Clean-code impact:
+- `src/routes` and `src/components/admin` no longer import `src/lib/supabase` directly.
+- Admin audit inserts are no longer best-effort in scattered hooks; service-level admin actions now throw if the audit log insert fails, so callers do not show success when audit persistence fails.
+- CSS ownership is explicit enough for future changes to target token, layout, modal/form, route-specific, component, or light-theme files without searching a large global stylesheet.
+
+Validation:
+- `rg "from ['\\\"]\\.\\.?/\\.\\.?/lib/supabase|from ['\\\"]\\.\\.?/lib/supabase|supabase\\." src/routes src/components` returns no matches.
+- `rg "window\\.confirm|window\\.alert|\\balert\\(|console\\.log|URL\\.createObjectURL" src` only returns the allowlisted helper implementation in `src/utils/fileUpload.ts`.
+- `npm run lint` passes.
+- `npm test` passes: 10 test files, 57 tests.
+- `npm run build` passes; no PostCSS warning.
+- `npm run check:bundle` passes; CSS asset remains under the 90 KiB warning threshold.
+- Browser QA on local Vite dev (`http://127.0.0.1:5152`) passes for login, guest-login interaction, `/`, `/reserve`, `/events`, `/profile`, and `/legal/terms`; mobile viewport `395x750` has `overflowX = 0` on reserve/events/profile and no console errors.

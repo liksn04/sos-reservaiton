@@ -1,0 +1,62 @@
+.segmented-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  background: rgb(var(--color-surface-container-low));
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+}
+
+.segmented-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 42px;
+  padding: 0 1rem;
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.segmented-option.active {
+  background: rgb(var(--color-surface-container-lowest));
+  color: var(--primary);
+  box-shadow: 0 8px 18px rgba(0, 78, 203, 0.08);
+}
+
+.page-section-card {
+  background: rgb(var(--color-surface-container-low));
+  border: 1px solid var(--card-border);
+  border-radius: 2rem;
+  box-shadow: 0 12px 32px rgba(0, 78, 203, 0.04);
+}
+
+.surface-card {
+  background: rgb(var(--color-surface-container-lowest));
+  border: 1px solid var(--card-border);
+  border-radius: 2rem;
+  box-shadow: 0 12px 32px rgba(0, 78, 203, 0.05);
+}
+
+.soft-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background: rgb(var(--color-surface-container-high));
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.soft-chip.active {
+  background: var(--primary-btn-gradient);
+  color: white;
+  box-shadow: 0 10px 20px rgba(0, 100, 255, 0.16);
+}

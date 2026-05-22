@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../lib/supabase';
 import { queryKeys } from '../../lib/queryKeys';
 import { useUnbanUser } from '../../hooks/mutations/useUnbanUser';
 import { useConfirm } from '../../contexts/useConfirm';
 import { useToast } from '../../contexts/useToast';
+import { listBannedMembers } from '../../services/adminService';
 import AdminUserCard from './AdminUserCard';
 import type { Profile } from '../../types';
 
@@ -14,13 +14,7 @@ export default function BannedTab() {
 
   const { data: users = [], isLoading } = useQuery<Profile[]>({
     queryKey: queryKeys.admin.banned,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles').select('*').eq('status', 'banned')
-        .order('banned_at', { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as Profile[];
-    },
+    queryFn: listBannedMembers,
   });
 
   async function handleUnban(user: Profile) {

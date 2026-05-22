@@ -1,17 +1,13 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../lib/supabase';
 import { queryKeys } from '../lib/queryKeys';
 import { adminTabModuleLoaders, prefetchAdminTabModule, prefetchRouteModule, scheduleIdlePrefetch } from '../lib/moduleLoaders';
+import { getAdminCounts } from '../services/adminService';
 
 type AdminTab = 'members' | 'policy' | 'banned' | 'logs' | 'legal';
 
-interface TabCount {
-  banned: number;
-}
-
-const ADMIN_TABS: { key: AdminTab; icon: string; label: string; badgeKey?: keyof TabCount }[] = [
+const ADMIN_TABS: { key: AdminTab; icon: string; label: string; badgeKey?: 'banned' }[] = [
   { key: 'members', icon: 'groups', label: '전체 회원' },
   { key: 'policy', icon: 'event_upcoming', label: '예약 정책' },
   { key: 'banned', icon: 'block', label: '차단됨', badgeKey: 'banned' },
@@ -47,14 +43,9 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState<AdminTab>('members');
 
   // 배지 카운트용 쿼리
-  const { data: counts } = useQuery<TabCount>({
+  const { data: counts } = useQuery({
     queryKey: queryKeys.admin.counts,
-    queryFn: async () => {
-      const [b] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('status', 'banned'),
-      ]);
-      return { banned: b.count ?? 0 };
-    },
+    queryFn: getAdminCounts,
     refetchInterval: 30_000,
   });
 

@@ -52,6 +52,11 @@ function DeleteAccountDialogContent({ onClose }: Pick<Props, 'onClose'>) {
   }, [onClose]);
 
   const nameMatches = confirmName.trim() === profile?.display_name?.trim();
+  const deletedItems = [
+    '프로필 정보 및 아바타 이미지',
+    '내가 등록한 모든 예약',
+    '합주 초대 내역',
+  ];
 
   async function handleConfirm() {
     if (!nameMatches) return;
@@ -72,81 +77,65 @@ function DeleteAccountDialogContent({ onClose }: Pick<Props, 'onClose'>) {
 
   return (
     <div
-      className="modal-overlay active"
+      className="modal-overlay active delete-account-overlay"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="modal-container animate-slide-up" style={{ maxWidth: 420 }}>
-
-        {/* 헤더 */}
-        <div className="modal-header" style={{ paddingBottom: '1rem' }}>
-          <h2 className="font-headline text-xl font-bold tracking-tight">
-            회원 <span className="text-error">탈퇴</span>
-          </h2>
+      <div
+        className="modal-container animate-slide-up delete-account-dialog"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="delete-account-title"
+        aria-describedby="delete-account-description"
+      >
+        <div className="delete-account-header">
+          <div className="min-w-0">
+            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-error/70">
+              irreversible action
+            </p>
+            <h2 id="delete-account-title" className="font-headline text-xl font-bold tracking-tight text-on-surface">
+              회원 <span className="text-error">탈퇴</span>
+            </h2>
+          </div>
           <button
-            className="material-symbols-outlined text-2xl text-on-surface-variant hover:text-on-surface transition-colors"
+            type="button"
+            aria-label="회원 탈퇴 닫기"
+            className="w-10 h-10 rounded-full bg-surface-container-high border border-card-border flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors"
             onClick={onClose}
             disabled={deleteAccount.isPending}
           >
-            close
+            <span className="material-symbols-outlined text-[22px]">close</span>
           </button>
         </div>
 
-        <div className="modal-body space-y-6 !p-6">
-          {/* ── STEP 1: 경고 확인 ── */}
+        <div className="delete-account-body">
           {step === 1 && (
-            <div className="space-y-6">
-              {/* 경고 박스 */}
-              <div 
-                className="rounded-2xl p-5 border border-error/20 bg-error/5" 
-              >
-                <div className="flex items-start gap-4">
-                  <span className="material-symbols-outlined text-2xl text-error flex-shrink-0">warning</span>
-                  <div className="space-y-2">
-                    <p className="text-base font-black text-error leading-tight">탈퇴 시 다음 정보가 모두 삭제됩니다</p>
-                    <ul className="text-[13px] text-on-surface-variant/80 space-y-1.5 list-none">
-                      <li className="flex items-center gap-1.5 font-bold">
-                        <span className="material-symbols-outlined text-[14px] text-error">chevron_right</span>
-                        프로필 정보 및 아바타 이미지
-                      </li>
-                      <li className="flex items-center gap-1.5 font-bold">
-                        <span className="material-symbols-outlined text-[14px] text-error">chevron_right</span>
-                        내가 등록한 모든 예약
-                      </li>
-                      <li className="flex items-center gap-1.5 font-bold">
-                        <span className="material-symbols-outlined text-[14px] text-error">chevron_right</span>
-                        합주 초대 내역
-                      </li>
-                    </ul>
-                    <p className="text-[11px] text-error/80 font-black mt-3 flex items-center gap-1 uppercase tracking-widest">
-                      <span className="material-symbols-outlined text-[14px]">info</span>
-                      이 작업은 되돌릴 수 없습니다.
-                    </p>
-                  </div>
+            <div className="space-y-4">
+              <div className="delete-account-warning">
+                <span className="material-symbols-outlined text-[28px] text-error">warning</span>
+                <div className="min-w-0">
+                  <p id="delete-account-description" className="text-base font-black text-error leading-tight">
+                    탈퇴하면 계정 복구가 불가능합니다.
+                  </p>
+                  <p className="mt-1 text-sm font-semibold leading-relaxed text-on-surface-variant">
+                    아래 데이터가 즉시 삭제되며, 같은 계정으로 되돌릴 수 없습니다.
+                  </p>
                 </div>
               </div>
 
-              <div className="flex gap-3">
-                <button type="button" className="secondary-btn flex-1 py-4" onClick={onClose}>
-                  취소
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="error-btn flex-[1.5] py-4"
-                >
-                  계속 진행
-                </button>
-              </div>
+              <ul className="delete-account-list">
+                {deletedItems.map((item) => (
+                  <li key={item} className="delete-account-list-item">
+                    <span className="material-symbols-outlined text-[18px] text-error/80">remove_circle</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
-          {/* ── STEP 2: 이름 재확인 ── */}
           {step === 2 && (
-            <div className="space-y-6">
-              <div 
-                className="rounded-2xl p-5 border border-outline-variant/10"
-                style={{ backgroundColor: 'var(--surface-container-high)' }}
-              >
+            <div className="space-y-5">
+              <div className="delete-account-confirm-copy">
                 <p className="text-sm font-bold text-on-surface-variant leading-relaxed">
                   탈퇴를 확인하려면 아래에 본인의 닉네임{' '}
                   <span className="text-on-surface font-black underline decoration-error/50 underline-offset-4">
@@ -157,7 +146,9 @@ function DeleteAccountDialogContent({ onClose }: Pick<Props, 'onClose'>) {
               </div>
 
               <div className="form-group">
-                <label className="text-[10px] font-black uppercase tracking-widest text-muted mb-1.5 block">닉네임 확인</label>
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted mb-1.5 block">
+                  닉네임 확인
+                </label>
                 <input
                   ref={confirmInputRef}
                   type="text"
@@ -168,7 +159,9 @@ function DeleteAccountDialogContent({ onClose }: Pick<Props, 'onClose'>) {
                   autoComplete="off"
                 />
                 {confirmName && !nameMatches && (
-                  <p className="text-[11px] text-error mt-2 font-black italic tracking-tight">앗, 닉네임이 일치하지 않아요!</p>
+                  <p className="text-[11px] text-error mt-2 font-black italic tracking-tight">
+                    닉네임이 일치하지 않아요.
+                  </p>
                 )}
               </div>
 
@@ -177,26 +170,43 @@ function DeleteAccountDialogContent({ onClose }: Pick<Props, 'onClose'>) {
                   {error}
                 </div>
               )}
-
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  className="secondary-btn flex-1 py-4"
-                  onClick={() => setStep(1)}
-                  disabled={deleteAccount.isPending}
-                >
-                  뒤로
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirm}
-                  disabled={!nameMatches || deleteAccount.isPending}
-                  className="error-btn flex-[1.5] py-4 disabled:opacity-30"
-                >
-                  {deleteAccount.isPending ? '처리 중...' : '탈퇴 확정'}
-                </button>
-              </div>
             </div>
+          )}
+        </div>
+
+        <div className="delete-account-footer">
+          {step === 1 ? (
+            <>
+              <button type="button" className="secondary-btn flex-1" onClick={onClose}>
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={() => setStep(2)}
+                className="error-btn flex-[1.2]"
+              >
+                계속 진행
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="secondary-btn flex-1"
+                onClick={() => setStep(1)}
+                disabled={deleteAccount.isPending}
+              >
+                뒤로
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirm}
+                disabled={!nameMatches || deleteAccount.isPending}
+                className="error-btn flex-[1.2] disabled:opacity-30"
+              >
+                {deleteAccount.isPending ? '처리 중...' : '탈퇴 확정'}
+              </button>
+            </>
           )}
         </div>
       </div>

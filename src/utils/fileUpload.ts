@@ -33,6 +33,15 @@ export function getSafeImageExtension(file: File): string {
   return 'jpg';
 }
 
+export function createImagePreviewUrl(file: File): string {
+  validateImageFile(file);
+  return URL.createObjectURL(file);
+}
+
+export function revokePreviewUrl(url: string | null): void {
+  if (url) URL.revokeObjectURL(url);
+}
+
 function formatMegabytes(bytes: number): number {
   return Math.floor(bytes / 1024 / 1024);
 }

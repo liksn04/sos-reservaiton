@@ -272,3 +272,27 @@ Build result:
 - `npm run build` passes.
 - `npm run check:bundle` passes.
 - Precache guard now reports 45 entries, 2.08 MiB.
+
+## PERF-05 Closeout - 2026-05-22
+
+Completed:
+- Split the remaining app stylesheet by ownership without class renames:
+  - `src/index.css` now contains only Tailwind directives.
+  - `src/styles/app.css` is the app CSS import hub.
+  - `src/styles/base.css` owns reset, body, typography, and icon defaults.
+  - `src/styles/layout.css` owns app shell and top app bar primitives.
+  - `src/styles/routes-login.css` owns the login screen.
+  - `src/styles/shell.css` owns post-login shell, dashboard title, nav, and stat primitives.
+  - `src/styles/modals.css` owns modal, form, button, picker, animation, and form-error rules.
+  - `src/styles/routes.css` owns calendar/dashboard hero route-specific styles.
+  - `src/styles/components.css` owns segmented controls, shared cards, and chips.
+  - `src/styles/theme-light.css` owns light-mode polish overrides.
+- Kept `src/main.tsx` import order deterministic: Tailwind entry first, app CSS hub second.
+- Chose `src/styles/app.css` as the import hub instead of placing app `@import` rules inside `src/index.css`, because CSS imports after `@tailwind` would trigger PostCSS ordering warnings and could alter the established cascade.
+
+Verified output:
+- `npm run build` passes with no PostCSS warning.
+- `npm run check:bundle` passes.
+- CSS asset: `assets/index-CdDpbjJx.css` at 83.2 KiB.
+- Precache: 48 entries, 2.08 MiB.
+- Browser QA on local Vite dev validates login, guest-login interaction, core authenticated routes, and `395x750` mobile reserve/events/profile with no console errors and no horizontal overflow.

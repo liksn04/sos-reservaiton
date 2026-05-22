@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 // ─────────────────────────────────────────────────────────────────────────────
 // 모든 색상이 rgb(var(--color-NAME) / <alpha-value>) 형식으로 CSS 변수를 참조합니다.
-// :root = 다크 테마 / html.light = 라이트 테마 (index.css에서 정의)
+// :root = 다크 테마 / html.light = 라이트 테마 (src/styles/tokens.css에서 정의)
 // 이 구조 덕분에 테마 전환 시 Tailwind 유틸리티(bg-primary/20 등)가 자동 반응합니다.
 // ─────────────────────────────────────────────────────────────────────────────
 export default {

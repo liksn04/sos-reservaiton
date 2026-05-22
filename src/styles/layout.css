@@ -1,0 +1,51 @@
+/* ── Layout Components ── */
+.app-shell { width: 100%; max-width: 800px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* Top App Bar */
+.top-app-bar {
+  position: fixed; top: 0; left: 0; width: 100%; height: 72px; z-index: 50;
+  display: flex; justify-content: space-between; align-items: center; padding: 0 1.5rem;
+  background-color: var(--nav-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--nav-border);
+}
+
+.logo-area { display: flex; align-items: center; gap: 0.75rem; }
+.logo-icon {
+  width: 36px; height: 36px; border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
+}
+.roomin-login-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.18);
+}
+.roomin-brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #ffffff;
+}
+.roomin-brand-icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+.roomin-brand-icon .roomin-brand-icon-dark {
+  display: none;
+}
+html.dark .roomin-brand-icon {
+  background: #07050d;
+  box-shadow: 0 12px 32px rgba(168, 85, 247, 0.24);
+}
+html.dark .roomin-brand-icon .roomin-brand-icon-light {
+  display: none;
+}
+html.dark .roomin-brand-icon .roomin-brand-icon-dark {
+  display: block;
+}
