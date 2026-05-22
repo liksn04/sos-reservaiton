@@ -1,6 +1,11 @@
-import { useRef, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { validateImageFile } from '../utils/fileUpload';
+import {
+  isDisplayNameTaken,
+  updateProfile,
+  uploadAvatarForUser,
+} from '../services/profileService';
 import type { Part } from '../types';
 
 interface InitialValues {
@@ -34,12 +39,30 @@ export function useProfileForm({ initialValues, onSuccess }: UseProfileFormOptio
   /** [규칙 4] 사용자가 "동명이인" 토글을 활성화했는지 여부 */
   const [allowDuplicateName, setAllowDuplicateName] = useState(false);
 
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) {
+        URL.revokeObjectURL(avatarPreview);
+      }
+    };
+  }, [avatarPreview]);
+
   /** 파일 선택 시 미리보기 URL 생성 */
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    try {
+      validateImageFile(file);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '이미지 업로드 파일이 올바르지 않습니다.');
+      e.target.value = '';
+      return;
+    }
+
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
+    setError('');
   }
 
   /** 현재 표시할 아바타: 미리보기 > 저장된 URL > null */
@@ -84,54 +107,23 @@ export function useProfileForm({ initialValues, onSuccess }: UseProfileFormOptio
     setSuccess(false);
 
     try {
-      // [규칙 4] 중복 닉네임 체크 (동명이인 허용 플래그가 없을 때만)
-      if (!allowDuplicateName) {
-        const { data: existing, error: checkErr } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('display_name', trimmedName)
-          .neq('id', session.user.id) // 자기 자신은 제외
-          .limit(1);
-
-        // Edge case: Supabase 조회 실패
-        if (checkErr) {
-          console.error('닉네임 중복 확인 실패:', checkErr);
-          // 조회 실패 시 저장을 막지 않고 계속 진행 (보수적 선택)
-        }
-
-        if (existing && existing.length > 0) {
-          // 중복 발견 → 동명이인 토글 노출
-          setShowDuplicateToggle(true);
-          setError('이미 사용 중인 닉네임입니다.');
-          setIsPending(false);
-          return;
-        }
+      if (!allowDuplicateName && await isDisplayNameTaken(trimmedName, session.user.id)) {
+        setShowDuplicateToggle(true);
+        setError('이미 사용 중인 닉네임입니다.');
+        setIsPending(false);
+        return;
       }
 
-      let avatarUrl: string | undefined;
+      const avatarUrl = avatarFile
+        ? await uploadAvatarForUser(avatarFile, session.user.id)
+        : undefined;
 
-      if (avatarFile) {
-        const ext = avatarFile.name.split('.').pop();
-        // Edge case: 확장자가 없는 파일
-        const safePath = `${session.user.id}/avatar.${ext ?? 'jpg'}`;
-        const { error: uploadErr } = await supabase.storage
-          .from('avatars')
-          .upload(safePath, avatarFile, { upsert: true });
-        if (uploadErr) throw uploadErr;
-        avatarUrl = supabase.storage.from('avatars').getPublicUrl(safePath).data.publicUrl;
-      }
-
-      const { error: updateErr } = await supabase
-        .from('profiles')
-        .update({
-          display_name: trimmedName,
-          part,
-          bio: bio.trim() || null,
-          ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
-        })
-        .eq('id', session.user.id);
-
-      if (updateErr) throw updateErr;
+      await updateProfile(session.user.id, {
+        display_name: trimmedName,
+        part,
+        bio: bio.trim() || null,
+        ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
+      });
 
       await refreshProfile();
       setAvatarFile(null);

@@ -35,7 +35,7 @@ async function getAssetEntries() {
 
 function extractPrecacheUrls(swSource) {
   const urls = []
-  const pattern = /url:"([^"]+)"/g
+  const pattern = /["']url["']\s*:\s*["']([^"']+)["']/g
   let match = pattern.exec(swSource)
 
   while (match) {

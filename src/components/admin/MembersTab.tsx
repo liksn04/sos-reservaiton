@@ -6,6 +6,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useBanUser } from '../../hooks/mutations/useBanUser';
 import { useSetAdminRole } from '../../hooks/mutations/useSetAdminRole';
 import { useAdminDeleteUser } from '../../hooks/mutations/useAdminDeleteUser';
+import { useConfirm } from '../../contexts/useConfirm';
+import { useToast } from '../../contexts/useToast';
 import AdminUserCard from './AdminUserCard';
 import BanDialog from './BanDialog';
 import type { Profile } from '../../types';
@@ -15,6 +17,8 @@ export default function MembersTab() {
   const banUser       = useBanUser();
   const setAdminRole  = useSetAdminRole();
   const deleteUser    = useAdminDeleteUser();
+  const confirm       = useConfirm();
+  const { addToast }  = useToast();
 
   const [banTarget, setBanTarget]   = useState<Profile | null>(null);
   const [search, setSearch]         = useState('');
@@ -37,20 +41,31 @@ export default function MembersTab() {
 
   async function handleToggleAdmin(user: Profile) {
     const action = user.is_admin ? '어드민 해제' : '어드민 지정';
-    if (!confirm(`[${user.display_name}] 님을 ${action}하시겠습니까?`)) return;
+    const ok = await confirm({
+      title: action,
+      description: `[${user.display_name}] 님을 ${action}하시겠습니까?`,
+      confirmLabel: action,
+    });
+    if (!ok) return;
     try {
       await setAdminRole.mutateAsync({
         userId: user.id, userName: user.display_name, isAdmin: !user.is_admin,
       });
-    } catch { alert('처리에 실패했습니다.'); }
+    } catch { addToast('처리에 실패했습니다.', 'error'); }
   }
 
   async function handleDelete(user: Profile) {
-    if (user.id === me?.id) { alert('본인 계정은 삭제할 수 없습니다.'); return; }
-    if (!confirm(`[${user.display_name}] 님의 계정을 영구 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+    if (user.id === me?.id) { addToast('본인 계정은 삭제할 수 없습니다.', 'error'); return; }
+    const ok = await confirm({
+      title: '계정 영구 삭제',
+      description: `[${user.display_name}] 님의 계정을 영구 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`,
+      confirmLabel: '삭제',
+      destructive: true,
+    });
+    if (!ok) return;
     try {
       await deleteUser.mutateAsync({ userId: user.id, userName: user.display_name });
-    } catch { alert('삭제에 실패했습니다.'); }
+    } catch { addToast('삭제에 실패했습니다.', 'error'); }
   }
 
   if (isLoading) return <LoadingCard />;
@@ -141,7 +156,7 @@ export default function MembersTab() {
               userId: banTarget.id, userName: banTarget.display_name, reason,
             });
             setBanTarget(null);
-          } catch { alert('차단에 실패했습니다.'); }
+          } catch { addToast('차단에 실패했습니다.', 'error'); }
         }}
       />
     </>

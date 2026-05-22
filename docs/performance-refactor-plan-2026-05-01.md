@@ -247,3 +247,28 @@ Remaining follow-up:
 - PERF-04 is only needed if future feature work grows `BudgetRoute`, `EventsRoute`, or modal chunks beyond the current baseline.
 - PERF-05 can be done later as a low-risk CSS ownership cleanup because the current CSS asset is below the warning threshold.
 - PERF-06 should be revisited only after a meaningful PWA behavior or asset policy change.
+
+## Guardrail Correction Log - 2026-05-22
+
+Applied:
+- Updated `scripts/check-bundle-size.mjs` to parse current Workbox precache entries with quoted `url` keys.
+- Before this correction, the guardrail undercounted the generated service worker manifest as `1 entries, 0.0 KiB`.
+
+Current verified bundle output:
+
+| Asset | Size |
+|---|---:|
+| `charts-vendor-*.js` | 385.2 KiB |
+| `react-core-*.js` | 193.0 KiB |
+| `supabase-*.js` | 186.8 KiB |
+| `LegalMarkdown-*.js` | 155.8 KiB |
+| `motion-ui-*.js` | 126.4 KiB |
+| `ProfileRoute-*.js` | 37.5 KiB |
+| `EventsRoute-*.js` | 37.5 KiB |
+| `BudgetRoute-*.js` | 36.9 KiB |
+| `index-*.css` | 83.1 KiB |
+
+Build result:
+- `npm run build` passes.
+- `npm run check:bundle` passes.
+- Precache guard now reports 45 entries, 2.08 MiB.

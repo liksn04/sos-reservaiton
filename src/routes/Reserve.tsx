@@ -7,6 +7,7 @@ import Calendar from '../components/Calendar';
 import DailySchedule from '../components/DailySchedule';
 import ReservationDetailModal from '../components/ReservationDetailModal';
 import { useToast } from '../contexts/useToast';
+import { useConfirm } from '../contexts/useConfirm';
 import { computeSlotAvailability, formatDate, getTimeSlots, normalizeTime } from '../utils/time';
 import type { Purpose, ReservationWithDetails } from '../types';
 import type { AppShellContext } from './AppShell';
@@ -23,6 +24,7 @@ export default function Reserve() {
   const { data: reservations = [] } = useReservations();
   const { openNew, openEdit } = useOutletContext<AppShellContext>();
   const { addToast } = useToast();
+  const confirm = useConfirm();
   const deleteReservation = useDeleteReservation();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -121,12 +123,18 @@ export default function Reserve() {
   }
 
   async function handleDelete(id: string, teamName: string) {
-    if (!confirm(`[${teamName}] 팀의 예약을 취소하시겠습니까?`)) return;
+    const ok = await confirm({
+      title: '예약 취소',
+      description: `[${teamName}] 팀의 예약을 취소하시겠습니까?`,
+      confirmLabel: '취소',
+      destructive: true,
+    });
+    if (!ok) return;
     try {
       await deleteReservation.mutateAsync(id);
       setSelectedReservation((current) => (current?.id === id ? null : current));
     } catch {
-      alert('예약 취소에 실패했습니다. 네트워크 연결을 확인해주세요.');
+      addToast('예약 취소에 실패했습니다. 네트워크 연결을 확인해주세요.', 'error');
     }
   }
 

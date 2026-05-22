@@ -6,6 +6,7 @@ import {
 } from '../../hooks/mutations/useReservationPolicySeasonMutations';
 import { useReservationPolicySeasons } from '../../hooks/useReservationPolicySeasons';
 import { useToast } from '../../contexts/useToast';
+import { useConfirm } from '../../contexts/useConfirm';
 import { hasReservationPolicyTableMissingDetected } from '../../utils/reservationPolicyFeature';
 import {
   findActiveReservationPolicySeason,
@@ -75,6 +76,7 @@ function getErrorMessage(error: unknown): string {
 export default function ReservationPolicyTab() {
   const today = formatDate(new Date());
   const { addToast } = useToast();
+  const confirm = useConfirm();
   const { data: seasons = [], isLoading } = useReservationPolicySeasons({ includeInactive: true });
   const createSeason = useCreateReservationPolicySeason();
   const updateSeason = useUpdateReservationPolicySeason();
@@ -141,7 +143,13 @@ export default function ReservationPolicyTab() {
   }
 
   async function handleDelete(season: ReservationPolicySeason) {
-    if (!confirm(`[${season.name}] 시즌을 삭제하시겠습니까?`)) return;
+    const ok = await confirm({
+      title: '시즌 삭제',
+      description: `[${season.name}] 시즌을 삭제하시겠습니까?`,
+      confirmLabel: '삭제',
+      destructive: true,
+    });
+    if (!ok) return;
 
     try {
       await deleteSeason.mutateAsync(season.id);

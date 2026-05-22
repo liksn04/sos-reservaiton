@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../contexts/useToast';
 import { resolveAuthenticatedRoute } from '../utils/authRedirect';
 
 function KakaoIcon() {
@@ -24,6 +25,7 @@ function GuestIcon() {
 export default function Login() {
   const { session, profile, loading } = useAuth();
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   useEffect(() => {
     if (loading || !session) return;
@@ -52,7 +54,7 @@ export default function Login() {
   async function handleAnonymousLogin() {
     const { error } = await supabase.auth.signInAnonymously();
     if (error) {
-      alert('게스트 입장에 실패했습니다. Supabase Anonymous 로그인 설정을 확인해주세요.');
+      addToast('게스트 입장에 실패했습니다. Supabase Anonymous 로그인 설정을 확인해주세요.', 'error');
       console.error(error);
     }
   }

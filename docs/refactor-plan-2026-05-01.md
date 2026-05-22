@@ -208,5 +208,79 @@ Validation after action:
 - `npm test` passes: 8 test files, 49 tests.
 - `npm run build` passes with PWA generation.
 
-Remaining non-blocking follow-up:
-- Vite build reports a circular chunk warning involving `vendor -> react-vendor -> vendor` and a large `vendor` chunk above 500 kB. This is not caused by the security fixes alone, but the manual chunk strategy should be revisited in a later performance gate.
+Superseded follow-up:
+- The earlier Vite circular chunk warning and large `vendor` chunk were closed by the later performance gate recorded in `docs/performance-refactor-plan-2026-05-01.md`.
+
+## Clean Code / SOLID Action Log - 2026-05-22
+
+Applied:
+- Split `BudgetTransactionModal` category editing, receipt upload UI, and transaction-type toggle into focused child components.
+- Centralized image upload validation and safe extension normalization in `src/utils/fileUpload.ts`.
+- Reused the same image validation path for receipt upload and avatar upload.
+- Added object URL cleanup for avatar and receipt previews so repeated file selection does not leak browser memory.
+- Added focused unit tests for image upload validation and extension normalization.
+- Applied non-forced `npm audit fix`; current audit reports zero vulnerabilities.
+
+Clean-code impact:
+- `BudgetTransactionModal.tsx` moved from 511 lines to 363 lines and now acts more like modal orchestration instead of owning every UI subsection.
+- Upload rules are no longer duplicated between receipt and avatar flows.
+- Storage filename extension policy is explicit and test-covered instead of being derived ad hoc from raw filenames.
+
+Validation:
+- `npm run lint` passes.
+- `npm test` passes: 9 test files, 53 tests.
+- `npm run build` passes.
+- `npm run check:bundle` passes.
+- `npm audit --audit-level=high` passes.
+
+## Clean Code / SOLID Action Log - 2026-05-22 (Phase 2 Decomposition)
+
+Applied:
+- Extracted `EventCard` into `src/components/events/EventCard.tsx` (memoized) and lifted `useJoinEvent`/`useLeaveEvent` from per-card to the parent route, so 1 mutation pair is created instead of N pairs per render.
+- Extracted `useFilteredEvents` hook with single-pass filter+sort over events; removed two intermediate `useMemo`s in `EventsRoute`.
+- Extracted `useEventForm` hook and `EventCategoryEditor` component out of `EventModal`. Category icon/color presets moved to `eventCategoryConstants.ts`.
+- Split `BudgetRoute` into `BudgetSummaryCards`, `BudgetTransactionList`, and memoized `BudgetTransactionItem`. Summary now computed by a single reduce instead of two filter+reduce passes.
+- Split `MembershipFeePanel` into `MembershipFeePolicyCard` + `MemberPaymentCard` (memoized); inline async `onClick` extracted to `handleToggle` callback; `filteredRecords` and aggregation now memoized.
+- Split `ProfileRoute` into `ProfileHeader` + memoized `MyReservationCard`; sorting/partitioning of my reservations moved into `useMyReservations` hook.
+- Centralized duplicated `formatKoreanDate` / `diffDaysBetween` helpers into `src/utils/dateLabels.ts` with unit tests (4 cases).
+
+Clean-code impact (lines per top file):
+- `EventsRoute.tsx`: 427 -> 196 (-54%).
+- `BudgetRoute.tsx`: 329 -> 178 (-46%).
+- `ProfileRoute.tsx`: 325 -> 157 (-52%).
+- `MembershipFeePanel.tsx`: 312 -> 175 (-44%).
+- `EventModal.tsx`: 392 -> 213 (-46%).
+- All largest 5 product-surface files now sit under 220 lines.
+
+Performance impact:
+- `EventCard` and `MyReservationCard` are wrapped in `React.memo`, so list renders only update the affected card on filter/scroll updates.
+- `useJoinEvent`/`useLeaveEvent` allocations dropped from O(events) to O(1) per `EventsRoute` render.
+- `MembershipFeePanel` aggregation (filter + paid count + total amount) collapsed from 3 array passes + per-render filter into a single memoized reduce keyed on records/policy amount.
+- `BudgetRoute.summary` collapsed from `2 * (filter + reduce)` into a single linear pass over transactions.
+
+Validation:
+- `npm run lint` passes.
+- `npm test` passes: 10 test files, 57 tests.
+- `npm run build` passes; no chunk warnings.
+- `npm run check:bundle` passes; route chunks (`EventsRoute`, `ProfileRoute`, `BudgetRoute`) within +1 KiB of prior baseline, far below the 500 KiB guard.
+- Dev preview boot is clean (no console errors; login + `/legal/terms` render correctly).
+
+## Clean Code / SOLID Action Log - 2026-05-22 (Phase 1/3/4 Completion)
+
+Applied:
+- Created `src/services/budgetService.ts` (`uploadReceiptForUser`, `uploadReceiptForCurrentUser`) and `src/services/profileService.ts` (`isDisplayNameTaken`, `uploadAvatarForUser`, `updateProfile`). `BudgetTransactionModal` no longer imports `supabase`; `useProfileForm` no longer touches Supabase directly. The mutation hook `useBudgetMutations.createTransaction`/`updateTransaction` now own the upload-then-insert sequence, so the modal just hands over the file.
+- Added `ConfirmContext` + `ConfirmProvider` + `useConfirm()` shared dialog. Wired into `App.tsx`. Provides `{ title, description, confirmLabel, cancelLabel, destructive }` with Enter/Esc handling.
+- Replaced every remaining native `confirm()`/`alert()` call in product surfaces (EventsRoute, BudgetRoute, ProfileRoute, Reserve, ReservationPolicyTab, BudgetTransactionModal, EventCategoryEditor, MembersTab, BannedTab, Login) with `useConfirm()` + `addToast(..., 'error')`. Eight `confirm(` calls and ten `alert(` calls removed from product code; only `await confirm({ ... })` calls remain.
+- Split `src/styles/tokens.css` (197 lines of dark/light design tokens) out of `src/index.css`. `index.css` now imports tokens at the top; all class rules are untouched so visual cascade is unchanged.
+
+Clean-code impact:
+- UI components depend on hooks/services, never on the Supabase client directly (DIP).
+- Dialog/toast styling is centrally owned; testable and a11y-compliant (`role="alertdialog"`, `aria-modal`, keyboard handling) instead of host-browser `confirm`.
+- Design tokens have explicit ownership (`src/styles/tokens.css`), so theme changes don't touch component styles.
+
+Validation:
+- `npm run lint` passes.
+- `npm test` passes: 10 test files, 57 tests.
+- `npm run build` passes; no PostCSS warning.
+- `npm run check:bundle` passes; route chunks within +0.4 KiB of post-Phase-2 baseline.
+- Dev preview boots clean; `/legal/terms` renders with full content; CSS tokens load through new import (verified `--primary` and `--surface-container` resolve correctly in the browser).

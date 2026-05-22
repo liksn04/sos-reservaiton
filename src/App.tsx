@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AuthContext';
 import { RequireAuth, RequireApproved, RequireAdmin } from './components/RouteGuards';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { ConfirmProvider } from './contexts/ConfirmProvider';
 import { ToastContainer } from './components/Toast';
 import { RealtimeProvider } from './lib/RealtimeProvider';
 import { routeModuleLoaders } from './lib/moduleLoaders';
@@ -39,12 +40,32 @@ function AppErrorBoundary({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const handleError = (event: ErrorEvent) => {
+      if (!(event.error instanceof Error)) {
+        console.warn('Ignored non-fatal browser error event:', event.message || event.type);
+        return;
+      }
+
       console.error('💥 Global Error Caught:', event.error);
       setHasError(true);
       setError(event.error);
     };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      const reason = event.reason;
+      const runtimeError = reason instanceof Error ? reason : new Error(String(reason || 'Unhandled promise rejection'));
+
+      console.error('💥 Unhandled Promise Rejection:', runtimeError);
+      setHasError(true);
+      setError(runtimeError);
+    };
+
     window.addEventListener('error', handleError);
-    return () => window.removeEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
   }, []);
 
   if (hasError) {
@@ -83,6 +104,7 @@ export default function App() {
       </Suspense>
       <ThemeProvider>
         <ToastProvider>
+          <ConfirmProvider>
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
               <RealtimeProvider>
@@ -117,6 +139,7 @@ export default function App() {
               </RealtimeProvider>
             </AuthProvider>
           </QueryClientProvider>
+          </ConfirmProvider>
           <ToastContainer />
         </ToastProvider>
       </ThemeProvider>

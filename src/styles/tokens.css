@@ -1,0 +1,197 @@
+/* ── Dark Theme ────────────────────────────────────────────── */
+:root, html.dark {
+  /* Tailwind RGB tuples — bg-primary/20 같은 opacity modifier가 동작하려면
+     반드시 "R G B" 숫자만 저장해야 함 (rgb() 래퍼 없이)              */
+  --color-background:                14 14 17;
+  --color-surface:                   14 14 17;
+  --color-surface-bright:            28 28 30;
+  --color-surface-variant:           38 37 41;
+  --color-surface-tint:              204 151 255;
+  --color-surface-container:         26 25 29;
+  --color-surface-container-low:     22 21 25;
+  --color-surface-container-lowest:  11 10 14;
+  --color-surface-container-high:    38 37 41;
+  --color-surface-container-highest: 51 49 54;
+  --color-on-surface:                228 225 232;
+  --color-on-surface-variant:        199 197 208;
+  --color-on-background:             228 225 232;
+  --color-inverse-surface:           228 225 232;
+  --color-inverse-on-surface:        46 43 49;
+
+  --color-primary:                   204 151 255;
+  --color-primary-fixed:             232 204 255;
+  --color-primary-fixed-dim:         177 105 255;
+  --color-primary-container:         76 0 139;
+  --color-on-primary:                51 0 97;
+  --color-on-primary-fixed:          0 0 0;
+  --color-on-primary-fixed-variant:  100 0 180;
+  --color-on-primary-container:      239 219 255;
+
+  --color-secondary:                 203 194 211;
+  --color-secondary-container:       68 68 74;
+  --color-secondary-fixed:           232 222 240;
+  --color-secondary-fixed-dim:       203 194 211;
+  --color-on-secondary:              49 45 56;
+  --color-on-secondary-container:    232 222 240;
+  --color-on-secondary-fixed:        27 20 34;
+  --color-on-secondary-fixed-variant: 68 68 74;
+
+  --color-tertiary:                  205 173 255;
+  --color-tertiary-container:        131 66 244;
+  --color-tertiary-fixed:            231 207 255;
+  --color-tertiary-fixed-dim:        205 173 255;
+  --color-on-tertiary:               60 0 139;
+  --color-on-tertiary-container:     239 219 255;
+  --color-on-tertiary-fixed:         37 0 90;
+  --color-on-tertiary-fixed-variant: 89 0 203;
+
+  --color-error:                     255 180 171;
+  --color-error-container:           147 0 10;
+  --color-on-error:                  105 0 5;
+  --color-on-error-container:        255 178 185;
+
+  --color-outline:                   145 142 154;
+  --color-outline-variant:           70 70 79;
+  --primary-rgb:                     168, 85, 247;
+  --surface-rgb:                     14, 14, 17;
+
+  /* Legacy CSS vars (hex/rgba — CSS 클래스에서 직접 사용) */
+  --bg-dark:                #000000;
+  --surface-container:      #151515;
+  --surface-container-high: #1a1a1a;
+  --surface-highest:        #2c2b30;
+  --primary:                #a855f7;
+  --primary-glow:           rgba(168, 85, 247, 0.4);
+  --on-primary-fixed:       #ffffff;
+  --error:                  #ff453a;
+  --success:                #4ade80;
+  --success-glow:           rgba(74, 222, 128, 0.4);
+  --text-main:              #ffffff;
+  --text-muted:             #8e8e93;
+  --text-on-surface-var:    #c7c5d0;
+  --outline-variant:        #333333;
+  --outline-border:         rgba(70, 70, 79, 0.15);
+  --kakao-yellow:           #FEE500;
+  --kakao-black:            #191919;
+
+  /* Computed theme tokens — 다크모드 시인성 강화를 위해 불투명도 및 경계 대비 상향 */
+  --glass-bg:               rgba(255, 255, 255, 0.05); /* 0.03 -> 0.05 */
+  --glass-border:           rgba(255, 255, 255, 0.15); /* 0.08 -> 0.15 */
+  --glass-border-hover:     rgba(255, 255, 255, 0.25); /* 0.15 -> 0.25 */
+  --card-border:            rgba(255, 255, 255, 0.12); /* 0.05 -> 0.12 */
+  --input-bg:               #000000;
+  --input-border:           rgba(255, 255, 255, 0.15); /* 0.1 -> 0.15 */
+  --nav-bg:                 rgba(10, 10, 11, 0.95);
+  --nav-border:             rgba(255, 255, 255, 0.05); /* 0.03 -> 0.05 */
+  --nav-link-inactive:      #6b7280;
+  --overlay-bg:             rgba(0, 0, 0, 0.7);
+  --title-gradient:         linear-gradient(to right, #ffffff 10%, #d8b4fe 100%);
+  --primary-btn-gradient:   linear-gradient(135deg, #d8b4fe 0%, #a855f7 100%);
+  --reserve-btn-gradient:   linear-gradient(90deg,  #d8b4fe 0%, #a855f7 100%);
+  --secondary-btn-gradient: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  --secondary-btn-color:    #cccccc;
+  --secondary-btn-border:   rgba(255, 255, 255, 0.05);
+  --calendar-today-bg:      rgba(255, 255, 255, 0.1);
+  --club-tag-bg:            rgba(168, 85, 247, 0.1);
+  --primary-border:         rgba(204, 151, 255, 0.2);
+  --stat-text:              #ffffff;
+  --logo-title-color:       #ffffff;
+  --primary-glow-shadow:    0 0 40px rgba(168, 85, 247, 0.5);
+}
+
+/* ── Light Theme (Cool Blue) ───────────────────────────────── */
+html.light {
+  /* Tailwind RGB tuples — Main_Designs 기반 Toss 스타일 라이트 테마 */
+  --color-background:                248 249 255;
+  --color-surface:                   248 249 255;
+  --color-surface-bright:            248 249 255;
+  --color-surface-variant:           221 227 239;
+  --color-surface-tint:              0 100 255;
+  --color-surface-container:         233 238 251;
+  --color-surface-container-low:     239 244 255;
+  --color-surface-container-lowest:  255 255 255;
+  --color-surface-container-high:    227 232 245;
+  --color-surface-container-highest: 221 227 239;
+  --color-on-surface:                22 28 37;
+  --color-on-surface-variant:        66 70 86;
+  --color-on-background:             22 28 37;
+  --color-inverse-surface:           43 49 58;
+  --color-inverse-on-surface:        235 241 254;
+
+  --color-primary:                   0 100 255;
+  --color-primary-fixed:             219 225 255;
+  --color-primary-fixed-dim:         179 197 255;
+  --color-primary-container:         0 78 203;
+  --color-on-primary:                255 255 255;
+  --color-on-primary-fixed:          0 23 74;
+  --color-on-primary-fixed-variant:  0 62 166;
+  --color-on-primary-container:      245 245 255;
+
+  --color-secondary:                 84 95 110;
+  --color-secondary-container:       213 224 243;
+  --color-secondary-fixed:           216 227 245;
+  --color-secondary-fixed-dim:       188 199 217;
+  --color-on-secondary:              255 255 255;
+  --color-on-secondary-container:    88 99 115;
+  --color-on-secondary-fixed:        17 28 41;
+  --color-on-secondary-fixed-variant: 61 72 86;
+
+  --color-tertiary:                  0 85 178;
+  --color-tertiary-container:        0 109 224;
+  --color-tertiary-fixed:            215 226 255;
+  --color-tertiary-fixed-dim:        172 199 255;
+  --color-on-tertiary:               255 255 255;
+  --color-on-tertiary-container:     244 245 255;
+  --color-on-tertiary-fixed:         0 26 64;
+  --color-on-tertiary-fixed-variant: 0 68 145;
+
+  --color-error:                     186 26 26;
+  --color-error-container:           255 218 214;
+  --color-on-error:                  255 255 255;
+  --color-on-error-container:        147 0 10;
+
+  --color-outline:                   115 118 135;
+  --color-outline-variant:           194 198 216;
+  --primary-rgb:                     0, 100, 255;
+  --surface-rgb:                     248, 249, 255;
+
+  /* Legacy CSS vars — Main_Designs Light overrides */
+  --bg-dark:                #F8F9FF;
+  --surface-container:      #E9EEFB;
+  --surface-container-high: #E3E8F5;
+  --surface-highest:        #DDE3EF;
+  --primary:                #0064FF;
+  --primary-glow:           rgba(0, 100, 255, 0.18);
+  --on-primary-fixed:       #ffffff;
+  --error:                  #BA1A1A;
+  --success:                #16A34A;
+  --success-glow:           rgba(22, 163, 74, 0.18);
+  --text-main:              #161C25;
+  --text-muted:             #424656;
+  --text-on-surface-var:    #586373;
+  --outline-variant:        #C2C6D8;
+  --outline-border:         rgba(194, 198, 216, 0.58);
+
+  --glass-bg:               rgba(255, 255, 255, 0.82);
+  --glass-border:           rgba(194, 198, 216, 0.42);
+  --glass-border-hover:     rgba(0, 100, 255, 0.18);
+  --card-border:            rgba(194, 198, 216, 0.32);
+  --input-bg:               #EFF4FF;
+  --input-border:           rgba(194, 198, 216, 0.65);
+  --nav-bg:                 rgba(255, 255, 255, 0.84);
+  --nav-border:             rgba(194, 198, 216, 0.45);
+  --nav-link-inactive:      #94A3B8;
+  --overlay-bg:             rgba(15, 23, 42, 0.2);
+  --title-gradient:         linear-gradient(135deg, #161C25 0%, #004ECB 100%);
+  --primary-btn-gradient:   linear-gradient(135deg, #0064FF 0%, #2F80FF 100%);
+  --reserve-btn-gradient:   linear-gradient(135deg, #0064FF 0%, #2F80FF 100%);
+  --secondary-btn-gradient: linear-gradient(135deg, #FFFFFF 0%, #EFF4FF 100%);
+  --secondary-btn-color:    #004ECB;
+  --secondary-btn-border:   rgba(194, 198, 216, 0.65);
+  --calendar-today-bg:      rgba(0, 100, 255, 0.12);
+  --club-tag-bg:            rgba(0, 100, 255, 0.08);
+  --primary-border:         rgba(0, 100, 255, 0.16);
+  --stat-text:              #161C25;
+  --logo-title-color:       #004ECB;
+  --primary-glow-shadow:    0 16px 40px rgba(0, 100, 255, 0.18);
+}

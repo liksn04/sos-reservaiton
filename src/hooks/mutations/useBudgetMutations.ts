@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
 import { queryKeys } from '../../lib/queryKeys';
+import { uploadReceiptForCurrentUser } from '../../services/budgetService';
 import type {
   BudgetTransactionInput,
   BudgetCategory,
@@ -8,20 +9,15 @@ import type {
   MembershipFeePolicyInput,
 } from '../../types';
 
-// ── 영수증 이미지 업로드 헬퍼 ──────────────────────────────────────────
-/**
- * Supabase 'receipts' 버킷에 영수증 파일을 업로드하고 public URL을 반환합니다.
- * Edge case: 확장자가 없는 파일 → 'jpg' 로폴백
- * Edge case: 업로드 실패 → Error throw (caller에서 처리)
- */
-export async function uploadReceipt(file: File, userId: string): Promise<string> {
-  const ext = file.name.split('.').pop() ?? 'jpg';
-  const path = `${userId}/${Date.now()}.${ext}`;
-  const { error } = await supabase.storage
-    .from('receipts')
-    .upload(path, file, { upsert: false });
-  if (error) throw error;
-  return supabase.storage.from('receipts').getPublicUrl(path).data.publicUrl;
+interface BudgetTransactionCreateArgs {
+  input: BudgetTransactionInput;
+  receiptFile?: File | null;
+}
+
+interface BudgetTransactionUpdateArgs {
+  id: string;
+  input: Partial<BudgetTransactionInput>;
+  receiptFile?: File | null;
 }
 
 export function useBudgetMutations() {
@@ -29,14 +25,19 @@ export function useBudgetMutations() {
 
   // 1. 거래 등록 (CREATE)
   const createTransaction = useMutation({
-    mutationFn: async (input: BudgetTransactionInput) => {
+    mutationFn: async ({ input, receiptFile }: BudgetTransactionCreateArgs) => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error('Not authenticated');
+
+      const receipt_url = receiptFile
+        ? await uploadReceiptForCurrentUser(receiptFile)
+        : input.receipt_url ?? null;
 
       const { data, error } = await supabase
         .from('budget_transactions')
         .insert({
           ...input,
+          receipt_url,
           created_by: userData.user.id,
         })
         .select()
@@ -52,10 +53,14 @@ export function useBudgetMutations() {
 
   // 2. 거래 수정 (UPDATE)
   const updateTransaction = useMutation({
-    mutationFn: async ({ id, input }: { id: string; input: Partial<BudgetTransactionInput> }) => {
+    mutationFn: async ({ id, input, receiptFile }: BudgetTransactionUpdateArgs) => {
+      const receipt_url = receiptFile
+        ? await uploadReceiptForCurrentUser(receiptFile)
+        : input.receipt_url;
+
       const { data, error } = await supabase
         .from('budget_transactions')
-        .update(input)
+        .update(receipt_url !== undefined ? { ...input, receipt_url } : input)
         .eq('id', id)
         .select()
         .single();

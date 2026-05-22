@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { supabase } from '../lib/supabase';
 import { useBudgetCategories } from '../hooks/useBudgetCategories';
-import { useBudgetMutations, uploadReceipt } from '../hooks/mutations/useBudgetMutations';
+import { useBudgetMutations } from '../hooks/mutations/useBudgetMutations';
 import { useToast } from '../contexts/useToast';
+import { useConfirm } from '../contexts/useConfirm';
+import { validateImageFile } from '../utils/fileUpload';
+import { CategorySection } from './BudgetTransactionModal/CategorySection';
+import { BUDGET_CATEGORY_COLOR_PRESETS, BUDGET_CATEGORY_ICON_OPTIONS } from './BudgetTransactionModal/constants';
+import { ReceiptUploadField } from './BudgetTransactionModal/ReceiptUploadField';
+import { TransactionTypeToggle } from './BudgetTransactionModal/TransactionTypeToggle';
 import type { BudgetTransaction, BudgetTransactionInput, BudgetCategory } from '../types';
 
 interface Props {
@@ -15,19 +20,11 @@ interface Props {
   fiscalHalf: 1 | 2;
 }
 
-const ICON_OPTIONS = [
-  'payments', 'account_balance', 'savings', 'receipt', 'sell',
-  'restaurant', 'sports_esports', 'mic', 'music_note', 'celebration',
-];
-const COLOR_PRESETS = [
-  '#10b981', '#3b82f6', '#a855f7', '#f59e0b',
-  '#ef4444', '#ec4899', '#06b6d4', '#6b7280',
-];
-
 export default function BudgetTransactionModal({ isOpen, onClose, editing, fiscalYear, fiscalHalf }: Props) {
   const { data: categories = [] } = useBudgetCategories();
   const { createTransaction, updateTransaction, createCategory, deleteCategory } = useBudgetMutations();
   const { addToast } = useToast();
+  const confirm = useConfirm();
 
   // ── 폼 상태 ────────────────────────────────────────────────────────────
   const [txType, setTxType] = useState<'income' | 'expense'>('expense');
@@ -48,8 +45,8 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
   // ── 카테고리 편집 상태 ──────────────────────────────────────────────────
   const [showCategoryEditor, setShowCategoryEditor] = useState(false);
   const [newCatName, setNewCatName] = useState('');
-  const [newCatColor, setNewCatColor] = useState(COLOR_PRESETS[0]);
-  const [newCatIcon, setNewCatIcon] = useState(ICON_OPTIONS[0]);
+  const [newCatColor, setNewCatColor] = useState(BUDGET_CATEGORY_COLOR_PRESETS[0]);
+  const [newCatIcon, setNewCatIcon] = useState(BUDGET_CATEGORY_ICON_OPTIONS[0]);
 
   // ── 현재 타입에 맞는 카테고리만 필터 ─────────────────────────────────────
   const filteredCategories = categories.filter((c) => c.type === txType);
@@ -87,6 +84,14 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
     setCategoryId(null);
   }, [txType]);
 
+  useEffect(() => {
+    return () => {
+      if (receiptPreview) {
+        URL.revokeObjectURL(receiptPreview);
+      }
+    };
+  }, [receiptPreview]);
+
   // ── ESC 닫기 ────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!isOpen) return;
@@ -101,16 +106,15 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
   function handleReceiptChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Edge case: 이미지가 아닌 파일 방어
-    if (!file.type.startsWith('image/')) {
-      setError('이미지 파일만 업로드할 수 있습니다.');
+
+    try {
+      validateImageFile(file);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '이미지 업로드 파일이 올바르지 않습니다.');
+      e.target.value = '';
       return;
     }
-    // Edge case: 5MB 초과 파일 방어
-    if (file.size > 5 * 1024 * 1024) {
-      setError('파일 크기는 5MB 이하여야 합니다.');
-      return;
-    }
+
     setError(null);
     setReceiptFile(file);
     setReceiptPreview(URL.createObjectURL(file));
@@ -135,7 +139,13 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
 
   // ── 카테고리 삭제 ─────────────────────────────────────────────────────────
   async function handleDeleteCategory(cat: BudgetCategory) {
-    if (!confirm(`'${cat.name}' 카테고리를 삭제하시겠습니까?\n연결된 거래 내역의 카테고리가 비워집니다.`)) return;
+    const ok = await confirm({
+      title: '카테고리 삭제',
+      description: `'${cat.name}' 카테고리를 삭제하시겠습니까?\n연결된 거래 내역의 카테고리가 비워집니다.`,
+      confirmLabel: '삭제',
+      destructive: true,
+    });
+    if (!ok) return;
     try {
       await deleteCategory.mutateAsync(cat.id);
       if (categoryId === cat.id) setCategoryId(null);
@@ -155,15 +165,6 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
 
     setIsUploading(true);
     try {
-      // 영수증 업로드 처리
-      let receiptUrl = existingReceiptUrl;
-      if (receiptFile) {
-        const { data: userData } = await supabase.auth.getUser();
-        // Edge case: 인증되지 않은 사용자
-        if (!userData.user) throw new Error('로그인이 필요합니다.');
-        receiptUrl = await uploadReceipt(receiptFile, userData.user.id);
-      }
-
       const payload: BudgetTransactionInput = {
         category_id: categoryId,
         type: txType,
@@ -171,16 +172,16 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
         description: description.trim(),
         transaction_date: txDate,
         bank_account: bankAccount.trim() || null,
-        receipt_url: receiptUrl,
+        receipt_url: existingReceiptUrl,
         fiscal_year: fiscalYear,
         fiscal_half: fiscalHalf,
       };
 
       if (editing) {
-        await updateTransaction.mutateAsync({ id: editing.id, input: payload });
+        await updateTransaction.mutateAsync({ id: editing.id, input: payload, receiptFile });
         addToast('거래 내역이 수정되었습니다.', 'success');
       } else {
-        await createTransaction.mutateAsync(payload);
+        await createTransaction.mutateAsync({ input: payload, receiptFile });
         addToast('새 거래 내역이 등록되었습니다.', 'success');
       }
       onClose();
@@ -228,28 +229,7 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
 
         <div className="modal-body space-y-6">
 
-          {/* ── 수입/지출 타입 토글 ── */}
-          <div className="flex items-center gap-2 p-1.5 rounded-2xl border border-card-border bg-surface-container-low">
-            {(['income', 'expense'] as const).map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setTxType(t)}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-                  txType === t
-                    ? t === 'income'
-                      ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
-                      : 'bg-rose-500 text-white shadow-lg shadow-rose-500/30'
-                    : 'opacity-40 hover:opacity-80'
-                }`}
-              >
-                <span className="material-symbols-outlined text-sm">
-                  {t === 'income' ? 'add_circle' : 'remove_circle'}
-                </span>
-                {t === 'income' ? '수입' : '지출'}
-              </button>
-            ))}
-          </div>
+          <TransactionTypeToggle value={txType} onChange={setTxType} />
 
           {/* ── 금액 ── */}
           <div className="form-group">
@@ -303,167 +283,37 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
             </div>
           </div>
 
-          {/* ── 카테고리 ── */}
-          <div className="form-group">
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-muted">
-                카테고리
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowCategoryEditor((v) => !v)}
-                className="text-[11px] font-bold text-primary hover:underline"
-              >
-                {showCategoryEditor ? '닫기' : '편집'}
-              </button>
-            </div>
+          <CategorySection
+            categories={filteredCategories}
+            selectedCategoryId={categoryId}
+            transactionType={txType}
+            fiscalYear={fiscalYear}
+            fiscalHalf={fiscalHalf}
+            isEditorOpen={showCategoryEditor}
+            newCategoryName={newCatName}
+            newCategoryColor={newCatColor}
+            newCategoryIcon={newCatIcon}
+            isCreatingCategory={createCategory.isPending}
+            onToggleEditor={() => setShowCategoryEditor((value) => !value)}
+            onSelectCategory={setCategoryId}
+            onDeleteCategory={handleDeleteCategory}
+            onNewCategoryNameChange={setNewCatName}
+            onNewCategoryColorChange={setNewCatColor}
+            onNewCategoryIconChange={setNewCatIcon}
+            onAddCategory={handleAddCategory}
+          />
 
-            <div className="flex flex-wrap gap-2">
-              {filteredCategories.length === 0 ? (
-                <p className="text-xs text-muted italic">이 유형의 카테고리가 없습니다. 편집에서 추가해주세요.</p>
-              ) : (
-                filteredCategories.map((c) => {
-                  const active = c.id === categoryId;
-                  return (
-                    <button
-                      key={c.id}
-                      type="button"
-                      onClick={() => setCategoryId(active ? null : c.id)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all"
-                      style={{
-                        backgroundColor: active ? `${c.color}25` : 'var(--surface-container-highest)',
-                        color: active ? c.color : 'var(--text-muted)',
-                        border: `1px solid ${active ? c.color : 'var(--outline-border)'}`,
-                      }}
-                    >
-                      <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
-                        {c.icon}
-                      </span>
-                      {c.name}
-                      {showCategoryEditor && (
-                        <span
-                          className="material-symbols-outlined text-sm text-error ml-1 hover:scale-125 transition-transform"
-                          onClick={(e) => { e.stopPropagation(); handleDeleteCategory(c); }}
-                        >
-                          close
-                        </span>
-                      )}
-                    </button>
-                  );
-                })
-              )}
-            </div>
-
-            {showCategoryEditor && (
-              <div
-                className="mt-3 p-4 rounded-2xl space-y-3"
-                style={{ backgroundColor: 'var(--surface-container)', border: '1px solid var(--outline-border)' }}
-              >
-                <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
-                  {fiscalYear}년 {fiscalHalf}학기
-                </span>
-                <input
-                  className="w-full bg-transparent text-sm font-bold outline-none border-b border-outline-border pb-2"
-                  placeholder="카테고리 이름"
-                  value={newCatName}
-                  onChange={(e) => setNewCatName(e.target.value)}
-                  style={{ color: 'var(--text-main)', borderColor: 'var(--outline-border)' }}
-                />
-                <div className="flex gap-1.5 flex-wrap">
-                  {COLOR_PRESETS.map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => setNewCatColor(c)}
-                      className="w-7 h-7 rounded-full transition-all hover:scale-110"
-                      style={{
-                        backgroundColor: c,
-                        boxShadow: newCatColor === c ? `0 0 12px ${c}` : 'none',
-                        border: `2px solid ${newCatColor === c ? 'white' : 'transparent'}`,
-                      }}
-                    />
-                  ))}
-                </div>
-                <div className="flex gap-1 flex-wrap">
-                  {ICON_OPTIONS.map((i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setNewCatIcon(i)}
-                      className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
-                      style={{
-                        backgroundColor: newCatIcon === i ? newCatColor : 'var(--surface-container-high)',
-                        color: newCatIcon === i ? '#fff' : 'var(--text-muted)',
-                      }}
-                    >
-                      <span className="material-symbols-outlined text-xl">{i}</span>
-                    </button>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  onClick={handleAddCategory}
-                  disabled={createCategory.isPending || !newCatName.trim()}
-                  className="w-full py-2.5 rounded-xl text-xs font-black tracking-wider uppercase bg-primary-btn text-white"
-                  style={{ opacity: !newCatName.trim() ? 0.5 : 1 }}
-                >
-                  {createCategory.isPending ? '추가 중...' : '카테고리 추가'}
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* ── 영수증 이미지 ── */}
-          <div className="form-group">
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted">
-              영수증 이미지 (선택)
-            </label>
-            <input
-              ref={receiptInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleReceiptChange}
-            />
-            {(receiptPreview || existingReceiptUrl) ? (
-              <div className="relative group w-full aspect-video rounded-2xl overflow-hidden border border-card-border">
-                <img
-                  src={receiptPreview ?? existingReceiptUrl!}
-                  alt="영수증 미리보기"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => receiptInputRef.current?.click()}
-                    className="px-4 py-2 bg-white/20 backdrop-blur rounded-xl text-white text-xs font-bold"
-                  >
-                    변경
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setReceiptFile(null); setReceiptPreview(null); setExistingReceiptUrl(null); }}
-                    className="px-4 py-2 bg-error/30 backdrop-blur rounded-xl text-white text-xs font-bold"
-                  >
-                    삭제
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => receiptInputRef.current?.click()}
-                className="w-full h-24 rounded-2xl border-2 border-dashed border-card-border hover:border-primary/50 transition-colors flex flex-col items-center justify-center gap-2 group"
-              >
-                <span className="material-symbols-outlined text-[28px] text-muted group-hover:text-primary transition-colors">
-                  add_photo_alternate
-                </span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted group-hover:text-primary transition-colors">
-                  영수증 첨부
-                </span>
-              </button>
-            )}
-          </div>
+          <ReceiptUploadField
+            inputRef={receiptInputRef}
+            previewUrl={receiptPreview}
+            existingUrl={existingReceiptUrl}
+            onFileChange={handleReceiptChange}
+            onClear={() => {
+              setReceiptFile(null);
+              setReceiptPreview(null);
+              setExistingReceiptUrl(null);
+            }}
+          />
 
           {/* ── 계좌 정보 (선택) ── */}
           <div className="form-group">

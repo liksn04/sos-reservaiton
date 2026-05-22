@@ -2,11 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
 import { queryKeys } from '../../lib/queryKeys';
 import { useUnbanUser } from '../../hooks/mutations/useUnbanUser';
+import { useConfirm } from '../../contexts/useConfirm';
+import { useToast } from '../../contexts/useToast';
 import AdminUserCard from './AdminUserCard';
 import type { Profile } from '../../types';
 
 export default function BannedTab() {
   const unbanUser = useUnbanUser();
+  const confirm = useConfirm();
+  const { addToast } = useToast();
 
   const { data: users = [], isLoading } = useQuery<Profile[]>({
     queryKey: queryKeys.admin.banned,
@@ -20,10 +24,15 @@ export default function BannedTab() {
   });
 
   async function handleUnban(user: Profile) {
-    if (!confirm(`[${user.display_name}] 님의 차단을 해제하시겠습니까?`)) return;
+    const ok = await confirm({
+      title: '차단 해제',
+      description: `[${user.display_name}] 님의 차단을 해제하시겠습니까?`,
+      confirmLabel: '해제',
+    });
+    if (!ok) return;
     try {
       await unbanUser.mutateAsync({ userId: user.id, userName: user.display_name });
-    } catch { alert('차단 해제에 실패했습니다.'); }
+    } catch { addToast('차단 해제에 실패했습니다.', 'error'); }
   }
 
   if (isLoading) {
