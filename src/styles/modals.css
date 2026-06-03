@@ -215,7 +215,7 @@
   white-space: nowrap; display: inline-flex; align-items: center; justify-content: center;
   transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
   box-shadow: var(--primary-glow-shadow);
-  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
 }
 .primary-btn:active { transform: scale(0.98); opacity: 0.9; }
 .primary-btn:disabled { opacity: 0.5; cursor: not-allowed; }

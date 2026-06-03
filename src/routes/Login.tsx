@@ -120,6 +120,10 @@ export default function Login() {
             </Link>
             에 동의하게 됩니다.
           </p>
+
+          <p className="roomin-login-copyright">
+            © 2026 Junmo Kim. All rights reserved.
+          </p>
         </section>
       </main>
     </div>

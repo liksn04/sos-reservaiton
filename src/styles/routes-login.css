@@ -231,6 +231,15 @@
 .roomin-login-legal-link:hover {
   opacity: 0.82;
 }
+.roomin-login-copyright {
+  margin-top: 12px;
+  color: rgba(110, 127, 157, 0.72);
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: 0;
+}
 
 html.dark .roomin-login-page {
   color: #ffffff;
@@ -305,7 +314,8 @@ html.dark .roomin-login-title {
   text-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
 }
 html.dark .roomin-login-tagline,
-html.dark .roomin-login-legal {
+html.dark .roomin-login-legal,
+html.dark .roomin-login-copyright {
   color: rgba(223, 216, 236, 0.64);
 }
 html.dark .roomin-login-legal-link {
@@ -354,5 +364,9 @@ html.dark .roomin-login-guest-button {
   .roomin-login-legal {
     margin-top: 20px;
     font-size: 0.86rem;
+  }
+  .roomin-login-copyright {
+    margin-top: 8px;
+    font-size: 0.72rem;
   }
 }

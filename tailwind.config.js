@@ -65,9 +65,9 @@ export default {
         'outline-variant':           'rgb(var(--color-outline-variant) / <alpha-value>)',
       },
       fontFamily: {
-        sans: ['Inter', 'Pretendard', 'system-ui', '-apple-system', 'sans-serif'],
-        headline: ['"Plus Jakarta Sans"', 'Inter', 'Pretendard', 'sans-serif'],
-        body: ['Inter', 'Pretendard', 'system-ui', 'sans-serif'],
+        sans: ['Pretendard', 'system-ui', '-apple-system', 'sans-serif'],
+        headline: ['Pretendard', 'system-ui', '-apple-system', 'sans-serif'],
+        body: ['Pretendard', 'system-ui', '-apple-system', 'sans-serif'],
       },
       // ── 아래는 rgb() 패턴을 쓸 수 없는 CSS 변수들 (rgba 전체값 / gradient / shadow) ──
       // colors 확장으로는 불가능하므로 각 유틸리티에 직접 매핑합니다.
