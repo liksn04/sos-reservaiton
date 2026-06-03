@@ -93,10 +93,10 @@ export default function EventParticipantsModal({ isOpen, onClose, event }: Props
           {!isAdmin ? (
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-5">
               <p className="text-sm font-bold text-on-surface">
-                현재 공개 범위에서는 내 참여 여부만 제공됩니다.
+                현재 참여 인원은 모든 회원에게 공개됩니다.
               </p>
               <p className="mt-2 text-xs text-muted">
-                참가자 총원, 상세 명단, 출석 상태는 관리자 화면에서만 확인할 수 있습니다.
+                상세 명단과 출석 상태는 관리자 화면에서만 확인할 수 있습니다.
               </p>
             </div>
           ) : isLoading ? (

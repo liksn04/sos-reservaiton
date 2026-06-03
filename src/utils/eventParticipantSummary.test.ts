@@ -38,4 +38,20 @@ describe('eventParticipantSummary', () => {
       hasExactParticipantCount: false,
     });
   });
+
+  it('공개 집계 테이블의 participant_count 값을 그대로 사용한다', () => {
+    const summaries = buildEventParticipantSummaryMap({
+      eventIds: ['event-1', 'event-2'],
+      countRows: [
+        { event_id: 'event-1', participant_count: 12 },
+      ],
+      viewerRows: [{ event_id: 'event-2' }],
+      hasExactParticipantCount: true,
+    });
+
+    expect(summaries).toEqual({
+      'event-1': { eventId: 'event-1', participantCount: 12, viewerJoined: false, hasExactParticipantCount: true },
+      'event-2': { eventId: 'event-2', participantCount: 0, viewerJoined: true, hasExactParticipantCount: true },
+    });
+  });
 });

@@ -76,6 +76,10 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
         queryClient.invalidateQueries({ queryKey: queryKeys.events.summaries.all });
         queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
       })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'event_participant_counts' }, () => {
+        queryClient.invalidateQueries({ queryKey: queryKeys.events.summaries.all });
+        queryClient.invalidateQueries({ queryKey: queryKeys.events.all });
+      })
       // 예산
       .on('postgres_changes', { event: '*', schema: 'public', table: 'budget_transactions' }, () => {
         queryClient.invalidateQueries({ queryKey: queryKeys.budget.all });

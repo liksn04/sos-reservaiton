@@ -2,6 +2,7 @@ import type { EventParticipantSummary } from '../types';
 
 interface EventParticipantCountRow {
   event_id: string;
+  participant_count?: number | null;
 }
 
 interface ViewerParticipationRow {
@@ -15,6 +16,11 @@ export function buildEventParticipantSummaryMap(params: {
   hasExactParticipantCount: boolean;
 }) {
   const countsByEventId = params.countRows.reduce<Map<string, number>>((accumulator, row) => {
+    if (typeof row.participant_count === 'number') {
+      accumulator.set(row.event_id, row.participant_count);
+      return accumulator;
+    }
+
     accumulator.set(row.event_id, (accumulator.get(row.event_id) ?? 0) + 1);
     return accumulator;
   }, new Map());

@@ -18,12 +18,10 @@ export function useEventParticipantSummaries(eventIds: readonly string[]) {
     enabled: normalizedEventIds.length > 0 && Boolean(profile?.id),
     queryFn: async () => {
       const [countResult, viewerResult] = await Promise.all([
-        profile?.is_admin
-          ? supabase
-            .from('event_participants')
-            .select('event_id')
-            .in('event_id', normalizedEventIds)
-          : Promise.resolve({ data: [], error: null }),
+        supabase
+          .from('event_participant_counts')
+          .select('event_id, participant_count')
+          .in('event_id', normalizedEventIds),
         supabase
           .from('event_participants')
           .select('event_id')
@@ -38,7 +36,7 @@ export function useEventParticipantSummaries(eventIds: readonly string[]) {
         eventIds: normalizedEventIds,
         countRows: countResult.data ?? [],
         viewerRows: viewerResult.data ?? [],
-        hasExactParticipantCount: Boolean(profile?.is_admin),
+        hasExactParticipantCount: true,
       });
     },
   });
