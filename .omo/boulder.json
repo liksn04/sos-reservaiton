@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "active_work_id": "roomin-realignment",
+  "works": {
+    "roomin-realignment": {
+      "work_id": "roomin-realignment",
+      "active_plan": ".omo/plans/roomin-realignment.md",
+      "plan_name": "roomin-realignment",
+      "session_ids": ["codex:roomin-realignment-20260603"],
+      "status": "completed",
+      "worktree_path": null
+    }
+  }
+}

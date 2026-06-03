@@ -1,0 +1,217 @@
+{
+  "startedAt": "2026-06-03T09:38:26.796Z",
+  "baseUrl": "http://localhost:5150",
+  "checks": [
+    {
+      "name": "login-desktop-1280x720",
+      "url": "http://localhost:5150/login",
+      "title": "Roomin - 빛소리",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "beforeReload": {
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "copyrightText": "© 2026 Junmo Kim. All rights reserved.",
+        "copyrightVisible": true,
+        "externalAppFontStylesheets": [],
+        "legalVisible": true,
+        "materialSymbolNodeCount": 0,
+        "materialSymbolsStylesheet": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+        "overlapLegalCopyright": false,
+        "overlapTitleActions": false,
+        "pageFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "path": "/login",
+        "pretendardReady": true,
+        "viewport": {
+          "height": 720,
+          "width": 1280
+        }
+      },
+      "afterReload": {
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "copyrightText": "© 2026 Junmo Kim. All rights reserved.",
+        "copyrightVisible": true,
+        "externalAppFontStylesheets": [],
+        "legalVisible": true,
+        "materialSymbolNodeCount": 0,
+        "materialSymbolsStylesheet": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+        "overlapLegalCopyright": false,
+        "overlapTitleActions": false,
+        "pageFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "path": "/login",
+        "pretendardReady": true,
+        "viewport": {
+          "height": 720,
+          "width": 1280
+        }
+      },
+      "console": [],
+      "assetsSummary": {
+        "byKind": {
+          "font": 4,
+          "image": 2,
+          "other": 0,
+          "script": 43,
+          "stylesheet": 3,
+          "video": 0
+        },
+        "inlineSvgCount": 2,
+        "totalCount": 52
+      },
+      "fontAssets": [
+        "http://localhost:5150/fonts/pretendard/Pretendard-Bold.otf",
+        "http://localhost:5150/fonts/pretendard/Pretendard-Regular.otf",
+        "http://localhost:5150/fonts/pretendard/Pretendard-Medium.otf",
+        "http://localhost:5150/fonts/pretendard/Pretendard-SemiBold.otf"
+      ],
+      "screenshot": "/Users/liksn04/Desktop/Coding/artifact_2/sos-reservation-t/.omo/start-work/screenshots/login-desktop-1280x720.png"
+    },
+    {
+      "name": "login-mobile-390x844",
+      "url": "http://localhost:5150/login",
+      "title": "Roomin - 빛소리",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "beforeReload": {
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "copyrightText": "© 2026 Junmo Kim. All rights reserved.",
+        "copyrightVisible": true,
+        "externalAppFontStylesheets": [],
+        "legalVisible": true,
+        "materialSymbolNodeCount": 0,
+        "materialSymbolsStylesheet": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+        "overlapLegalCopyright": false,
+        "overlapTitleActions": false,
+        "pageFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "path": "/login",
+        "pretendardReady": true,
+        "viewport": {
+          "height": 844,
+          "width": 390
+        }
+      },
+      "afterReload": {
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "copyrightText": "© 2026 Junmo Kim. All rights reserved.",
+        "copyrightVisible": true,
+        "externalAppFontStylesheets": [],
+        "legalVisible": true,
+        "materialSymbolNodeCount": 0,
+        "materialSymbolsStylesheet": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+        "overlapLegalCopyright": false,
+        "overlapTitleActions": false,
+        "pageFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "path": "/login",
+        "pretendardReady": true,
+        "viewport": {
+          "height": 844,
+          "width": 390
+        }
+      },
+      "console": [],
+      "assetsSummary": {
+        "byKind": {
+          "font": 4,
+          "image": 2,
+          "other": 0,
+          "script": 43,
+          "stylesheet": 3,
+          "video": 0
+        },
+        "inlineSvgCount": 2,
+        "totalCount": 52
+      },
+      "fontAssets": [
+        "http://localhost:5150/fonts/pretendard/Pretendard-Bold.otf",
+        "http://localhost:5150/fonts/pretendard/Pretendard-Regular.otf",
+        "http://localhost:5150/fonts/pretendard/Pretendard-Medium.otf",
+        "http://localhost:5150/fonts/pretendard/Pretendard-SemiBold.otf"
+      ],
+      "screenshot": "/Users/liksn04/Desktop/Coding/artifact_2/sos-reservation-t/.omo/start-work/screenshots/login-mobile-390x844.png"
+    },
+    {
+      "name": "terms-desktop-1280x720",
+      "url": "http://localhost:5150/legal/terms",
+      "title": "Roomin - 빛소리",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "beforeReload": {
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "headingText": "Roomin 서비스이용약관",
+        "headingVisible": true,
+        "materialSymbolFontFamily": "\"Material Symbols Outlined\"",
+        "materialSymbolText": "arrow_back",
+        "materialSymbolVisible": true,
+        "path": "/legal/terms",
+        "pretendardReady": true,
+        "rootChildren": 0,
+        "viewport": {
+          "height": 720,
+          "width": 1280
+        }
+      },
+      "afterReload": {
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "headingText": "Roomin 서비스이용약관",
+        "headingVisible": true,
+        "materialSymbolFontFamily": "\"Material Symbols Outlined\"",
+        "materialSymbolText": "arrow_back",
+        "materialSymbolVisible": true,
+        "path": "/legal/terms",
+        "pretendardReady": true,
+        "rootChildren": 0,
+        "viewport": {
+          "height": 720,
+          "width": 1280
+        }
+      },
+      "console": [],
+      "assetsSummary": {
+        "byKind": {
+          "font": 2,
+          "image": 0,
+          "other": 0,
+          "script": 48,
+          "stylesheet": 3,
+          "video": 0
+        },
+        "inlineSvgCount": 0,
+        "totalCount": 53
+      },
+      "fontAssets": [
+        "http://localhost:5150/fonts/pretendard/Pretendard-Bold.otf",
+        "http://localhost:5150/fonts/pretendard/Pretendard-Regular.otf"
+      ],
+      "screenshot": "/Users/liksn04/Desktop/Coding/artifact_2/sos-reservation-t/.omo/start-work/screenshots/terms-desktop-1280x720.png"
+    }
+  ],
+  "finishedAt": "2026-06-03T09:38:32.157Z",
+  "termsLoadedFollowup": {
+    "checkedAt": "2026-06-03T09:39:26.487Z",
+    "url": "http://localhost:5150/legal/terms",
+    "title": "Roomin - 빛소리",
+    "check": {
+      "articleVisible": true,
+      "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+      "firstParagraph": "본 약관은 운영자가 제공하는 서비스의 이용 조건과 절차, 회원과 운영자의 권리·의무 및 책임 사항, 기타 필요한 사항을 규정하는 것을 목적으로 합니다.",
+      "h2Text": "Roomin 서비스이용약관",
+      "loadingVisible": false,
+      "materialSymbolFontFamily": "\"Material Symbols Outlined\"",
+      "materialSymbolText": "arrow_back",
+      "materialSymbolVisible": true,
+      "path": "/legal/terms",
+      "pretendardReady": true,
+      "viewport": {
+        "height": 720,
+        "width": 1280
+      }
+    },
+    "console": [],
+    "screenshot": "/Users/liksn04/Desktop/Coding/artifact_2/sos-reservation-t/.omo/start-work/screenshots/terms-desktop-1280x720-loaded.png"
+  }
+}
