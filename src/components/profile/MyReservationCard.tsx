@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { diffDaysBetween } from '../../utils/dateLabels';
 import { normalizeTime } from '../../utils/time';
 import type { MyReservation } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 type ScheduleTab = 'upcoming' | 'history';
 
@@ -70,7 +71,7 @@ function MyReservationCardComponent({
           {normalizeTime(res.start_time)} - {normalizeTime(res.end_time)}
         </p>
         <div className="flex items-center gap-2 text-on-surface-variant">
-          <span className="material-symbols-outlined text-[16px]">groups</span>
+          <MaterialIcon name="groups" className="text-[16px]" />
           <p className="font-headline font-bold text-base text-on-surface/80 truncate leading-none">{res.team_name}</p>
         </div>
       </div>
@@ -79,26 +80,32 @@ function MyReservationCardComponent({
         {canManage ? (
           <>
             <button
+              type="button"
+              aria-label={`${res.team_name} 예약 수정`}
               onClick={() => onEdit(res)}
               className="w-8 h-8 rounded-full flex items-center justify-center bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface-variant border border-outline-variant/10"
             >
-              <span className="material-symbols-outlined text-[18px]">settings</span>
+              <MaterialIcon name="settings" className="text-[18px]" />
             </button>
             <button
+              type="button"
+              aria-label={`${res.team_name} 예약 삭제`}
               onClick={() => onDelete(res.id, res.team_name)}
               disabled={isHostMutating}
               className="w-8 h-8 rounded-full flex items-center justify-center bg-surface-container hover:bg-error-container/10 hover:text-error transition-colors text-on-surface-variant border border-outline-variant/10"
             >
-              <span className="material-symbols-outlined text-[18px]">delete</span>
+              <MaterialIcon name="delete" className="text-[18px]" />
             </button>
           </>
         ) : (
           <button
+            type="button"
+            aria-label={`${res.team_name} 예약 나가기`}
             onClick={() => onLeave(res.id, res.team_name)}
             disabled={isLeaveMutating}
             className="w-8 h-8 rounded-full flex items-center justify-center bg-surface-container hover:bg-error-container/10 hover:text-error transition-colors text-on-surface-variant border border-outline-variant/10"
           >
-            <span className="material-symbols-outlined text-[18px]">logout</span>
+            <MaterialIcon name="logout" className="text-[18px]" />
           </button>
         )}
       </div>

@@ -1,5 +1,6 @@
 import type { ReservationWithDetails } from '../types';
 import { useReservationChangeLog } from '../hooks/useReservationChangeLog';
+import MaterialIcon from './MaterialIcon';
 import {
   buildReservationParticipantItems,
   formatReservationDetailDate,
@@ -103,10 +104,10 @@ export default function ReservationDetailModal({
           <button
             type="button"
             aria-label="상세정보 닫기"
-            className="material-symbols-outlined text-2xl text-on-surface-variant hover:text-on-surface transition-colors flex-shrink-0 w-11 h-11 rounded-full border border-card-border bg-surface-container-low flex items-center justify-center"
+            className="text-2xl text-on-surface-variant hover:text-on-surface transition-colors flex-shrink-0 w-11 h-11 rounded-full border border-card-border bg-surface-container-low flex items-center justify-center"
             onClick={onClose}
           >
-            close
+            <MaterialIcon name="close" />
           </button>
         </div>
 
@@ -344,7 +345,7 @@ function InfoCard({ icon, label, value, subValue }: InfoCardProps) {
   return (
     <div className="rounded-[1.5rem] border border-card-border bg-surface-container-low px-4 py-4 min-w-0">
       <div className="flex items-start gap-3">
-        <span className="material-symbols-outlined text-primary text-[22px]">{icon}</span>
+        <MaterialIcon name={icon} className="text-primary text-[22px]" />
         <div className="min-w-0">
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-on-surface-variant/70 mb-1">
             {label}

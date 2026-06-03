@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { prefetchRouteModule, scheduleIdlePrefetch } from '../lib/moduleLoaders';
+import MaterialIcon from './MaterialIcon';
 
 const TABS = [
   { to: '/',        icon: 'home',           label: '홈',      end: true  },
@@ -40,12 +41,7 @@ export default function BottomNav() {
         >
           {({ isActive }) => (
             <>
-              <span
-                className="material-symbols-outlined font-bold text-[22px]"
-                style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
-              >
-                {icon}
-              </span>
+              <MaterialIcon name={icon} className="font-bold text-[22px]" style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}} />
               <span className="label">{label}</span>
             </>
           )}

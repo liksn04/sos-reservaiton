@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLegalDocument } from '../hooks/useLegalDocument';
 import LegalMarkdown from '../components/LegalMarkdown';
 import type { LegalDocumentSlug } from '../types';
+import MaterialIcon from '../components/MaterialIcon';
 
 interface LegalDocumentRouteProps {
   slug: LegalDocumentSlug;
@@ -27,7 +28,7 @@ export default function LegalDocumentRoute({ slug, fallbackTitle }: LegalDocumen
             className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container hover:bg-surface-container-high transition-colors border border-outline-variant/10"
             aria-label="뒤로 가기"
           >
-            <span className="material-symbols-outlined text-[20px] text-on-surface-variant">arrow_back</span>
+            <MaterialIcon name="arrow_back" className="text-[20px] text-on-surface-variant" />
           </button>
           <h1 className="font-headline text-lg font-bold tracking-tight truncate">{title}</h1>
         </div>
@@ -41,7 +42,7 @@ export default function LegalDocumentRoute({ slug, fallbackTitle }: LegalDocumen
           </div>
         ) : isError ? (
           <div className="surface-card p-8 text-center space-y-2">
-            <span className="material-symbols-outlined text-[36px] text-error">error</span>
+            <MaterialIcon name="error" className="text-[36px] text-error" />
             <p className="font-headline text-base font-bold text-on-surface">문서를 불러오지 못했습니다</p>
             <p className="text-xs text-on-surface-variant break-words">
               {error instanceof Error ? error.message : '잠시 후 다시 시도해주세요.'}
@@ -49,7 +50,7 @@ export default function LegalDocumentRoute({ slug, fallbackTitle }: LegalDocumen
           </div>
         ) : !data ? (
           <div className="surface-card p-8 text-center space-y-2">
-            <span className="material-symbols-outlined text-[36px] text-on-surface-variant">draft</span>
+            <MaterialIcon name="draft" className="text-[36px] text-on-surface-variant" />
             <p className="font-headline text-base font-bold text-on-surface">
               아직 게시된 문서가 없습니다
             </p>

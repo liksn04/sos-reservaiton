@@ -1,0 +1,29 @@
+
+> roomin@0.0.0 test
+> vitest run src/components/MaterialIcon.test.tsx
+
+
+ RUN  v4.1.4 /Users/liksn04/Desktop/Coding/artifact_2/sos-reservation-t
+
+ ❯ src/components/MaterialIcon.test.tsx (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/MaterialIcon.test.tsx [ src/components/MaterialIcon.test.tsx ]
+Error: Cannot find module './MaterialIcon' imported from /Users/liksn04/Desktop/Coding/artifact_2/sos-reservation-t/src/components/MaterialIcon.test.tsx
+ ❯ src/components/MaterialIcon.test.tsx:3:1
+      1| import { describe, expect, it } from 'vitest';
+      2| import { renderToStaticMarkup } from 'react-dom/server';
+      3| import MaterialIcon from './MaterialIcon';
+       | ^
+      4|
+      5| describe('MaterialIcon', () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  19:46:10
+   Duration  85ms (transform 14ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

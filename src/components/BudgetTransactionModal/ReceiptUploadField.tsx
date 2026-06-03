@@ -1,4 +1,5 @@
 import type { ChangeEvent, RefObject } from 'react';
+import MaterialIcon from '../MaterialIcon';
 
 interface ReceiptUploadFieldProps {
   inputRef: RefObject<HTMLInputElement | null>;
@@ -59,9 +60,7 @@ export function ReceiptUploadField({
           onClick={() => inputRef.current?.click()}
           className="w-full h-24 rounded-2xl border-2 border-dashed border-card-border hover:border-primary/50 transition-colors flex flex-col items-center justify-center gap-2 group"
         >
-          <span className="material-symbols-outlined text-[28px] text-muted group-hover:text-primary transition-colors">
-            add_photo_alternate
-          </span>
+          <MaterialIcon name="add_photo_alternate" className="text-[28px] text-muted group-hover:text-primary transition-colors" />
           <span className="text-[10px] font-black uppercase tracking-widest text-muted group-hover:text-primary transition-colors">
             영수증 첨부
           </span>

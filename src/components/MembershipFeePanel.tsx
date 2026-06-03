@@ -6,6 +6,7 @@ import { formatCurrency } from '../utils/format';
 import { MembershipFeePolicyCard } from './budget/MembershipFeePolicyCard';
 import { MemberPaymentCard } from './budget/MemberPaymentCard';
 import type { MembershipFeeMemberStatus } from '../types';
+import MaterialIcon from './MaterialIcon';
 
 interface Props {
   year: number;
@@ -94,7 +95,7 @@ export default function MembershipFeePanel({ year, half }: Props) {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-emerald-500 text-xl">check_circle</span>
+                  <MaterialIcon name="check_circle" className="text-emerald-500 text-xl" />
                 </div>
                 <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
                   납부 현황 ({paidCount}/{totalCount})
@@ -125,15 +126,13 @@ export default function MembershipFeePanel({ year, half }: Props) {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-on-surface/5 flex items-center justify-center">
-              <span className="material-symbols-outlined text-sm opacity-60">group</span>
+              <MaterialIcon name="group" className="text-sm opacity-60" />
             </div>
             <h3 className="text-sm font-black uppercase tracking-widest">회비 납부 명단</h3>
           </div>
 
           <div className="relative group">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-sm opacity-30 group-focus-within:text-primary transition-colors">
-              search
-            </span>
+            <MaterialIcon name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-sm opacity-30 group-focus-within:text-primary transition-colors" />
             <input
               type="text"
               placeholder="이름으로 검색..."
@@ -166,7 +165,7 @@ export default function MembershipFeePanel({ year, half }: Props) {
 
         {filteredRecords.length === 0 && (
           <div className="py-16 flex flex-col items-center justify-center opacity-20">
-            <span className="material-symbols-outlined text-5xl mb-3">person_search</span>
+            <MaterialIcon name="person_search" className="text-5xl mb-3" />
             <p className="text-xs font-bold tracking-widest uppercase">검색 결과가 없습니다</p>
           </div>
         )}

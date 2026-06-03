@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Download, MonitorSmartphone, PlusSquare, Share, X } from 'lucide-react';
+import MaterialIcon from './MaterialIcon';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -176,11 +177,11 @@ export default function PwaInstallPrompt() {
                 <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
                   <div className="flex items-center gap-2">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-warning-container text-warning">
-                      <span className="material-symbols-outlined text-[16px]">more_horiz</span>
+                      <MaterialIcon name="more_horiz" className="text-[16px]" />
                     </span>
                     <span className="text-xs font-black leading-4 text-on-surface">더보기</span>
                   </div>
-                  <span className="material-symbols-outlined text-[18px] text-warning/70">chevron_right</span>
+                  <MaterialIcon name="chevron_right" className="text-[18px] text-warning/70" />
                   <div className="flex items-center gap-2">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-warning-container text-warning">
                       <MonitorSmartphone className="h-3.5 w-3.5" />
@@ -217,7 +218,7 @@ export default function PwaInstallPrompt() {
                     </span>
                     <span className="text-xs font-black leading-4 text-on-surface">공유</span>
                   </div>
-                  <span className="material-symbols-outlined text-[18px] text-primary/70">chevron_right</span>
+                  <MaterialIcon name="chevron_right" className="text-[18px] text-primary/70" />
                   <div className="flex items-center gap-2">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <PlusSquare className="h-3.5 w-3.5" />
@@ -233,11 +234,11 @@ export default function PwaInstallPrompt() {
                 <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
                   <div className="flex items-center gap-2">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <span className="material-symbols-outlined text-[16px]">more_vert</span>
+                      <MaterialIcon name="more_vert" className="text-[16px]" />
                     </span>
                     <span className="text-xs font-black leading-4 text-on-surface">Chrome 메뉴</span>
                   </div>
-                  <span className="material-symbols-outlined text-[18px] text-primary/70">chevron_right</span>
+                  <MaterialIcon name="chevron_right" className="text-[18px] text-primary/70" />
                   <div className="flex items-center gap-2">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <Download className="h-3.5 w-3.5" />
@@ -253,7 +254,7 @@ export default function PwaInstallPrompt() {
                   <div className="flex items-center gap-2 text-xs font-black text-on-surface">
                     <Share className="h-4 w-4 shrink-0 text-primary" />
                     <span>공유</span>
-                    <span className="material-symbols-outlined text-[16px] text-primary/70">chevron_right</span>
+                    <MaterialIcon name="chevron_right" className="text-[16px] text-primary/70" />
                     <span>홈 화면에 추가</span>
                   </div>
                 </div>
@@ -261,9 +262,9 @@ export default function PwaInstallPrompt() {
                   <p className="mb-2 text-xs font-black text-primary">Android</p>
                   <p className="mb-2 text-xs font-semibold leading-5 text-on-surface-variant">Chrome 브라우저 필수</p>
                   <div className="flex items-center gap-2 text-xs font-black text-on-surface">
-                    <span className="material-symbols-outlined text-[16px] text-primary">more_vert</span>
+                    <MaterialIcon name="more_vert" className="text-[16px] text-primary" />
                     <span>Chrome 메뉴</span>
-                    <span className="material-symbols-outlined text-[16px] text-primary/70">chevron_right</span>
+                    <MaterialIcon name="chevron_right" className="text-[16px] text-primary/70" />
                     <span>홈 화면에 추가</span>
                   </div>
                 </div>

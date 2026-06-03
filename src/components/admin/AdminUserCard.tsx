@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { Profile } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 interface Props {
   user: Profile;
@@ -17,7 +18,7 @@ export default function AdminUserCard({ user, badge, meta, actions }: Props) {
           <img src={user.avatar_url} alt={user.display_name} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-on-surface-variant opacity-40">
-            <span className="material-symbols-outlined text-[28px]">person</span>
+            <MaterialIcon name="person" className="text-[28px]" />
           </div>
         )}
       </div>

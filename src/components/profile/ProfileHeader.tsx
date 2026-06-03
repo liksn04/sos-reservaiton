@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { PART_INFO } from '../../lib/constants';
 import type { Profile } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 interface Props {
   profile: Profile | null;
@@ -25,7 +26,7 @@ export function ProfileHeader({ profile, onEdit, onSignOut, onOpenDeleteDialog }
           {profile?.avatar_url ? (
             <img src={profile.avatar_url} alt="User Avatar" className="w-full h-full object-cover" />
           ) : (
-            <span className="material-symbols-outlined text-[40px] text-muted">person</span>
+            <MaterialIcon name="person" className="text-[40px] text-muted" />
           )}
         </div>
         <div className="flex flex-col items-center z-10 relative">

@@ -1,12 +1,20 @@
 {
   "schema_version": 2,
-  "active_work_id": "roomin-realignment",
+  "active_work_id": null,
   "works": {
     "roomin-realignment": {
       "work_id": "roomin-realignment",
       "active_plan": ".omo/plans/roomin-realignment.md",
       "plan_name": "roomin-realignment",
       "session_ids": ["codex:roomin-realignment-20260603"],
+      "status": "completed",
+      "worktree_path": null
+    },
+    "first-load-icon-key-flash": {
+      "work_id": "first-load-icon-key-flash",
+      "active_plan": ".omo/plans/first-load-icon-key-flash.md",
+      "plan_name": "first-load-icon-key-flash",
+      "session_ids": ["codex:019e8d05-6c9f-7113-85e9-8dd79ab533b9"],
       "status": "completed",
       "worktree_path": null
     }

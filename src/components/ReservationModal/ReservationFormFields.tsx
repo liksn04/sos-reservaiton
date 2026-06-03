@@ -6,6 +6,7 @@ import { findActiveReservationPolicySeason } from '../../utils/reservationPolicy
 import { getAvailableReservationPurposes } from '../../lib/constants';
 import { formatDate } from '../../utils/time';
 import type { ReservationPolicySeason, ReservationWithDetails, Purpose, Profile } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 interface Props {
   // 날짜 & 시간
@@ -79,16 +80,14 @@ export default function ReservationFormFields({
         />
         {purpose === '합주' && activeSameDaySeason && (
           <p className="mt-1.5 flex items-center gap-1 text-[11px] font-bold tracking-tight text-primary">
-            <span className="material-symbols-outlined text-sm shrink-0">event_available</span>
+            <MaterialIcon name="event_available" className="text-sm shrink-0" />
             현재 [{activeSameDaySeason.name}] 시즌으로 오늘 합주 예약도 가능합니다.
           </p>
         )}
         {/* [규칙 1] 합주 당일 선택 시 경고 */}
         {sameDayWarning && (
           <p className="text-error mt-1.5 flex items-center gap-1 text-[11px] font-bold tracking-tight animate-in fade-in slide-in-from-top-1 duration-300">
-            <span className="material-symbols-outlined text-sm shrink-0">
-              warning
-            </span>
+            <MaterialIcon name="warning" className="text-sm shrink-0" />
             {sameDayWarning.message}
           </p>
         )}
@@ -125,11 +124,12 @@ export default function ReservationFormFields({
           <div className="flex items-stretch bg-input-bg border border-input-border rounded-[1.5rem] min-h-[56px] px-1.5 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
             <button
               type="button"
+              aria-label="참여 인원 줄이기"
               className="w-11 min-h-[52px] flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors disabled:opacity-20"
               onClick={() => onPeopleCountChange(Math.max(1, peopleCount - 1))}
               disabled={peopleCount <= 1}
             >
-              <span className="material-symbols-outlined text-lg">remove</span>
+              <MaterialIcon name="remove" className="text-lg" />
             </button>
             
             <div className="flex-1 flex items-center justify-center gap-2 focus-within:bg-white/5 transition-colors rounded-[1rem] min-h-[52px]">
@@ -152,11 +152,12 @@ export default function ReservationFormFields({
 
             <button
               type="button"
+              aria-label="참여 인원 늘리기"
               className="w-11 min-h-[52px] flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors disabled:opacity-20"
               onClick={() => onPeopleCountChange(Math.min(9, peopleCount + 1))}
               disabled={peopleCount >= 9}
             >
-              <span className="material-symbols-outlined text-lg">add</span>
+              <MaterialIcon name="add" className="text-lg" />
             </button>
           </div>
         </div>

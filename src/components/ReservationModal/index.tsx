@@ -2,6 +2,7 @@ import { useMembers } from '../../hooks/useMembers';
 import { useReservationForm } from './useReservationForm';
 import ReservationFormFields from './ReservationFormFields';
 import type { Profile, ReservationPolicySeason, ReservationWithDetails } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 interface Props {
   isOpen: boolean;
@@ -96,10 +97,10 @@ function ReservationModalContent({
           <button
             type="button"
             aria-label="닫기"
-            className="material-symbols-outlined text-2xl text-on-surface-variant hover:text-on-surface transition-colors flex-shrink-0 w-11 h-11 rounded-full border border-card-border bg-surface-container-low flex items-center justify-center"
+            className="text-2xl text-on-surface-variant hover:text-on-surface transition-colors flex-shrink-0 w-11 h-11 rounded-full border border-card-border bg-surface-container-low flex items-center justify-center"
             onClick={onClose}
           >
-            close
+            <MaterialIcon name="close" />
           </button>
         </div>
 

@@ -9,6 +9,7 @@ import { BUDGET_CATEGORY_COLOR_PRESETS, BUDGET_CATEGORY_ICON_OPTIONS } from './B
 import { ReceiptUploadField } from './BudgetTransactionModal/ReceiptUploadField';
 import { TransactionTypeToggle } from './BudgetTransactionModal/TransactionTypeToggle';
 import type { BudgetTransaction, BudgetTransactionInput, BudgetCategory } from '../types';
+import MaterialIcon from './MaterialIcon';
 
 interface Props {
   isOpen: boolean;
@@ -217,10 +218,12 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
             </span>
           </h2>
           <button
-            className="material-symbols-outlined text-[28px] text-muted hover:text-on-surface transition-colors"
+            type="button"
+            aria-label="거래 내역 닫기"
+            className="text-[28px] text-muted hover:text-on-surface transition-colors"
             onClick={onClose}
           >
-            close
+            <MaterialIcon name="close" />
           </button>
         </div>
 
@@ -267,9 +270,7 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
               날짜
             </label>
             <div className="relative">
-              <span className="material-symbols-outlined text-xl absolute left-4 top-1/2 -translate-y-1/2 text-primary">
-                calendar_today
-              </span>
+              <MaterialIcon name="calendar_today" className="text-xl absolute left-4 top-1/2 -translate-y-1/2 text-primary" />
               <input
                 type="date"
                 className="w-full h-[54px] bg-surface-container-high border border-outline-variant/10 rounded-2xl font-bold outline-none focus:border-primary/50 transition-colors"
@@ -332,7 +333,7 @@ export default function BudgetTransactionModal({ isOpen, onClose, editing, fisca
             <div
               className="text-xs font-bold p-4 rounded-2xl flex items-center gap-2 bg-error/10 text-error border border-error/20"
             >
-              <span className="material-symbols-outlined text-lg">error</span>
+              <MaterialIcon name="error" className="text-lg" />
               {error}
             </div>
           )}

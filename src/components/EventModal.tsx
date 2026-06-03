@@ -5,6 +5,7 @@ import type { ClubEventWithDetails, EventCategory } from '../types';
 import DatePicker from './Calendar/DatePicker';
 import { EventCategoryEditor } from './events/EventCategoryEditor';
 import { getTimeSlots } from '../utils/time';
+import MaterialIcon from './MaterialIcon';
 
 interface Props {
   isOpen: boolean;
@@ -71,10 +72,10 @@ function EventModalContent({ onClose, editing, initialDate, categories }: Conten
             <button
               type="button"
               aria-label="닫기"
-              className="material-symbols-outlined text-2xl text-on-surface-variant hover:text-on-surface transition-colors flex-shrink-0 w-11 h-11 rounded-full border border-card-border bg-surface-container-low flex items-center justify-center"
+              className="text-2xl text-on-surface-variant hover:text-on-surface transition-colors flex-shrink-0 w-11 h-11 rounded-full border border-card-border bg-surface-container-low flex items-center justify-center"
               onClick={onClose}
             >
-              close
+              <MaterialIcon name="close" />
             </button>
           </div>
 
@@ -107,11 +108,11 @@ function EventModalContent({ onClose, editing, initialDate, categories }: Conten
                 <label className="text-[10px] font-black uppercase tracking-widest mb-3 block text-muted">시작 일시</label>
                 <div className="flex flex-col gap-4">
                   <div className="premium-input-box group" onClick={() => setPickerOpen('start_date')}>
-                    <span className="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">calendar_today</span>
+                    <MaterialIcon name="calendar_today" className="text-primary group-hover:scale-110 transition-transform" />
                     <span className="premium-input-value font-bold">{startDate || '날짜 선택'}</span>
                   </div>
                   <div className="relative">
-                    <span className="material-symbols-outlined text-xl absolute left-4 top-1/2 -translate-y-1/2 text-primary z-10">schedule</span>
+                    <MaterialIcon name="schedule" className="text-xl absolute left-4 top-1/2 -translate-y-1/2 text-primary z-10" />
                     <select
                       className="premium-select-input"
                       style={{ paddingLeft: '3.5rem' }}
@@ -129,13 +130,13 @@ function EventModalContent({ onClose, editing, initialDate, categories }: Conten
                 <label className="text-[10px] font-black uppercase tracking-widest mb-3 block text-muted">종료 일시 (선택)</label>
                 <div className="flex flex-col gap-4">
                   <div className="premium-input-box group" onClick={() => setPickerOpen('end_date')}>
-                    <span className="material-symbols-outlined text-muted">calendar_today</span>
+                    <MaterialIcon name="calendar_today" className="text-muted" />
                     <span className={`premium-input-value ${!endDate ? 'premium-input-placeholder' : ''}`}>
                       {endDate || '날짜 선택'}
                     </span>
                   </div>
                   <div className="relative">
-                    <span className="material-symbols-outlined text-xl text-muted absolute left-4 top-1/2 -translate-y-1/2 z-10">schedule</span>
+                    <MaterialIcon name="schedule" className="text-xl text-muted absolute left-4 top-1/2 -translate-y-1/2 z-10" />
                     <select
                       className="premium-select-input"
                       style={{ paddingLeft: '3.5rem' }}
@@ -153,7 +154,7 @@ function EventModalContent({ onClose, editing, initialDate, categories }: Conten
             <div className="form-group">
               <label className="text-[10px] font-black uppercase tracking-widest block mb-1.5 text-muted">장소</label>
               <div className="relative">
-                <span className="material-symbols-outlined text-xl text-muted absolute left-4 top-1/2 -translate-y-1/2">place</span>
+                <MaterialIcon name="place" className="text-xl text-muted absolute left-4 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   className="w-full h-[54px] bg-surface-container-high border border-outline-variant/10 rounded-2xl pr-4 font-bold outline-none focus:border-primary/50 transition-colors"
@@ -179,7 +180,7 @@ function EventModalContent({ onClose, editing, initialDate, categories }: Conten
             {error && (
               <div className="text-xs font-bold p-4 rounded-2xl animate-fade-in bg-error/10 text-error border border-error/20">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-lg">error</span>
+                  <MaterialIcon name="error" className="text-lg" />
                   {error}
                 </div>
               </div>

@@ -17,6 +17,7 @@ import { ProfileHeader } from '../components/profile/ProfileHeader';
 import { MyReservationCard } from '../components/profile/MyReservationCard';
 import type { AppShellContext } from './AppShell';
 import type { MyReservation } from '../types';
+import MaterialIcon from '../components/MaterialIcon';
 
 type ScheduleTab = 'upcoming' | 'history';
 
@@ -108,7 +109,7 @@ export default function ProfileRoute() {
         <section className="mb-8">
           <div className="surface-card p-5">
             <div className="flex items-center gap-2 mb-4">
-              <span className="material-symbols-outlined text-[20px] text-on-surface-variant">palette</span>
+              <MaterialIcon name="palette" className="text-[20px] text-on-surface-variant" />
               <h4 className="font-headline text-sm font-bold text-on-surface tracking-tight">화면 테마</h4>
             </div>
             <ThemeToggle />
@@ -153,7 +154,7 @@ export default function ProfileRoute() {
         <div className="space-y-4">
           {visibleReservations.length === 0 ? (
             <div className="glass-card rounded-[2rem] p-10 flex flex-col items-center justify-center text-center border border-outline-variant/10">
-              <span className="material-symbols-outlined text-[48px] text-surface-variant mb-4">event_busy</span>
+              <MaterialIcon name="event_busy" className="text-[48px] text-surface-variant mb-4" />
               <p className="text-on-surface-variant font-bold">
                 {scheduleTab === 'upcoming' ? '예정된 일정이 없습니다.' : '지난 일정이 없습니다.'}
               </p>

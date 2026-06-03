@@ -1,0 +1,13 @@
+
+> roomin@0.0.0 test
+> vitest run src/utils/materialSymbolsReady.test.ts
+
+
+ RUN  v4.1.4 /Users/liksn04/Desktop/Coding/artifact_2/sos-reservation-t
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  19:49:24
+   Duration  87ms (transform 19ms, setup 0ms, import 24ms, tests 3ms, environment 0ms)
+

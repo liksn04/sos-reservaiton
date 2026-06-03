@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import MaterialIcon from '../MaterialIcon';
 
 interface Props {
   isOpen: boolean;
@@ -41,11 +42,13 @@ function BanDialogContent({ userName, onConfirm, onClose, isPending }: Omit<Prop
             회원 <span className="text-error">차단</span>
           </h2>
           <button
-            className="material-symbols-outlined text-2xl text-on-surface-variant"
+            type="button"
+            aria-label="회원 차단 닫기"
+            className="text-2xl text-on-surface-variant"
             onClick={onClose}
             disabled={isPending}
           >
-            close
+            <MaterialIcon name="close" />
           </button>
         </div>
 
@@ -81,7 +84,7 @@ function BanDialogContent({ userName, onConfirm, onClose, isPending }: Omit<Prop
             {isPending
               ? <div className="w-4 h-4 border-2 border-error/20 border-t-error rounded-full animate-spin" />
               : <>
-                  <span className="material-symbols-outlined text-[18px]">block</span>
+                  <MaterialIcon name="block" className="text-[18px]" />
                   차단 확정
                 </>
             }

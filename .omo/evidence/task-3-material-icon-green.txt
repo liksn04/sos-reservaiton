@@ -1,0 +1,13 @@
+
+> roomin@0.0.0 test
+> vitest run src/components/MaterialIcon.test.tsx
+
+
+ RUN  v4.1.4 /Users/liksn04/Desktop/Coding/artifact_2/sos-reservation-t
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  19:49:24
+   Duration  101ms (transform 20ms, setup 0ms, import 37ms, tests 4ms, environment 0ms)
+

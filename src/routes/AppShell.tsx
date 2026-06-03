@@ -7,6 +7,7 @@ import BottomNav from '../components/BottomNav';
 import ReservationModal from '../components/ReservationModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import type { ReservationWithDetails } from '../types';
+import MaterialIcon from '../components/MaterialIcon';
 
 /** Passed to child routes via <Outlet context={...}> */
 export interface AppShellContext {
@@ -71,7 +72,7 @@ export default function AppShell() {
         <div className="flex items-center gap-3">
           {profile?.is_admin && (
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-full bg-primary/10 text-primary text-[11px] font-bold border border-primary/10">
-              <span className="material-symbols-outlined text-[14px]">verified_user</span>
+              <MaterialIcon name="verified_user" className="text-[14px]" />
               관리자
             </div>
           )}
@@ -96,7 +97,7 @@ export default function AppShell() {
               <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <span className="material-symbols-outlined text-[20px]" style={{ color: 'var(--text-muted)' }}>person</span>
+                <MaterialIcon name="person" className="text-[20px]" style={{ color: 'var(--text-muted)' }} />
               </div>
             )}
           </div>

@@ -9,6 +9,7 @@ import {
   validateMembershipFeePolicyDraft,
 } from '../../utils/membershipFees';
 import type { MembershipFeePolicy } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 interface Props {
   year: number;
@@ -61,7 +62,7 @@ export function MembershipFeePolicyCard({ year, half, policy }: Props) {
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-            <span className="material-symbols-outlined text-primary text-xl">payments</span>
+            <MaterialIcon name="payments" className="text-primary text-xl" />
           </div>
           <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
             {year}년 {half}학기 회비 정책

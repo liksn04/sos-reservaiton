@@ -6,6 +6,7 @@ import { useToast } from '../../contexts/useToast';
 import { listBannedMembers } from '../../services/adminService';
 import AdminUserCard from './AdminUserCard';
 import type { Profile } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 export default function BannedTab() {
   const unbanUser = useUnbanUser();
@@ -41,7 +42,7 @@ export default function BannedTab() {
   if (users.length === 0) {
     return (
       <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-4 opacity-60">
-        <span className="material-symbols-outlined text-5xl opacity-20">check_circle</span>
+        <MaterialIcon name="check_circle" className="text-5xl opacity-20" />
         <p className="text-sm font-bold">차단된 회원이 없습니다.</p>
       </div>
     );
@@ -73,7 +74,7 @@ export default function BannedTab() {
             >
               {unbanUser.isPending
                 ? <div className="w-4 h-4 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-                : <><span className="material-symbols-outlined text-[18px]">lock_open</span>차단 해제</>}
+                : <><MaterialIcon name="lock_open" className="text-[18px]" />차단 해제</>}
             </button>
           }
         />

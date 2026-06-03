@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useDeleteAccount } from '../hooks/mutations/useDeleteAccount';
+import MaterialIcon from './MaterialIcon';
 
 interface Props {
   isOpen: boolean;
@@ -103,7 +104,7 @@ function DeleteAccountDialogContent({ onClose }: Pick<Props, 'onClose'>) {
             onClick={onClose}
             disabled={deleteAccount.isPending}
           >
-            <span className="material-symbols-outlined text-[22px]">close</span>
+            <MaterialIcon name="close" className="text-[22px]" />
           </button>
         </div>
 
@@ -111,7 +112,7 @@ function DeleteAccountDialogContent({ onClose }: Pick<Props, 'onClose'>) {
           {step === 1 && (
             <div className="space-y-4">
               <div className="delete-account-warning">
-                <span className="material-symbols-outlined text-[28px] text-error">warning</span>
+                <MaterialIcon name="warning" className="text-[28px] text-error" />
                 <div className="min-w-0">
                   <p id="delete-account-description" className="text-base font-black text-error leading-tight">
                     탈퇴하면 계정 복구가 불가능합니다.
@@ -125,7 +126,7 @@ function DeleteAccountDialogContent({ onClose }: Pick<Props, 'onClose'>) {
               <ul className="delete-account-list">
                 {deletedItems.map((item) => (
                   <li key={item} className="delete-account-list-item">
-                    <span className="material-symbols-outlined text-[18px] text-error/80">remove_circle</span>
+                    <MaterialIcon name="remove_circle" className="text-[18px] text-error/80" />
                     <span>{item}</span>
                   </li>
                 ))}

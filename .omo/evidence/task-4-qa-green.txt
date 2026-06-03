@@ -1,0 +1,406 @@
+
+> roomin@0.0.0 qa:public-routes
+> node scripts/verify-public-routes.mjs
+
+{
+  "status": "PASS",
+  "baseUrl": "http://127.0.0.1:5150",
+  "results": [
+    {
+      "name": "login desktop",
+      "kind": "login",
+      "path": "/login",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "deviceScaleFactor": 1
+      },
+      "screenshotPath": ".omo/evidence/task-4-login-desktop.png",
+      "beforeReload": {
+        "path": "/login",
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "copyrightText": "© 2026 Junmo Kim. All rights reserved.",
+        "copyrightVisible": true,
+        "externalAppFontStylesheets": [],
+        "externalMaterialSymbolsStylesheets": [],
+        "legalVisible": true,
+        "localMaterialSymbolsFontFace": true,
+        "materialSymbolsReadyClass": true,
+        "overlapLegalCopyright": false,
+        "overlapTitleActions": false,
+        "pretendardReady": true,
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "visibleIconKeyLeaks": []
+      },
+      "afterReload": {
+        "path": "/login",
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "copyrightText": "© 2026 Junmo Kim. All rights reserved.",
+        "copyrightVisible": true,
+        "externalAppFontStylesheets": [],
+        "externalMaterialSymbolsStylesheets": [],
+        "legalVisible": true,
+        "localMaterialSymbolsFontFace": true,
+        "materialSymbolsReadyClass": true,
+        "overlapLegalCopyright": false,
+        "overlapTitleActions": false,
+        "pretendardReady": true,
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "visibleIconKeyLeaks": []
+      },
+      "consoleMessages": []
+    },
+    {
+      "name": "login mobile",
+      "kind": "login",
+      "path": "/login",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "isMobile": true,
+        "deviceScaleFactor": 2
+      },
+      "screenshotPath": ".omo/evidence/task-4-login-mobile.png",
+      "beforeReload": {
+        "path": "/login",
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "copyrightText": "© 2026 Junmo Kim. All rights reserved.",
+        "copyrightVisible": true,
+        "externalAppFontStylesheets": [],
+        "externalMaterialSymbolsStylesheets": [],
+        "legalVisible": true,
+        "localMaterialSymbolsFontFace": true,
+        "materialSymbolsReadyClass": true,
+        "overlapLegalCopyright": false,
+        "overlapTitleActions": false,
+        "pretendardReady": true,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "visibleIconKeyLeaks": []
+      },
+      "afterReload": {
+        "path": "/login",
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "copyrightText": "© 2026 Junmo Kim. All rights reserved.",
+        "copyrightVisible": true,
+        "externalAppFontStylesheets": [],
+        "externalMaterialSymbolsStylesheets": [],
+        "legalVisible": true,
+        "localMaterialSymbolsFontFace": true,
+        "materialSymbolsReadyClass": true,
+        "overlapLegalCopyright": false,
+        "overlapTitleActions": false,
+        "pretendardReady": true,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "visibleIconKeyLeaks": []
+      },
+      "consoleMessages": []
+    },
+    {
+      "name": "terms desktop",
+      "kind": "legal",
+      "path": "/legal/terms",
+      "viewport": {
+        "width": 1280,
+        "height": 720,
+        "deviceScaleFactor": 1
+      },
+      "screenshotPath": ".omo/evidence/task-4-terms-desktop.png",
+      "beforeReload": {
+        "path": "/legal/terms",
+        "articleVisible": true,
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "externalAppFontStylesheets": [],
+        "externalMaterialSymbolsStylesheets": [],
+        "headingVisible": true,
+        "headings": [
+          "Roomin 서비스이용약관",
+          "Roomin 서비스이용약관",
+          "제1조 (목적)",
+          "제2조 (용어의 정의)",
+          "제3조 (약관의 게시와 개정)",
+          "제4조 (이용계약의 체결)",
+          "제5조 (회원 정보의 관리)",
+          "제6조 (서비스의 제공 및 변경)",
+          "제7조 (서비스의 중단)",
+          "제8조 (회원의 의무)",
+          "제9조 (예약 정책 및 합주실 이용)",
+          "제10조 (관리자 권한)",
+          "제11조 (게시물 및 데이터의 관리)",
+          "제12조 (지적재산권)",
+          "제13조 (계약 해지 및 이용 제한)",
+          "제14조 (책임의 제한)",
+          "제15조 (개인정보의 보호)",
+          "제16조 (분쟁 해결 및 준거법)",
+          "부칙",
+          "운영자 정보"
+        ],
+        "localMaterialSymbolsFontFace": true,
+        "materialSymbolsReadyClass": true,
+        "materialSymbolFontFamily": "\"Material Symbols Outlined\"",
+        "materialSymbolText": "",
+        "materialSymbolVisible": true,
+        "pretendardReady": true,
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "visibleIconKeyLeaks": []
+      },
+      "afterReload": {
+        "path": "/legal/terms",
+        "articleVisible": true,
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "externalAppFontStylesheets": [],
+        "externalMaterialSymbolsStylesheets": [],
+        "headingVisible": true,
+        "headings": [
+          "Roomin 서비스이용약관",
+          "Roomin 서비스이용약관",
+          "제1조 (목적)",
+          "제2조 (용어의 정의)",
+          "제3조 (약관의 게시와 개정)",
+          "제4조 (이용계약의 체결)",
+          "제5조 (회원 정보의 관리)",
+          "제6조 (서비스의 제공 및 변경)",
+          "제7조 (서비스의 중단)",
+          "제8조 (회원의 의무)",
+          "제9조 (예약 정책 및 합주실 이용)",
+          "제10조 (관리자 권한)",
+          "제11조 (게시물 및 데이터의 관리)",
+          "제12조 (지적재산권)",
+          "제13조 (계약 해지 및 이용 제한)",
+          "제14조 (책임의 제한)",
+          "제15조 (개인정보의 보호)",
+          "제16조 (분쟁 해결 및 준거법)",
+          "부칙",
+          "운영자 정보"
+        ],
+        "localMaterialSymbolsFontFace": true,
+        "materialSymbolsReadyClass": true,
+        "materialSymbolFontFamily": "\"Material Symbols Outlined\"",
+        "materialSymbolText": "",
+        "materialSymbolVisible": true,
+        "pretendardReady": true,
+        "viewport": {
+          "width": 1280,
+          "height": 720
+        },
+        "visibleIconKeyLeaks": []
+      },
+      "consoleMessages": []
+    },
+    {
+      "name": "terms mobile",
+      "kind": "legal",
+      "path": "/legal/terms",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "isMobile": true,
+        "deviceScaleFactor": 2
+      },
+      "screenshotPath": ".omo/evidence/task-4-terms-mobile.png",
+      "beforeReload": {
+        "path": "/legal/terms",
+        "articleVisible": true,
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "externalAppFontStylesheets": [],
+        "externalMaterialSymbolsStylesheets": [],
+        "headingVisible": true,
+        "headings": [
+          "Roomin 서비스이용약관",
+          "Roomin 서비스이용약관",
+          "제1조 (목적)",
+          "제2조 (용어의 정의)",
+          "제3조 (약관의 게시와 개정)",
+          "제4조 (이용계약의 체결)",
+          "제5조 (회원 정보의 관리)",
+          "제6조 (서비스의 제공 및 변경)",
+          "제7조 (서비스의 중단)",
+          "제8조 (회원의 의무)",
+          "제9조 (예약 정책 및 합주실 이용)",
+          "제10조 (관리자 권한)",
+          "제11조 (게시물 및 데이터의 관리)",
+          "제12조 (지적재산권)",
+          "제13조 (계약 해지 및 이용 제한)",
+          "제14조 (책임의 제한)",
+          "제15조 (개인정보의 보호)",
+          "제16조 (분쟁 해결 및 준거법)",
+          "부칙",
+          "운영자 정보"
+        ],
+        "localMaterialSymbolsFontFace": true,
+        "materialSymbolsReadyClass": true,
+        "materialSymbolFontFamily": "\"Material Symbols Outlined\"",
+        "materialSymbolText": "",
+        "materialSymbolVisible": true,
+        "pretendardReady": true,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "visibleIconKeyLeaks": []
+      },
+      "afterReload": {
+        "path": "/legal/terms",
+        "articleVisible": true,
+        "bodyFontFamily": "Pretendard, system-ui, -apple-system, sans-serif",
+        "externalAppFontStylesheets": [],
+        "externalMaterialSymbolsStylesheets": [],
+        "headingVisible": true,
+        "headings": [
+          "Roomin 서비스이용약관",
+          "Roomin 서비스이용약관",
+          "제1조 (목적)",
+          "제2조 (용어의 정의)",
+          "제3조 (약관의 게시와 개정)",
+          "제4조 (이용계약의 체결)",
+          "제5조 (회원 정보의 관리)",
+          "제6조 (서비스의 제공 및 변경)",
+          "제7조 (서비스의 중단)",
+          "제8조 (회원의 의무)",
+          "제9조 (예약 정책 및 합주실 이용)",
+          "제10조 (관리자 권한)",
+          "제11조 (게시물 및 데이터의 관리)",
+          "제12조 (지적재산권)",
+          "제13조 (계약 해지 및 이용 제한)",
+          "제14조 (책임의 제한)",
+          "제15조 (개인정보의 보호)",
+          "제16조 (분쟁 해결 및 준거법)",
+          "부칙",
+          "운영자 정보"
+        ],
+        "localMaterialSymbolsFontFace": true,
+        "materialSymbolsReadyClass": true,
+        "materialSymbolFontFamily": "\"Material Symbols Outlined\"",
+        "materialSymbolText": "",
+        "materialSymbolVisible": true,
+        "pretendardReady": true,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "visibleIconKeyLeaks": []
+      },
+      "consoleMessages": []
+    }
+  ],
+  "delayedFontResult": {
+    "name": "terms delayed material symbols",
+    "kind": "delayed-font",
+    "path": "/legal/terms",
+    "viewport": {
+      "width": 1280,
+      "height": 720,
+      "deviceScaleFactor": 1
+    },
+    "samples": [
+      {
+        "name": "terms delayed material symbols",
+        "path": "/legal/terms",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "deviceScaleFactor": 1
+        },
+        "sampleMs": 0,
+        "localMaterialSymbolsFontFace": false,
+        "materialSymbolsReadyClass": false,
+        "iconBoxes": [],
+        "leaks": []
+      },
+      {
+        "name": "terms delayed material symbols",
+        "path": "/legal/terms",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "deviceScaleFactor": 1
+        },
+        "sampleMs": 250,
+        "localMaterialSymbolsFontFace": false,
+        "materialSymbolsReadyClass": false,
+        "iconBoxes": [],
+        "leaks": []
+      },
+      {
+        "name": "terms delayed material symbols",
+        "path": "/legal/terms",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "deviceScaleFactor": 1
+        },
+        "sampleMs": 1000,
+        "localMaterialSymbolsFontFace": false,
+        "materialSymbolsReadyClass": false,
+        "iconBoxes": [
+          {
+            "className": "material-symbols-outlined text-[20px] text-on-surface-variant",
+            "dataIcon": "arrow_back",
+            "fontFamily": "\"Material Symbols Outlined\"",
+            "color": "rgba(0, 0, 0, 0)",
+            "width": 24,
+            "height": 24,
+            "visible": true
+          }
+        ],
+        "leaks": []
+      },
+      {
+        "name": "terms delayed material symbols",
+        "path": "/legal/terms",
+        "viewport": {
+          "width": 1280,
+          "height": 720,
+          "deviceScaleFactor": 1
+        },
+        "sampleMs": 4000,
+        "localMaterialSymbolsFontFace": false,
+        "materialSymbolsReadyClass": false,
+        "iconBoxes": [
+          {
+            "className": "material-symbols-outlined text-[20px] text-on-surface-variant",
+            "dataIcon": "arrow_back",
+            "fontFamily": "\"Material Symbols Outlined\"",
+            "color": "rgba(0, 0, 0, 0)",
+            "width": 24,
+            "height": 24,
+            "visible": true
+          }
+        ],
+        "leaks": []
+      }
+    ],
+    "finalState": {
+      "localMaterialSymbolsFontFace": true,
+      "materialSymbolsReadyClass": true,
+      "iconBoxes": [
+        {
+          "className": "material-symbols-outlined text-[20px] text-on-surface-variant",
+          "dataIcon": "arrow_back",
+          "fontFamily": "\"Material Symbols Outlined\"",
+          "color": "rgb(66, 70, 86)",
+          "width": 24,
+          "height": 24,
+          "visible": true
+        }
+      ],
+      "leaks": []
+    },
+    "screenshotPath": ".omo/evidence/task-4-terms-delayed.png"
+  },
+  "failures": []
+}

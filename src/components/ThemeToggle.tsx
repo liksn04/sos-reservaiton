@@ -1,5 +1,6 @@
 import { useTheme } from '../contexts/ThemeContext';
 import type { Theme } from '../contexts/ThemeContext';
+import MaterialIcon from './MaterialIcon';
 
 const OPTIONS: { value: Theme; icon: string; label: string }[] = [
   { value: 'dark',   icon: 'dark_mode',       label: '다크' },
@@ -26,12 +27,7 @@ export default function ThemeToggle() {
             aria-pressed={isActive}
             aria-label={label}
           >
-            <span
-              className="material-symbols-outlined text-[18px]"
-              style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
-            >
-              {icon}
-            </span>
+            <MaterialIcon name={icon} className="text-[18px]" style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}} />
             <span>{label}</span>
           </button>
         );

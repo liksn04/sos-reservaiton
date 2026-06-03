@@ -11,6 +11,7 @@ import { listApprovedMembers } from '../../services/adminService';
 import AdminUserCard from './AdminUserCard';
 import BanDialog from './BanDialog';
 import type { Profile } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 export default function MembersTab() {
   const { profile: me } = useAuth();
@@ -69,9 +70,7 @@ export default function MembersTab() {
       {/* 검색 */}
       <div className="mb-6">
         <div className="relative group">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[22px] transition-colors group-focus-within:text-primary">
-            search
-          </span>
+          <MaterialIcon name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[22px] transition-colors group-focus-within:text-primary" />
           <input
             type="text"
             placeholder="이름 또는 파트로 검색"
@@ -84,7 +83,7 @@ export default function MembersTab() {
 
       {filtered.length === 0 ? (
         <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-4 opacity-60">
-          <span className="material-symbols-outlined text-5xl opacity-20">group_off</span>
+          <MaterialIcon name="group_off" className="text-5xl opacity-20" />
           <p className="text-sm font-bold">검색 결과가 없습니다.</p>
         </div>
       ) : (
@@ -106,9 +105,7 @@ export default function MembersTab() {
                           : 'bg-surface-container-highest text-on-surface-variant border-card-border hover:bg-primary/10 hover:text-primary hover:border-primary/30'
                       }`}
                     >
-                      <span className="material-symbols-outlined text-[18px]">
-                        {user.is_admin ? 'shield' : 'shield_with_heart'}
-                      </span>
+                      <MaterialIcon name={user.is_admin ? 'shield' : 'shield_with_heart'} className="text-[18px]" />
                     </button>
 
                     {/* 차단 */}
@@ -118,7 +115,7 @@ export default function MembersTab() {
                       disabled={banUser.isPending || user.id === me?.id}
                       className="w-10 h-10 rounded-2xl flex items-center justify-center bg-surface-container-highest text-on-surface-variant border border-card-border hover:bg-error/10 hover:text-error hover:border-error/20 transition-all px-0"
                     >
-                      <span className="material-symbols-outlined text-[18px]">block</span>
+                      <MaterialIcon name="block" className="text-[18px]" />
                     </button>
 
                     {/* 삭제 */}
@@ -128,7 +125,7 @@ export default function MembersTab() {
                       disabled={deleteUser.isPending || user.id === me?.id}
                       className="w-10 h-10 rounded-2xl flex items-center justify-center bg-surface-container-highest text-on-surface-variant border border-card-border hover:bg-error/10 hover:text-error hover:border-error/20 transition-all px-0"
                     >
-                      <span className="material-symbols-outlined text-[18px]">delete</span>
+                      <MaterialIcon name="delete" className="text-[18px]" />
                     </button>
                   </div>
               }

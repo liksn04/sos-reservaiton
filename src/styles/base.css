@@ -46,6 +46,38 @@ h1, h2, h3, h4 { font-style: normal; letter-spacing: -0.03em; }
 
 /* ── Material Symbols ── */
 .material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  flex-shrink: 0;
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   vertical-align: middle;
+}
+
+.material-symbols-outlined[data-icon]::before {
+  content: attr(data-icon);
+}
+
+html.roomin-material-symbols-loading .material-symbols-outlined,
+html.roomin-material-symbols-failed .material-symbols-outlined {
+  color: transparent !important;
+}
+
+html.roomin-material-symbols-loading .material-symbols-outlined:not([data-icon]),
+html.roomin-material-symbols-failed .material-symbols-outlined:not([data-icon]) {
+  max-width: 1em;
+  max-height: 1em;
 }

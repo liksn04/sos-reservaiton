@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { ToastType } from '../../types/toast';
+import MaterialIcon from '../MaterialIcon';
 
 interface ToastItemProps {
   id: string;
@@ -63,15 +64,15 @@ export const ToastItem: React.FC<ToastItemProps> = ({ id, message, type, duratio
       onClick={handleClose}
     >
       <div className="toast-content">
-        <span 
-          className="material-symbols-outlined toast-icon"
-          style={{ color: config.color, fontVariationSettings: "'FILL' 1" }}
-        >
-          {config.icon}
-        </span>
+        <MaterialIcon name={config.icon} className="toast-icon" style={{ color: config.color, fontVariationSettings: "'FILL' 1" }} />
         <p className="toast-message">{message}</p>
-        <button className="toast-close" onClick={(e) => { e.stopPropagation(); handleClose(); }}>
-          <span className="material-symbols-outlined">close</span>
+        <button
+          type="button"
+          aria-label="알림 닫기"
+          className="toast-close"
+          onClick={(e) => { e.stopPropagation(); handleClose(); }}
+        >
+          <MaterialIcon name="close" />
         </button>
       </div>
       {duration > 0 && (

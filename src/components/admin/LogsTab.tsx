@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '../../lib/queryKeys';
 import { listAdminActionLogs } from '../../services/adminService';
 import type { AdminActionLog } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 const ACTION_META: Record<AdminActionLog['action'], { label: string; color: string; icon: string }> = {
   approve: { label: '승인',      color: 'text-primary',    icon: 'check_circle' },
@@ -31,7 +32,7 @@ export default function LogsTab() {
   if (logs.length === 0) {
     return (
       <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-4 opacity-60">
-        <span className="material-symbols-outlined text-5xl opacity-20">history</span>
+        <MaterialIcon name="history" className="text-5xl opacity-20" />
         <p className="text-sm font-bold">관리 로그가 없습니다.</p>
       </div>
     );
@@ -54,9 +55,7 @@ export default function LogsTab() {
             className="bg-surface-container-low border border-card-border rounded-2xl px-5 py-4 flex items-center gap-4 transition-colors hover:bg-surface-container-high"
           >
             {/* 아이콘 */}
-            <span className={`material-symbols-outlined text-[22px] flex-shrink-0 ${meta.color}`}>
-              {meta.icon}
-            </span>
+            <MaterialIcon name={meta.icon} className={`text-[22px] flex-shrink-0 ${meta.color}`} />
 
             {/* 내용 */}
             <div className="flex-1 min-w-0">

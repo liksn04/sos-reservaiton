@@ -1,0 +1,1 @@
+PASS icon-only MaterialIcon buttons all labelled

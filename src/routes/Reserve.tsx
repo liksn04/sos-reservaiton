@@ -11,6 +11,7 @@ import { useConfirm } from '../contexts/useConfirm';
 import { computeSlotAvailability, formatDate, getTimeSlots, normalizeTime } from '../utils/time';
 import type { Purpose, ReservationWithDetails } from '../types';
 import type { AppShellContext } from './AppShell';
+import MaterialIcon from '../components/MaterialIcon';
 
 type CalendarView = 'month' | 'week' | 'day';
 type ReservationScope = 'all' | 'mine';
@@ -163,9 +164,7 @@ export default function Reserve() {
 
           <div className="space-y-3">
             <div className="relative">
-              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">
-                search
-              </span>
+              <MaterialIcon name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]" />
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
@@ -206,18 +205,22 @@ export default function Reserve() {
             </h3>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button
+                type="button"
+                aria-label="이전 기간"
                 onClick={() => handleVisibleRangeChange(-1)}
-                className="material-symbols-outlined w-11 h-11 rounded-full flex items-center justify-center bg-surface-container-lowest border border-card-border"
+                className="w-11 h-11 rounded-full flex items-center justify-center bg-surface-container-lowest border border-card-border"
                 style={{ color: 'var(--text-muted)' }}
               >
-                chevron_left
+                <MaterialIcon name="chevron_left" />
               </button>
               <button
+                type="button"
+                aria-label="다음 기간"
                 onClick={() => handleVisibleRangeChange(1)}
-                className="material-symbols-outlined w-11 h-11 rounded-full flex items-center justify-center bg-surface-container-lowest border border-card-border"
+                className="w-11 h-11 rounded-full flex items-center justify-center bg-surface-container-lowest border border-card-border"
                 style={{ color: 'var(--text-muted)' }}
               >
-                chevron_right
+                <MaterialIcon name="chevron_right" />
               </button>
             </div>
           </div>
@@ -324,7 +327,7 @@ export default function Reserve() {
               className="reserve-now-btn !min-h-11 !w-auto shrink-0 !px-4 !py-2 text-sm"
               onClick={() => openNew(selectedDate)}
             >
-              <span className="material-symbols-outlined text-[18px]" style={{ fontWeight: 'bold' }}>add_circle</span>
+              <MaterialIcon name="add_circle" className="text-[18px]" style={{ fontWeight: 'bold' }} />
               예약 추가
             </button>
           </div>

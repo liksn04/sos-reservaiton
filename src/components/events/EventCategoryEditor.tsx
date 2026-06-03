@@ -3,6 +3,7 @@ import type { EventCategory } from '../../types';
 import { useCreateCategory, useDeleteCategory } from '../../hooks/mutations/useEventMutations';
 import { useConfirm } from '../../contexts/useConfirm';
 import { EVENT_CATEGORY_COLOR_PRESETS, EVENT_CATEGORY_ICON_OPTIONS } from './eventCategoryConstants';
+import MaterialIcon from '../MaterialIcon';
 
 interface Props {
   categories: EventCategory[];
@@ -80,28 +81,37 @@ export function EventCategoryEditor({
         {categories.map((c) => {
           const active = c.id === selectedCategoryId;
           return (
-            <button
+            <div
               key={c.id}
-              type="button"
-              onClick={() => onSelect(c.id)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all"
+              className="flex items-center rounded-full text-[11px] font-black uppercase tracking-widest transition-all"
               style={{
                 backgroundColor: active ? `${c.color}25` : 'var(--surface-container-highest)',
                 color: active ? c.color : 'var(--text-muted)',
                 border: `1px solid ${active ? c.color : 'var(--outline-border)'}`,
               }}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: '14px', fontVariationSettings: "'FILL' 1" }}>{c.icon}</span>
-              {c.name}
+              <button
+                type="button"
+                onClick={() => onSelect(c.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+              >
+                <MaterialIcon name={c.icon} style={{ fontSize: '14px', fontVariationSettings: "'FILL' 1" }} />
+                {c.name}
+              </button>
               {isOpen && (
-                <span
-                  className="material-symbols-outlined text-sm text-error ml-1 hover:scale-125 transition-transform"
-                  onClick={(e) => { e.stopPropagation(); handleDelete(c.id); }}
+                <button
+                  type="button"
+                  aria-label={`${c.name} 카테고리 삭제`}
+                  className="flex h-6 w-6 items-center justify-center rounded-full text-error transition-transform hover:scale-110"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(c.id);
+                  }}
                 >
-                  close
-                </span>
+                  <MaterialIcon name="close" className="text-sm" />
+                </button>
               )}
-            </button>
+            </div>
           );
         })}
       </div>
@@ -122,6 +132,7 @@ export function EventCategoryEditor({
               <button
                 key={c}
                 type="button"
+                aria-label={`${c} 색상 선택`}
                 onClick={() => setColor(c)}
                 className="w-7 h-7 rounded-full transition-all hover:scale-110"
                 style={{
@@ -137,6 +148,7 @@ export function EventCategoryEditor({
               <button
                 key={i}
                 type="button"
+                aria-label={`${i} 아이콘 선택`}
                 onClick={() => setIcon(i)}
                 className="w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-white/10"
                 style={{
@@ -144,7 +156,7 @@ export function EventCategoryEditor({
                   color: icon === i ? '#fff' : 'var(--text-muted)',
                 }}
               >
-                <span className="material-symbols-outlined text-xl">{i}</span>
+                <MaterialIcon name={i} className="text-xl" />
               </button>
             ))}
           </div>

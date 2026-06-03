@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import type { ClubEventWithDetails } from '../../types';
 import { diffDaysBetween, formatKoreanDate } from '../../utils/dateLabels';
+import MaterialIcon from '../MaterialIcon';
 
 type Tab = 'upcoming' | 'past' | 'timeline';
 
@@ -78,7 +79,7 @@ function EventCardComponent({
                 : 'var(--primary-btn-gradient)',
             }}
           >
-            <span className="material-symbols-outlined text-[28px] mb-2">{cat?.icon ?? 'event'}</span>
+            <MaterialIcon name={cat?.icon ?? 'event'} className="text-[28px] mb-2" />
             <span className="text-[10px] font-bold tracking-[0.18em] uppercase">{cat?.name ?? 'Event'}</span>
           </div>
 
@@ -108,7 +109,7 @@ function EventCardComponent({
                   className="flex items-center gap-1 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest"
                   style={{ backgroundColor: `${cat.color}25`, color: cat.color }}
                 >
-                  <span className="material-symbols-outlined text-xs">{cat.icon}</span>
+                  <MaterialIcon name={cat.icon} className="text-xs" />
                   {cat.name}
                 </span>
               )}
@@ -122,14 +123,14 @@ function EventCardComponent({
 
             <div className="space-y-1">
               <p className="text-[11px] font-bold text-on-surface-variant flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-sm">schedule</span>
+                <MaterialIcon name="schedule" className="text-sm" />
                 {formatKoreanDate(event.start_date)}
                 {event.start_time && ` ${event.start_time.slice(0, 5)}`}
                 {event.end_date && event.end_date !== event.start_date && ` ~ ${formatKoreanDate(event.end_date)}`}
               </p>
               {event.location && (
                 <p className="text-[11px] font-bold text-on-surface-variant flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-sm">place</span>
+                  <MaterialIcon name="place" className="text-sm" />
                   {event.location}
                 </p>
               )}
@@ -140,7 +141,7 @@ function EventCardComponent({
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-2 cursor-pointer group min-w-0" onClick={onViewParticipants}>
             <div className="flex h-8 min-w-[44px] items-center justify-center rounded-full border border-card-border bg-surface-container px-3">
-              <span className="material-symbols-outlined text-[15px] text-primary">group</span>
+              <MaterialIcon name="group" className="text-[15px] text-primary" />
             </div>
             <span className="text-[10px] font-black text-muted group-hover:text-primary transition-colors whitespace-nowrap">
               {participantLabel}
@@ -158,9 +159,7 @@ function EventCardComponent({
                 border: isJoined ? `1px solid ${cat?.color ?? '#cc97ff'}40` : 'none',
               }}
             >
-              <span className="material-symbols-outlined text-sm">
-                {isJoined ? 'check_circle' : 'add_circle'}
-              </span>
+              <MaterialIcon name={isJoined ? 'check_circle' : 'add_circle'} className="text-sm" />
               {isJoined ? '참여 완료' : '참여하기'}
             </button>
           )}
@@ -172,14 +171,14 @@ function EventCardComponent({
               title="수정"
               className="w-9 h-9 rounded-full flex items-center justify-center transition-all bg-surface-container-high text-on-surface-variant border border-card-border hover:border-primary/50 hover:text-primary hover:bg-surface-highest group-hover:shadow-md"
             >
-              <span className="material-symbols-outlined text-lg">settings</span>
+              <MaterialIcon name="settings" className="text-lg" />
             </button>
             <button
               onClick={onDelete}
               title="삭제"
               className="w-9 h-9 rounded-full flex items-center justify-center transition-all bg-surface-container-high text-on-surface-variant border border-card-border hover:border-error/50 hover:text-error hover:bg-error/5 group-hover:shadow-md"
             >
-              <span className="material-symbols-outlined text-lg">delete</span>
+              <MaterialIcon name="delete" className="text-lg" />
             </button>
           </div>
         )}

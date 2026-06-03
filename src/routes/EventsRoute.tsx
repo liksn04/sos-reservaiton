@@ -15,6 +15,7 @@ import { EventCard } from '../components/events/EventCard';
 import type { ClubEventWithDetails } from '../types';
 import { formatDate } from '../utils/time';
 import LoadingSpinner from '../components/LoadingSpinner';
+import MaterialIcon from '../components/MaterialIcon';
 
 type Tab = 'upcoming' | 'past' | 'timeline';
 
@@ -110,7 +111,7 @@ export default function EventsRoute() {
     <div className="tab-content animate-slide-up">
       <section className="mb-8">
         <div className="club-tag">
-          <span className="material-symbols-outlined text-sm">calendar_month</span>
+          <MaterialIcon name="calendar_month" className="text-sm" />
           동아리 일정
         </div>
         <h2 className="dashboard-title">
@@ -159,7 +160,7 @@ export default function EventsRoute() {
                 borderColor: filterCategory === c.id ? c.color : '',
               }}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: '14px', fontVariationSettings: "'FILL' 1" }}>{c.icon}</span>
+              <MaterialIcon name={c.icon} style={{ fontSize: '14px', fontVariationSettings: "'FILL' 1" }} />
               {c.name}
             </button>
           ))}
@@ -173,7 +174,7 @@ export default function EventsRoute() {
           <EventTimeline events={sorted} />
         ) : sorted.length === 0 ? (
           <div className="glass-card rounded-[2rem] p-10 flex flex-col items-center justify-center text-center border border-outline-variant/10">
-            <span className="material-symbols-outlined text-[48px] text-surface-variant mb-4">event_busy</span>
+            <MaterialIcon name="event_busy" className="text-[48px] text-surface-variant mb-4" />
             <p className="text-on-surface-variant font-bold">
               {tab === 'upcoming' ? '예정된 일정이 없습니다.' : '지난 일정이 없습니다.'}
             </p>
@@ -201,7 +202,7 @@ export default function EventsRoute() {
           className="reserve-now-btn min-w-[220px] mx-auto mt-10 block shadow-2xl hover:scale-105 transition-all"
           onClick={openNew}
         >
-          <span className="material-symbols-outlined" style={{ fontWeight: 'bold' }}>add_circle</span>
+          <MaterialIcon name="add_circle" style={{ fontWeight: 'bold' }} />
           일정 등록하기
         </button>
       )}

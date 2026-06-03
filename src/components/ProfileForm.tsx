@@ -1,6 +1,7 @@
 import AvatarUploader from './AvatarUploader';
 import { useProfileForm } from '../hooks/useProfileForm';
 import type { Part, Profile } from '../types';
+import MaterialIcon from './MaterialIcon';
 
 const PARTS: { value: Part; label: string }[] = [
   { value: 'vocal',    label: '보컬' },
@@ -46,10 +47,11 @@ export default function ProfileForm({ profile, onSuccess, onCancel }: ProfileFor
       {onCancel && (
         <button
           type="button"
+          aria-label="프로필 수정 닫기"
           onClick={onCancel}
           className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant z-20"
         >
-          <span className="material-symbols-outlined text-[20px]">close</span>
+          <MaterialIcon name="close" className="text-[20px]" />
         </button>
       )}
 

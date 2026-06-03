@@ -1,4 +1,5 @@
 import type { BudgetTransaction } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 type TransactionType = BudgetTransaction['type'];
 
@@ -23,9 +24,7 @@ export function TransactionTypeToggle({ value, onChange }: TransactionTypeToggle
               : 'opacity-40 hover:opacity-80'
           }`}
         >
-          <span className="material-symbols-outlined text-sm">
-            {type === 'income' ? 'add_circle' : 'remove_circle'}
-          </span>
+          <MaterialIcon name={type === 'income' ? 'add_circle' : 'remove_circle'} className="text-sm" />
           {type === 'income' ? '수입' : '지출'}
         </button>
       ))}

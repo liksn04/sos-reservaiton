@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { formatDate } from '../../utils/time';
+import MaterialIcon from '../MaterialIcon';
 
 interface Props {
   isOpen: boolean;
@@ -43,16 +44,20 @@ export default function DatePicker({ isOpen, onClose, selectedDate, onSelect }: 
           </h3>
           <div className="flex gap-2">
             <button 
-              className="material-symbols-outlined text-white hover:text-primary transition-colors"
+              type="button"
+              aria-label="이전 달"
+              className="text-white hover:text-primary transition-colors"
               onClick={() => handleMonthChange(-1)}
             >
-              chevron_left
+              <MaterialIcon name="chevron_left" />
             </button>
             <button 
-              className="material-symbols-outlined text-white hover:text-primary transition-colors"
+              type="button"
+              aria-label="다음 달"
+              className="text-white hover:text-primary transition-colors"
               onClick={() => handleMonthChange(1)}
             >
-              chevron_right
+              <MaterialIcon name="chevron_right" />
             </button>
           </div>
         </div>

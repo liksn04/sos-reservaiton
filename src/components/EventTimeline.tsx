@@ -1,3 +1,4 @@
+import MaterialIcon from './MaterialIcon';
 import { useMemo, useState } from 'react'
 import type { ClubEventWithDetails } from '../types'
 import { format } from 'date-fns'
@@ -108,9 +109,7 @@ export default function EventTimeline({ events }: Props) {
                         className="absolute -left-[60px] top-2 w-10 h-10 rounded-2xl flex items-center justify-center z-10 border-4 border-surface transition-transform group-hover:scale-125 group-hover:rotate-12 shadow-lg"
                         style={{ backgroundColor: cat?.color || 'var(--primary)' }}
                       >
-                        <span className="material-symbols-outlined text-lg text-white">
-                          {cat?.icon || 'event'}
-                        </span>
+                        <MaterialIcon name={cat?.icon || 'event'} className="text-lg text-white" />
                       </div>
 
                       {/* 내용 카드 */}
@@ -149,7 +148,7 @@ export default function EventTimeline({ events }: Props) {
                             
                             {ev.location && (
                               <div className="flex items-center gap-1.5 text-xs font-bold text-primary/60">
-                                <span className="material-symbols-outlined text-[14px]">place</span>
+                                <MaterialIcon name="place" className="text-[14px]" />
                                 {ev.location}
                               </div>
                             )}
@@ -163,7 +162,7 @@ export default function EventTimeline({ events }: Props) {
                               </span>
                             </div>
                             <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-card-border bg-surface-container-low px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">
-                              <span className="material-symbols-outlined text-[15px] text-primary">group</span>
+                              <MaterialIcon name="group" className="text-[15px] text-primary" />
                               {ev.participantSummary?.hasExactParticipantCount
                                 ? `${ev.participantSummary.participantCount}명 참여`
                                 : ev.participantSummary?.viewerJoined
@@ -184,7 +183,7 @@ export default function EventTimeline({ events }: Props) {
 
       {events.length === 0 && (
         <div className="py-20 flex flex-col items-center justify-center opacity-40 grayscale-[0.5]">
-          <span className="material-symbols-outlined text-6xl mb-4 text-primary/30">history</span>
+          <MaterialIcon name="history" className="text-6xl mb-4 text-primary/30" />
           <p className="font-headline text-sm font-bold text-on-surface/40">일정 역사가 아직 없습니다.</p>
         </div>
       )}

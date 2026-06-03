@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import type { BudgetTransaction } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 interface Props {
   transaction: BudgetTransaction;
@@ -17,9 +18,7 @@ function BudgetTransactionItemComponent({ transaction: t, isAdmin, isDeleting, o
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
           <div className="w-12 h-12 rounded-2xl bg-surface-container-lowest flex items-center justify-center border border-card-border group-hover:scale-110 transition-transform">
-            <span className="material-symbols-outlined" style={{ color: t.category?.color ?? '#6b7280' }}>
-              {t.category?.icon ?? (t.type === 'income' ? 'add_circle' : 'remove_circle')}
-            </span>
+            <MaterialIcon name={t.category?.icon ?? (t.type === 'income' ? 'add_circle' : 'remove_circle')} style={{ color: t.category?.color ?? '#6b7280' }} />
           </div>
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -40,7 +39,7 @@ function BudgetTransactionItemComponent({ transaction: t, isAdmin, isDeleting, o
                   className="text-[9px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <span className="material-symbols-outlined text-xs align-middle">receipt</span>
+                  <MaterialIcon name="receipt" className="text-xs align-middle" />
                 </a>
               )}
             </div>
@@ -58,18 +57,20 @@ function BudgetTransactionItemComponent({ transaction: t, isAdmin, isDeleting, o
             <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 type="button"
+                aria-label={`${t.description} 거래 수정`}
                 onClick={() => onEdit(t)}
                 className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-primary/10 text-primary transition-colors"
               >
-                <span className="material-symbols-outlined text-base">edit</span>
+                <MaterialIcon name="edit" className="text-base" />
               </button>
               <button
                 type="button"
+                aria-label={`${t.description} 거래 삭제`}
                 onClick={() => onDelete(t)}
                 className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-error/10 text-error transition-colors"
                 disabled={isDeleting}
               >
-                <span className="material-symbols-outlined text-base">delete</span>
+                <MaterialIcon name="delete" className="text-base" />
               </button>
             </div>
           )}

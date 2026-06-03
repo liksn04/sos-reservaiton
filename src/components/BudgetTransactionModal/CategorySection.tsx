@@ -1,5 +1,6 @@
 import type { BudgetCategory, BudgetTransaction } from '../../types';
 import { BUDGET_CATEGORY_COLOR_PRESETS, BUDGET_CATEGORY_ICON_OPTIONS } from './constants';
+import MaterialIcon from '../MaterialIcon';
 
 type TransactionType = BudgetTransaction['type'];
 
@@ -64,33 +65,37 @@ export function CategorySection({
           categories.map((category) => {
             const active = category.id === selectedCategoryId;
             return (
-              <button
+              <div
                 key={category.id}
-                type="button"
-                onClick={() => onSelectCategory(active ? null : category.id)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest transition-all"
+                className="flex items-center rounded-full text-[11px] font-black uppercase tracking-widest transition-all"
                 style={{
                   backgroundColor: active ? `${category.color}25` : 'var(--surface-container-highest)',
                   color: active ? category.color : 'var(--text-muted)',
                   border: `1px solid ${active ? category.color : 'var(--outline-border)'}`,
                 }}
               >
-                <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  {category.icon}
-                </span>
-                {category.name}
+                <button
+                  type="button"
+                  onClick={() => onSelectCategory(active ? null : category.id)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                >
+                  <MaterialIcon name={category.icon} className="text-sm" style={{ fontVariationSettings: "'FILL' 1" }} />
+                  {category.name}
+                </button>
                 {isEditorOpen && (
-                  <span
-                    className="material-symbols-outlined text-sm text-error ml-1 hover:scale-125 transition-transform"
+                  <button
+                    type="button"
+                    aria-label={`${category.name} 카테고리 삭제`}
+                    className="flex h-6 w-6 items-center justify-center rounded-full text-error transition-transform hover:scale-110"
                     onClick={(event) => {
                       event.stopPropagation();
                       onDeleteCategory(category);
                     }}
                   >
-                    close
-                  </span>
+                    <MaterialIcon name="close" className="text-sm" />
+                  </button>
                 )}
-              </button>
+              </div>
             );
           })
         )}
@@ -116,6 +121,7 @@ export function CategorySection({
               <button
                 key={color}
                 type="button"
+                aria-label={`${color} 색상 선택`}
                 onClick={() => onNewCategoryColorChange(color)}
                 className="w-7 h-7 rounded-full transition-all hover:scale-110"
                 style={{
@@ -131,6 +137,7 @@ export function CategorySection({
               <button
                 key={icon}
                 type="button"
+                aria-label={`${icon} 아이콘 선택`}
                 onClick={() => onNewCategoryIconChange(icon)}
                 className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
                 style={{
@@ -138,7 +145,7 @@ export function CategorySection({
                   color: newCategoryIcon === icon ? '#fff' : 'var(--text-muted)',
                 }}
               >
-                <span className="material-symbols-outlined text-xl">{icon}</span>
+                <MaterialIcon name={icon} className="text-xl" />
               </button>
             ))}
           </div>

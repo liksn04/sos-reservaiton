@@ -1,3 +1,4 @@
+import MaterialIcon from './MaterialIcon';
 import { useMemo } from 'react'
 import {
   BarChart,
@@ -165,7 +166,7 @@ export default function BudgetCharts({ transactions }: Props) {
       <div className="surface-card p-8">
         <h3 className="text-sm font-black uppercase tracking-widest mb-8 flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary text-sm">bar_chart</span>
+            <MaterialIcon name="bar_chart" className="text-primary text-sm" />
           </div>
           월별 수입 · 지출
         </h3>
@@ -193,7 +194,7 @@ export default function BudgetCharts({ transactions }: Props) {
         <div className="surface-card p-8">
           <h3 className="text-sm font-black uppercase tracking-widest mb-8 flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-secondary text-sm">pie_chart</span>
+              <MaterialIcon name="pie_chart" className="text-secondary text-sm" />
             </div>
             카테고리별 지출
           </h3>
@@ -235,7 +236,7 @@ export default function BudgetCharts({ transactions }: Props) {
             </>
           ) : (
             <div className="h-[200px] flex flex-col items-center justify-center opacity-30">
-              <span className="material-symbols-outlined text-4xl mb-2">data_info_alert</span>
+              <MaterialIcon name="data_info_alert" className="text-4xl mb-2" />
               <p className="text-xs font-bold">지출 내역이 없습니다.</p>
             </div>
           )}
@@ -245,7 +246,7 @@ export default function BudgetCharts({ transactions }: Props) {
         <div className="surface-card p-8">
           <h3 className="text-sm font-black uppercase tracking-widest mb-8 flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary text-sm">show_chart</span>
+              <MaterialIcon name="show_chart" className="text-primary text-sm" />
             </div>
             누적 잔액 추이
           </h3>

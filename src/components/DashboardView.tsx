@@ -7,6 +7,7 @@ import {
   normalizeTime,
 } from '../utils/time';
 import { useTheme } from '../contexts/ThemeContext';
+import MaterialIcon from './MaterialIcon';
 
 interface DashboardViewProps {
   reservations: ReservationWithDetails[];
@@ -66,7 +67,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
     <div className="animate-slide-up">
       <section className="mb-10">
         <div className="club-tag">
-          <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>music_note</span>
+          <MaterialIcon name="music_note" style={{ fontSize: '14px' }} />
           빛소리
         </div>
         <h2 className="dashboard-title">
@@ -90,7 +91,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
               </>
             ) : (
               <>
-                <span className="material-symbols-outlined" style={{ color: 'var(--primary)' }}>schedule</span>
+                <MaterialIcon name="schedule" style={{ color: 'var(--primary)' }} />
                 다가오는 일정
               </>
             )}
@@ -164,11 +165,11 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
                 )}
                 <div className={`upcoming-hero-meta-row ${isOngoingNow ? 'ongoing' : ''}`}>
                   <div className="upcoming-hero-meta-chip">
-                    <span className="material-symbols-outlined upcoming-hero-meta-icon">schedule</span>
+                    <MaterialIcon name="schedule" className="upcoming-hero-meta-icon" />
                     <span>{normalizeTime(primaryRes.start_time)} - {normalizeTime(primaryRes.end_time)}</span>
                   </div>
                   <div className="upcoming-hero-meta-chip purpose">
-                    <span className="material-symbols-outlined upcoming-hero-meta-icon">music_note</span>
+                    <MaterialIcon name="music_note" className="upcoming-hero-meta-icon" />
                     <span>{primaryRes.purpose}</span>
                   </div>
                 </div>
@@ -180,7 +181,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
                 </span>
                 {isOngoingNow ? (
                   <div className="upcoming-hero-orb" aria-hidden="true">
-                    <span className="material-symbols-outlined">calendar_month</span>
+                    <MaterialIcon name="calendar_month" />
                   </div>
                 ) : (
                   <div className="upcoming-hero-sidecard" aria-hidden="true">
@@ -195,7 +196,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
           </div>
         ) : (
           <div className="empty-card" style={{ background: 'var(--surface-container)', padding: '2.5rem', borderRadius: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', border: '1px dashed var(--card-border)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <span className="material-symbols-outlined" style={{ fontSize: '2rem', opacity: 0.5 }}>calendar_today</span>
+            <MaterialIcon name="calendar_today" style={{ fontSize: '2rem', opacity: 0.5 }} />
             <p>현재 예정된 합주가 없습니다.</p>
           </div>
         )}
@@ -205,7 +206,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
       <section className="stats-bento">
         <div className="stat-item">
           <div className="stat-icon-bg blue">
-            <span className="material-symbols-outlined">calendar_today</span>
+            <MaterialIcon name="calendar_today" />
           </div>
           <div>
             <p className="stat-value">{thisWeekReservations.length}건</p>
@@ -214,7 +215,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
         </div>
         <div className="stat-item">
           <div className="stat-icon-bg green">
-            <span className="material-symbols-outlined">groups</span>
+            <MaterialIcon name="groups" />
           </div>
           <div>
             <p className="stat-value">{totalUserCount}명</p>
@@ -225,7 +226,7 @@ export default function DashboardView({ reservations, totalUserCount }: Dashboar
 
       {/* Reserve Now Button */}
       <button className="reserve-now-btn" onClick={() => navigate('/reserve')}>
-        <span className="material-symbols-outlined" style={{ fontWeight: 'bold' }}>add_circle</span>
+        <MaterialIcon name="add_circle" style={{ fontWeight: 'bold' }} />
         <span>예약하기</span>
       </button>
     </div>

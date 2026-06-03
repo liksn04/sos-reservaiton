@@ -15,6 +15,7 @@ import {
 } from '../../utils/reservationPolicy';
 import { formatDate } from '../../utils/time';
 import type { ReservationPolicySeason, ReservationPolicySeasonInput } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 type SeasonStatus = 'active' | 'upcoming' | 'ended' | 'inactive';
 
@@ -349,7 +350,7 @@ function LoadingCard() {
 function EmptyCard() {
   return (
     <div className="bg-surface-container-low border border-card-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-4 opacity-70">
-      <span className="material-symbols-outlined text-5xl opacity-20">event_busy</span>
+      <MaterialIcon name="event_busy" className="text-5xl opacity-20" />
       <p className="text-sm font-bold">등록된 예약 정책 시즌이 없습니다.</p>
     </div>
   );
@@ -359,7 +360,7 @@ function MissingMigrationCard() {
   return (
     <div className="bg-surface-container-low border border-error/20 rounded-[2.5rem] p-8 flex flex-col gap-3">
       <div className="flex items-center gap-2 text-error">
-        <span className="material-symbols-outlined">warning</span>
+        <MaterialIcon name="warning" />
         <p className="text-base font-black">예약 정책 기능을 아직 사용할 수 없습니다.</p>
       </div>
       <p className="text-sm text-on-surface-variant">

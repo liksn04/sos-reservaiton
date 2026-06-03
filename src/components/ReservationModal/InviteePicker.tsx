@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Profile, Part } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 const PART_LABELS: Record<Part, string> = {
   vocal: '보컬',
@@ -68,7 +69,7 @@ export default function InviteePicker({ members, selected, currentUserId, onChan
                   {member.avatar_url ? (
                     <img src={member.avatar_url} alt={member.display_name} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="material-symbols-outlined text-[1rem] text-on-surface-variant">person</span>
+                    <MaterialIcon name="person" className="text-[1rem] text-on-surface-variant" />
                   )}
                 </div>
                 <div className="flex-1 flex flex-col">
@@ -80,7 +81,7 @@ export default function InviteePicker({ members, selected, currentUserId, onChan
                   )}
                 </div>
                 {checked && (
-                  <span className="material-symbols-outlined text-primary text-xl">check_circle</span>
+                  <MaterialIcon name="check_circle" className="text-primary text-xl" />
                 )}
               </label>
             );

@@ -5,6 +5,7 @@ import { queryKeys } from '../lib/queryKeys';
 import { adminTabModuleLoaders, prefetchAdminTabModule, prefetchRouteModule, scheduleIdlePrefetch } from '../lib/moduleLoaders';
 import { getAdminCounts } from '../services/adminService';
 import LoadingSpinner from '../components/LoadingSpinner';
+import MaterialIcon from '../components/MaterialIcon';
 
 type AdminTab = 'members' | 'policy' | 'banned' | 'logs' | 'legal';
 
@@ -70,10 +71,12 @@ export default function Admin() {
       <header className="top-app-bar" style={{ maxWidth: '800px', margin: '0 auto', left: '50%', transform: 'translateX(-50%)' }}>
         <div className="logo-area">
           <button
+            type="button"
+            aria-label="이전 화면"
             onClick={() => navigate(-1)}
             className="w-11 h-11 rounded-full flex items-center justify-center bg-surface-container-lowest border border-card-border hover:bg-surface-container-high transition-colors text-on-surface"
           >
-            <span className="material-symbols-outlined text-[24px]">arrow_back</span>
+            <MaterialIcon name="arrow_back" className="text-[24px]" />
           </button>
           <span className="logo-text ml-2">관리자 패널</span>
         </div>
@@ -102,7 +105,7 @@ export default function Admin() {
               style={{ background: 'var(--primary-btn-gradient)', boxShadow: 'var(--primary-glow-shadow)' }}
             >
               <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-white text-2xl font-black">payments</span>
+                <MaterialIcon name="payments" className="text-white text-2xl font-black" />
               </div>
               <div className="space-y-1 text-left">
                 <p className="text-sm font-black leading-tight">재정 관리</p>
@@ -119,7 +122,7 @@ export default function Admin() {
               className="surface-card p-6 relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition-all"
             >
               <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-primary text-2xl font-black">event_available</span>
+                <MaterialIcon name="event_available" className="text-primary text-2xl font-black" />
               </div>
               <div className="space-y-1 text-left">
                 <p className="text-sm font-black text-on-surface leading-tight">행사 관리</p>
@@ -142,12 +145,7 @@ export default function Admin() {
                   onTouchStart={() => { void prefetchAdminTabModule(key); }}
                   className={`segmented-option relative flex-1 whitespace-nowrap ${isActive ? 'active' : ''}`}
                 >
-                  <span
-                    className="material-symbols-outlined text-[18px]"
-                    style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
-                  >
-                    {icon}
-                  </span>
+                  <MaterialIcon name={icon} className="text-[18px]" style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}} />
                   <span className="whitespace-nowrap">{label}</span>
                   {/* 배지 */}
                   {badge != null && badge > 0 && (

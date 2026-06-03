@@ -3,6 +3,7 @@ import { useEventParticipants } from '../hooks/useEventParticipants'
 import { useMarkAttended } from '../hooks/mutations/useEventParticipantMutations'
 import { PART_INFO } from '../lib/constants'
 import type { ClubEventWithDetails, Part } from '../types'
+import MaterialIcon from './MaterialIcon'
 
 interface Props {
   isOpen: boolean
@@ -59,10 +60,12 @@ export default function EventParticipantsModal({ isOpen, onClose, event }: Props
             PARTICIPANTS <span className="text-primary">{participantCountLabel}</span>
           </h2>
           <button
-            className="material-symbols-outlined text-muted hover:text-white transition-colors"
+            type="button"
+            aria-label="참가자 목록 닫기"
+            className="text-muted hover:text-white transition-colors"
             onClick={onClose}
           >
-            close
+            <MaterialIcon name="close" />
           </button>
         </div>
 
@@ -146,19 +149,23 @@ export default function EventParticipantsModal({ isOpen, onClose, event }: Props
                 </div>
 
                 <button
+                  type="button"
+                  aria-label={participant.attended ? '참석 취소' : '참석 처리'}
                   onClick={() => markAttended.mutate({
                     participantId: participant.id,
                     attended: !participant.attended
                   })}
                   disabled={markAttended.isPending}
-                  className="material-symbols-outlined transition-all hover:scale-110"
+                  className="transition-all hover:scale-110"
                   style={{
                     color: participant.attended ? 'var(--primary)' : 'var(--muted)',
-                    fontVariationSettings: participant.attended ? "'FILL' 1" : "'FILL' 0",
                     fontSize: '28px'
                   }}
                 >
-                  {participant.attended ? 'check_circle' : 'radio_button_unchecked'}
+                  <MaterialIcon
+                    name={participant.attended ? 'check_circle' : 'radio_button_unchecked'}
+                    filled={participant.attended}
+                  />
                 </button>
               </div>
             ))

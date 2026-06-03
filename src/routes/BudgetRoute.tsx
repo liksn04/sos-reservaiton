@@ -13,6 +13,7 @@ import { useConfirm } from '../contexts/useConfirm';
 import { useToast } from '../contexts/useToast';
 import type { BudgetTransaction } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
+import MaterialIcon from '../components/MaterialIcon';
 
 type Tab = 'transactions' | 'charts' | 'fees';
 type FilterHalf = 1 | 2;
@@ -108,10 +109,12 @@ export default function BudgetRoute() {
       <header className="top-app-bar" style={{ maxWidth: '800px', margin: '0 auto', left: '50%', transform: 'translateX(-50%)' }}>
         <div className="logo-area">
           <button
+            type="button"
+            aria-label="이전 화면"
             onClick={() => navigate(-1)}
             className="w-11 h-11 rounded-full flex items-center justify-center bg-surface-container-lowest border border-card-border hover:bg-surface-container-high transition-colors text-on-surface"
           >
-            <span className="material-symbols-outlined text-[24px]">arrow_back</span>
+            <MaterialIcon name="arrow_back" className="text-[24px]" />
           </button>
           <span className="logo-text ml-2">재정 관리</span>
         </div>
@@ -146,7 +149,7 @@ export default function BudgetRoute() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`segmented-option ${activeTab === tab.id ? 'active' : ''}`}
               >
-                <span className="material-symbols-outlined text-sm">{tab.icon}</span>
+                <MaterialIcon name={tab.icon} className="text-sm" />
                 {tab.label}
               </button>
             ))}

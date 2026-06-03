@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import { formatDate, normalizeTime, isPastReservation } from '../../utils/time';
 import type { Purpose, ReservationWithDetails } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 interface Props {
   reservations: ReservationWithDetails[];
@@ -78,7 +79,7 @@ export default function DailySchedule({
     <div className="flex flex-col gap-3 animate-slide-up">
       {dayRes.length === 0 ? (
         <div className="glass-card rounded-[2rem] flex flex-col items-center justify-center p-12 opacity-60 border border-outline-variant/10">
-          <span className="material-symbols-outlined text-4xl mb-3 text-on-surface-variant/40">event_busy</span>
+          <MaterialIcon name="event_busy" className="text-4xl mb-3 text-on-surface-variant/40" />
           <p className="text-on-surface-variant text-sm font-medium">이 날은 예정된 합주가 없습니다.</p>
         </div>
       ) : (
@@ -177,12 +178,12 @@ export default function DailySchedule({
 
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1 text-on-surface-variant text-[11px] font-bold">
-                      <span className="material-symbols-outlined text-[14px]">person</span>
+                      <MaterialIcon name="person" className="text-[14px]" />
                       <span className="truncate max-w-[80px]">{res.host?.display_name ?? '알 수 없음'}</span>
                     </div>
                     <div className="w-1 h-1 rounded-full" style={{ backgroundColor: tone.border }}></div>
                     <div className="flex items-center gap-1 text-on-surface-variant text-[11px] font-bold">
-                      <span className="material-symbols-outlined text-[14px]">groups</span>
+                      <MaterialIcon name="groups" className="text-[14px]" />
                       <span>{res.people_count}명</span>
                     </div>
                   </div>
@@ -200,7 +201,7 @@ export default function DailySchedule({
                       onEdit(res);
                     }}
                   >
-                    <span className="material-symbols-outlined text-[18px]">settings</span>
+                    <MaterialIcon name="settings" className="text-[18px]" />
                   </button>
                   <button
                     title="삭제"
@@ -210,7 +211,7 @@ export default function DailySchedule({
                       onDelete(res.id, res.team_name);
                     }}
                   >
-                    <span className="material-symbols-outlined text-[18px]">delete</span>
+                    <MaterialIcon name="delete" className="text-[18px]" />
                   </button>
                 </div>
               )}

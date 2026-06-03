@@ -1,4 +1,5 @@
 import { useAuth } from '../context/AuthContext';
+import MaterialIcon from '../components/MaterialIcon';
 
 export default function BannedPage() {
   const { profile, signOut } = useAuth();
@@ -13,10 +14,7 @@ export default function BannedPage() {
       <div className="relative z-10 w-full max-w-sm text-center">
         {/* 아이콘 */}
         <div className="w-20 h-20 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-error/20">
-          <span className="material-symbols-outlined text-[40px] text-error"
-            style={{ fontVariationSettings: "'FILL' 1" }}>
-            block
-          </span>
+          <MaterialIcon name="block" className="text-[40px] text-error" style={{ fontVariationSettings: "'FILL' 1" }} />
         </div>
 
         <h1 className="text-2xl font-black tracking-tight text-on-surface mb-2">
@@ -48,7 +46,7 @@ export default function BannedPage() {
           onClick={signOut}
           className="w-full secondary-btn flex items-center justify-center gap-2"
         >
-          <span className="material-symbols-outlined text-[18px]">logout</span>
+          <MaterialIcon name="logout" className="text-[18px]" />
           로그아웃
         </button>
       </div>

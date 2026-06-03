@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { formatCurrency } from '../../utils/format';
+import MaterialIcon from '../MaterialIcon';
 
 interface Props {
   income: number;
@@ -12,7 +13,7 @@ function BudgetSummaryCardsComponent({ income, expense, balance }: Props) {
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10">
       <div className="surface-card p-6 relative overflow-hidden group">
         <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-          <span className="material-symbols-outlined text-emerald-500">add_circle</span>
+          <MaterialIcon name="add_circle" className="text-emerald-500" />
         </div>
         <div className="space-y-1">
           <p className="font-headline text-[2rem] font-bold text-on-surface leading-tight tracking-tight">
@@ -26,7 +27,7 @@ function BudgetSummaryCardsComponent({ income, expense, balance }: Props) {
 
       <div className="surface-card p-6 relative overflow-hidden group">
         <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-          <span className="material-symbols-outlined text-rose-500">remove_circle</span>
+          <MaterialIcon name="remove_circle" className="text-rose-500" />
         </div>
         <div className="space-y-1">
           <p className="font-headline text-[2rem] font-bold text-on-surface leading-tight tracking-tight">
@@ -43,7 +44,7 @@ function BudgetSummaryCardsComponent({ income, expense, balance }: Props) {
         style={{ background: 'var(--primary-btn-gradient)', boxShadow: 'var(--primary-glow-shadow)' }}
       >
         <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-          <span className="material-symbols-outlined text-white">account_balance_wallet</span>
+          <MaterialIcon name="account_balance_wallet" className="text-white" />
         </div>
         <div className="space-y-1">
           <p className="font-headline text-[2rem] font-bold text-white leading-tight tracking-tight">

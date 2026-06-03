@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import type { MembershipFeeMemberStatus } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 interface Props {
   record: MembershipFeeMemberStatus;
@@ -27,6 +28,8 @@ function MemberPaymentCardComponent({ record, isPending, onToggle }: Props) {
         )}
       </div>
       <button
+        type="button"
+        aria-label={`${record.displayName} 회비 ${record.isPaid ? '미납 처리' : '납부 처리'}`}
         onClick={() => onToggle(record)}
         disabled={isPending || !record.policyId}
         className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
@@ -35,9 +38,7 @@ function MemberPaymentCardComponent({ record, isPending, onToggle }: Props) {
             : 'bg-on-surface/10 text-on-surface opacity-30 hover:opacity-100 hover:bg-primary/20 hover:text-primary disabled:cursor-not-allowed disabled:opacity-20'
         }`}
       >
-        <span className="material-symbols-outlined text-sm font-black">
-          {record.isPaid ? 'check' : 'close'}
-        </span>
+        <MaterialIcon name={record.isPaid ? 'check' : 'close'} className="text-sm font-black" />
       </button>
     </div>
   );

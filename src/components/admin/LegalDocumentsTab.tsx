@@ -4,6 +4,7 @@ import { useUpdateLegalDocument } from '../../hooks/mutations/useLegalDocumentMu
 import { useToast } from '../../contexts/useToast';
 import LegalMarkdown from '../LegalMarkdown';
 import type { LegalDocument, LegalDocumentSlug } from '../../types';
+import MaterialIcon from '../MaterialIcon';
 
 interface DraftState {
   title: string;
@@ -116,9 +117,7 @@ function LegalDocumentEditor({ slug, label, defaultTitle, document }: LegalDocum
           onClick={() => setPreview((value) => !value)}
           className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/30 bg-surface-container px-4 py-2 text-xs font-bold text-on-surface-variant hover:bg-surface-container-high"
         >
-          <span className="material-symbols-outlined text-[16px]">
-            {preview ? 'edit' : 'preview'}
-          </span>
+          <MaterialIcon name={preview ? 'edit' : 'preview'} className="text-[16px]" />
           {preview ? '편집' : '미리보기'}
         </button>
       </div>

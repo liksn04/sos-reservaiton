@@ -1,0 +1,28 @@
+
+> roomin@0.0.0 test
+> vitest run src/utils/materialSymbolsReady.test.ts
+
+
+ RUN  v4.1.4 /Users/liksn04/Desktop/Coding/artifact_2/sos-reservation-t
+
+ ❯ src/utils/materialSymbolsReady.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/utils/materialSymbolsReady.test.ts [ src/utils/materialSymbolsReady.test.ts ]
+Error: Cannot find module './materialSymbolsReady' imported from /Users/liksn04/Desktop/Coding/artifact_2/sos-reservation-t/src/utils/materialSymbolsReady.test.ts
+ ❯ src/utils/materialSymbolsReady.test.ts:2:1
+      1| import { afterEach, describe, expect, it, vi } from 'vitest';
+      2| import {
+       | ^
+      3|   initMaterialSymbolsReady,
+      4|   MATERIAL_SYMBOLS_FAILED_CLASS,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  19:46:10
+   Duration  81ms (transform 13ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

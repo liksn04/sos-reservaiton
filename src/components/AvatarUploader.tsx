@@ -1,4 +1,5 @@
 import type { RefObject } from 'react';
+import MaterialIcon from './MaterialIcon';
 
 interface AvatarUploaderProps {
   currentAvatar: string | null;
@@ -21,12 +22,12 @@ export default function AvatarUploader({
           <>
             <img src={currentAvatar} alt="프로필" className="w-full h-full object-cover" />
             <div className="absolute flex inset-0 bg-black/50 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <span className="material-symbols-outlined text-white">photo_camera</span>
+              <MaterialIcon name="photo_camera" className="text-white" />
             </div>
           </>
         ) : (
           <div className="text-center text-on-surface-variant group-hover:text-primary transition-colors">
-            <span className="material-symbols-outlined text-3xl">add_a_photo</span>
+            <MaterialIcon name="add_a_photo" className="text-3xl" />
             <span className="block text-[10px] font-bold tracking-widest mt-1 uppercase">Upload</span>
           </div>
         )}
